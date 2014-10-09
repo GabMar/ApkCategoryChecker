@@ -10,19 +10,40 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
+ * This class analyze a given path: if the path point to an APK file will be called a istance of APKAnalyzer,
+ * if the path point a directory, the directory will be scanned and the APKs contained will be analyzed
+ * 
  * @author Gabriele Martini
  *
  */
 public class PathAnalyzer {
-	
-	private final ArrayList resultList = new ArrayList<>();
-        private String _path;
-        private APKAnalyzer apkAnalyzer;
-        private ToolDecoder tool_decoder;
-        private AnalyzerResult _analyzerResult; 
+    
+    /*--Attributes--*/
+    
+    /**
+     * The Arraylist of AnalyzerResult
+     */
+    private final ArrayList resultList = new ArrayList<>();
+    /**
+     * The istance of APKAnalyzer
+     */
+    private APKAnalyzer apkAnalyzer;
+    /**
+     * Istance of AnalyzerResult contained the result of a single APK
+     */
+    private AnalyzerResult _analyzerResult; 
 
-	public ArrayList Analyze(String _givenPath, boolean _keepDecodedPath) throws IOException {
-		
+    /*--Methods--*/
+    
+    /**
+     * 
+     * @param _givenPath The given path from CLI interface
+     * @param _keepDecodedPath If "true" the directory containing the decoded APK will be manteined
+     * @return Return an ArrayList of AnalyzerResult
+     * @throws IOException
+     */
+    public ArrayList Analyze(String _givenPath, boolean _keepDecodedPath) throws IOException {
+        
             File file_path = new File(_givenPath);
             
             //Check if is an APK file
@@ -45,7 +66,7 @@ public class PathAnalyzer {
                 }
             }
             
-		return this.resultList;
-	}
+        return this.resultList;
+    }
 
 }
