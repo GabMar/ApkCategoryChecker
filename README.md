@@ -12,3 +12,11 @@ The command-line parameters:
 -o 		:	The destination directory of the result's file. If this parameter is missing, the result's file will be exported on the working path
 
 -k 		:	Keep the directory of the encoded APK 
+
+3rd-part Applications:
+
+Apktool:   https://github.com/iBotPeaches/Apktool
+
+Apache Commons CSV:   http://commons.apache.org/proper/commons-csv/
+
+Apache Commons CLI:   http://commons.apache.org/proper/commons-cli/usage.html
