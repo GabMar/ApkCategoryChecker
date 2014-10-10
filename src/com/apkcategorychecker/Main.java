@@ -21,12 +21,17 @@ package com.apkcategorychecker;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import com.apkcategorychecker.analyzer.PathAnalyzer;
+import com.apkcategorychecker.writer.FactoryWriter;
+import com.apkcategorychecker.writer.Writer;
 
 
 /**
@@ -55,8 +60,8 @@ public class Main {
     /**
      * Take the Command-Line input
      * 
-     * @param args
-     * @throws IOException
+     * @param args Arguments
+     * @throws IOException Exception
      */
 	public static void main(String[] args) throws IOException {
 		

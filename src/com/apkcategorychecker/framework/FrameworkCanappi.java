@@ -25,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.apkcategorychecker.FileToString;
+import com.apkcategorychecker.tool.ToolFileToString;
 
 /**
  * Canappi Framework
@@ -118,8 +118,8 @@ public class FrameworkCanappi implements Framework{
 
             //If File
             if(search_file_path.isFile()){
-                FileToString readStringifyedFile;
-                readStringifyedFile = new FileToString();
+                ToolFileToString readStringifyedFile;
+                readStringifyedFile = new ToolFileToString();
                 String findWord = readStringifyedFile.readFile(_pathSearch);
                 this.founded = findWord.contains(_word);
 

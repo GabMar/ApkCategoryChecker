@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.tool;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +28,7 @@ import java.util.Scanner;
  *
  * @author Gabriele Martini
  */
-public class FileToString {
+public class ToolFileToString {
     
 	/**
 	 * 

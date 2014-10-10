@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.analyzer;
 
 import brut.androlib.AndrolibException;
 
@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import com.apkcategorychecker.framework.Framework;
 import com.apkcategorychecker.framework.FrameworkPool;
+import com.apkcategorychecker.tool.ToolDecoder;
 
 
 /**

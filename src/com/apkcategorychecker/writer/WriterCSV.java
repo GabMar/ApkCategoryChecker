@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.writer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -30,8 +30,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+
+import com.apkcategorychecker.analyzer.AnalyzerResult;
 
 /**
  * This class writes the results in a CSV file

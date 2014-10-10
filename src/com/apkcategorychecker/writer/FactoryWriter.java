@@ -17,23 +17,47 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.writer;
 
-import java.util.ArrayList;
 
 /**
- * This class is an interface for Writer
+ * This factory choose what kind of writer will be used based on the
+ * parameter passed from the Command-Line
  *
  * @author Gabriele Martini
  */
-public interface Writer {
+public class FactoryWriter {
     
-	/**
-	 * Write the result in a file
-	 * 
-	 * @param resultList List of results
-	 * @param _destinationPath Destination path for the file
-	 */
-    public void Write(ArrayList resultList, String _destinationPath);
+	/*Constructor*/
+    private FactoryWriter() {
+    }
     
+    /**
+     * Applying the Singleton Design-Pattern
+     * 
+     * @return
+     */
+    public static FactoryWriter getInstance() {
+        return FactoryWriterHolder.INSTANCE;
+    }
+    
+    private static class FactoryWriterHolder {
+
+        private static final FactoryWriter INSTANCE = new FactoryWriter();
+    }
+    
+    /**
+     * This method choose the writer
+     * 
+     * @param cliParameter Parameter given from the Command-Line
+     * @return
+     */
+    public Writer getWriter(String cliParameter) {
+        Writer writer = null;
+        if("csv".equals(cliParameter)){
+            writer = new WriterCSV();
+        }
+        
+        return writer;
+    }
 }
