@@ -17,89 +17,96 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.framework;
 
 import java.util.ArrayList;
 
 /**
+ * This class return a list of available Frameworks
  *
  * @author Gabriele Martini
  */
 public class FrameworkPool {
     
+	/*--Instance for Singleton Design-Pattern--*/
     private static FrameworkPool instance = null;
+    
+    /*--List of Frameworks--*/
     private final ArrayList<Framework> listOfFramework;
     
+    /*--Constructor--*/
     private FrameworkPool() {
+    	
+    	/*Creates a new ArrayList*/
         this.listOfFramework = new ArrayList<Framework>();
         
-        //Add Corvova Framework
+        /*Add Corvova Framework*/
         
         Framework Cordova;
         Cordova = new FrameworkCordova();
         this.listOfFramework.add(Cordova);
         
-        //Add Enyo Framework
+        /*Add Enyo Framework*/
         
         Framework Enyo;
         Enyo = new FrameworkEnyo();
         this.listOfFramework.add(Enyo);
         
-        //Add IUI Framework
+        /*Add IUI Framework*/
         
         Framework IUI;
         IUI = new FrameworkIUI();
         this.listOfFramework.add(IUI);
         
-        //Add Mobl Framework
+        /*Add Mobl Framework*/
         
         Framework Mobl;
         Mobl = new FrameworkMobl();
         this.listOfFramework.add(Mobl);
         
-        //Add Next Framework
+        /*Add Next Framework*/
         
         Framework Next;
         Next = new FrameworkNext();
         this.listOfFramework.add(Next);
         
-        //Add Sencha Framework
+        /*Add Sencha Framework*/
         
         Framework Sencha;
         Sencha = new FrameworkSencha();
         this.listOfFramework.add(Sencha);
         
-        //Add Canappi Framework
+        /*Add Canappi Framework*/
         
         Framework Canappi;
         Canappi = new FrameworkCanappi();
         this.listOfFramework.add(Canappi);
         
-        //Add Kivy Framework
+        /*Add Kivy Framework*/
         
         Framework Kivy;
         Kivy = new FrameworkKivy();
         this.listOfFramework.add(Kivy);
         
-        //Add MoSync Framework
+        /*Add MoSync Framework*/
         
         Framework MoSync;
         MoSync = new FrameworkMoSync();
         this.listOfFramework.add(MoSync);
         
-        //Add QuickConnect Framework
+        /*Add QuickConnect Framework*/
         
         Framework QuickConnect;
         QuickConnect = new FrameworkQuickConnect();
         this.listOfFramework.add(QuickConnect);
         
-        //Add RhoMobile Framework
+        /*Add RhoMobile Framework*/
         
         Framework RhoMobile;
         RhoMobile = new FrameworkRhoMobile();
         this.listOfFramework.add(RhoMobile);
         
-        //Add Titanium Framework
+        /*Add Titanium Framework*/
         
         Framework Titanium;
         Titanium = new FrameworkTitanium();
@@ -107,6 +114,11 @@ public class FrameworkPool {
         
     }
     
+    /**
+     * Applying Singleton Design-Pattern
+     * 
+     * @return
+     */
     public static FrameworkPool getInstance() {
     	if(instance == null) {
             instance = new FrameworkPool();
@@ -114,6 +126,11 @@ public class FrameworkPool {
          return instance;
     }
     
+    /**
+     * Get the list of Frameworks
+     * 
+     * @return
+     */
     public ArrayList<Framework> getFramework(){
         return this.listOfFramework;
     }

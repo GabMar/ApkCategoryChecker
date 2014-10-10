@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.framework;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,25 +25,39 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- *
- * @author gabriele
- */
-public class FrameworkQuickConnect implements Framework{
+import com.apkcategorychecker.FileToString;
 
-    private final String FrameworkName = "QuickConnect";
-    private boolean isCordova = false;
-    private boolean QuickConnect = false;
+/**
+ * Sencha Framework
+ *
+ * @author Gabriele Martini
+ */
+public class FrameworkSencha implements Framework{
+
+	/**
+	 * Name of Framework
+	 */
+    private final String FrameworkName = "Sencha";
+    
+    /**
+     * Boolean to check if this Framework uses Apache Cordova
+     */
+    private final boolean isCordova = true;
+    
+    /**
+     * Boolean to check if the APK matches the Framework
+     */
+    private boolean Sencha = false;
+    
+    /**
+     * Boolean used by the method searchString
+     */
     private boolean founded = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        File isdirqc = new File(_pathToAnalyze + "/assets/QCJSLib");
-        this.QuickConnect = isdirqc.exists();
-        if(!this.QuickConnect){
-            this.QuickConnect = this.searchString(_pathToAnalyze, "qc.handleError");
-        }
-        return this.QuickConnect;
+        this.Sencha = this.searchString(_pathToAnalyze + "/assets/www/", "Sencha");
+        return this.Sencha;
     }
 
     @Override
@@ -85,10 +99,17 @@ public class FrameworkQuickConnect implements Framework{
     
     @Override
     public void setoff(){
-        this.QuickConnect = false;
+        this.Sencha = false;
         this.founded = false;
     };
     
+    /**
+     * Method to search a given string in a file
+     * 
+     * @param _pathSearch Path of file
+     * @param _word Word to search
+     * @return
+     */
     private boolean searchString(String _pathSearch, String _word){
         
         if(this.founded == false){

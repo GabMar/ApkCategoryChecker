@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.framework;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,21 +25,43 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- *
- * @author gabriele
- */
-public class FrameworkMobl implements Framework{
+import com.apkcategorychecker.FileToString;
 
-    private final String FrameworkName = "Mobl";
-    private final boolean isCordova = true;
-    private boolean Mobl = false;
+/**
+ * RhoMobile Framework
+ *
+ * @author Gabriele Martini
+ */
+public class FrameworkRhoMobile implements Framework{
+
+	/**
+	 * Name of Framework
+	 */
+    private final String FrameworkName = "RhoMobile";
+    
+    /**
+     * Boolean to check if this Framework uses Apache Cordova
+     */
+    private boolean isCordova = false;
+    
+    /**
+     * Boolean to check if the APK matches the Framework
+     */
+    private boolean RhoMobile = false;
+    
+    /**
+     * Boolean used by the method searchString
+     */
     private boolean founded = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Mobl = this.searchString(_pathToAnalyze + "/assets/www/", "mobl");
-        return this.Mobl;
+        File isdirqc = new File(_pathToAnalyze + "/assets/rho.dat");
+        this.RhoMobile = isdirqc.exists();
+        if(!this.RhoMobile){
+            this.RhoMobile = this.searchString(_pathToAnalyze, "rhomobile");
+        }
+        return this.RhoMobile;
     }
 
     @Override
@@ -81,10 +103,17 @@ public class FrameworkMobl implements Framework{
     
     @Override
     public void setoff(){
-        this.Mobl = false;
+        this.RhoMobile = false;
         this.founded = false;
     };
     
+    /**
+     * Method to search a given string in a file
+     * 
+     * @param _pathSearch Path of file
+     * @param _word Word to search
+     * @return
+     */
     private boolean searchString(String _pathSearch, String _word){
         
         if(this.founded == false){

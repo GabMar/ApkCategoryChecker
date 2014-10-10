@@ -22,11 +22,18 @@ package com.apkcategorychecker;
 import java.util.ArrayList;
 
 /**
+ * This class is an interface for Writer
  *
  * @author Gabriele Martini
  */
 public interface Writer {
     
+	/**
+	 * Write the result in a file
+	 * 
+	 * @param resultList List of results
+	 * @param _destinationPath Destination path for the file
+	 */
     public void Write(ArrayList resultList, String _destinationPath);
     
 }

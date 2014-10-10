@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.framework;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,21 +25,39 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.apkcategorychecker.FileToString;
+
 /**
+ * Next Framework
  *
- * @author gabriele
+ * @author Gabriele Martini
  */
-public class FrameworkCordova implements Framework {
+public class FrameworkNext implements Framework{
+
+	/**
+	 * Name of Framework
+	 */
+    private final String FrameworkName = "Next";
     
-    private final String FrameworkName = "Apache Cordova";
+    /**
+     * Boolean to check if this Framework uses Apache Cordova
+     */
     private final boolean isCordova = true;
-    private boolean Cordova = false;
+    
+    /**
+     * Boolean to check if the APK matches the Framework
+     */
+    private boolean Next = false;
+    
+    /**
+     * Boolean used by the method searchString
+     */
     private boolean founded = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Cordova = this.searchString(_pathToAnalyze+"/res/xml/config.xml", "org.apache.cordova.App");
-        return this.Cordova;
+        this.Next = this.searchString(_pathToAnalyze + "/assets/www/", "nextwebapp");
+        return this.Next;
     }
 
     @Override
@@ -81,10 +99,17 @@ public class FrameworkCordova implements Framework {
     
     @Override
     public void setoff(){
-        this.Cordova = false;
+        this.Next = false;
         this.founded = false;
     };
     
+    /**
+     * Method to search a given string in a file
+     * 
+     * @param _pathSearch Path of file
+     * @param _word Word to search
+     * @return
+     */
     private boolean searchString(String _pathSearch, String _word){
         
         if(this.founded == false){
@@ -111,6 +136,5 @@ public class FrameworkCordova implements Framework {
         }
         return this.founded;
     }
-
     
 }

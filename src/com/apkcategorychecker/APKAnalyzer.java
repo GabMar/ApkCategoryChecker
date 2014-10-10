@@ -20,11 +20,15 @@
 package com.apkcategorychecker;
 
 import brut.androlib.AndrolibException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.apkcategorychecker.framework.Framework;
+import com.apkcategorychecker.framework.FrameworkPool;
 
 
 /**

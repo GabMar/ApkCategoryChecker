@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.framework;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,21 +25,39 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- *
- * @author gabriele
- */
-public class FrameworkNext implements Framework{
+import com.apkcategorychecker.FileToString;
 
-    private final String FrameworkName = "Next";
-    private final boolean isCordova = true;
-    private boolean Next = false;
+/**
+ * Canappi Framework
+ *
+ * @author Gabriele Martini
+ */
+public class FrameworkCanappi implements Framework{
+
+	/**
+	 * Name of Framework
+	 */
+    private final String FrameworkName = "Canappi";
+    
+    /**
+     * Boolean to check if this Framework uses Apache Cordova
+     */
+    private boolean isCordova = false;
+    
+    /**
+     * Boolean to check if the APK matches the Framework
+     */
+    private boolean Canappi = false;
+    
+    /**
+     * Boolean used by the method searchString
+     */
     private boolean founded = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Next = this.searchString(_pathToAnalyze + "/assets/www/", "nextwebapp");
-        return this.Next;
+        this.Canappi = this.searchString(_pathToAnalyze, "canappi");
+        return this.Canappi;
     }
 
     @Override
@@ -81,10 +99,18 @@ public class FrameworkNext implements Framework{
     
     @Override
     public void setoff(){
-        this.Next = false;
+        this.Canappi = false;
         this.founded = false;
     };
     
+    
+    /**
+     * Method to search a given string in a file
+     * 
+     * @param _pathSearch Path of file
+     * @param _word Word to search
+     * @return
+     */
     private boolean searchString(String _pathSearch, String _word){
         
         if(this.founded == false){

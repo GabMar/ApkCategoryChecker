@@ -30,30 +30,47 @@ import org.apache.commons.cli.ParseException;
 
 
 /**
+ * 
+ * Main class
  * @author Gabriele Martini
  *
  */
 public class Main {
 
 	/**
-	 * @param args
+	 * String of given path
 	 */
-	private static String _CSVPath;
 	private static String _givenPath;
-        private static ArrayList resultList = new ArrayList<>();
-        private static String _choosedResultFormat;
 	
+	/**
+	 * List of results
+	 */
+    private static ArrayList resultList = new ArrayList<>();
+    
+    /**
+     * Choosed format of output results
+     */
+    private static String _choosedResultFormat;
+	
+    /**
+     * Take the Command-Line input
+     * 
+     * @param args
+     * @throws IOException
+     */
 	public static void main(String[] args) throws IOException {
 		
-		//CLI options creation
+		/*--CLI options creation--*/
 		
 		Options options = new Options();
+		
+		/*--Add options--*/
 		options.addOption("p", true, "Path of APK or Directory containing APKs");
 		options.addOption("csv", false, "To obtain a CSV file result");
-                options.addOption("o", true, "Destination path for file result");
-                options.addOption("k", false, "Keep the decoded APK on the filesystem");
+        options.addOption("o", true, "Destination path for file result");
+        options.addOption("k", false, "Keep the decoded APK on the filesystem");
 		
-		//CLI parser
+		/*--CLI parser--*/
 		
 		CommandLineParser parser = new BasicParser();
 		CommandLine cmd;
@@ -61,54 +78,63 @@ public class Main {
 			cmd = parser.parse(options, args);
 		}catch (ParseException pe){ usage(options); return; }
 		
-		//CLI option switch
+		/*--CLI options switch--*/
 		
 		if(cmd.hasOption("p")){
-                    _givenPath = cmd.getOptionValue("p");
-                    
-                    //Analyzer Instance
-                    
-                    PathAnalyzer analyzer;
-                    analyzer = new PathAnalyzer();
-                    
-                    //Boolean for the Decoded Apk
-                    
-                    boolean _keep = false;
-                    if(cmd.hasOption("k")){ 
-                        _keep = true;
-                    }
-                    
-                    //Analyze given path; return a ArrayList of results
-                    
-                    resultList = analyzer.Analyze(_givenPath, _keep);
-                    
-                    //Writing results in a file
-                    
-                    Writer writer;
-                    
-                    //Instance a different writer depending on passed cli option
-                    
-                    if(cmd.hasOption("csv")){
-                        _choosedResultFormat = "csv";
-                    }
-                    
-                    writer = FactoryWriter.getInstance().getWriter(_choosedResultFormat);
-                    
-                    //Create a choosed format file in a given path or in the current directory 
-                    //depending on passed optionn's argument 
-                    if(cmd.hasOption("o")){
-                        writer.Write(resultList, cmd.getOptionValue("o"));
-                    }else {
-                        writer.Write(resultList, System.getProperty("user.dir"));
-                    }
+			
+			/*--Take the given path--*/
+            _givenPath = cmd.getOptionValue("p");
+            
+            /*--Instance of new Analyzer--*/
+            
+            PathAnalyzer analyzer;
+            analyzer = new PathAnalyzer();
+            
+            /*--If k parameter is passed, the directory of decoded APK will be mantained--*/
+            
+            boolean _keep = false;
+            if(cmd.hasOption("k")){ 
+                _keep = true;
+            }
+            
+            /*--Analyze given path; return a ArrayList of results--*/
+            
+            resultList = analyzer.Analyze(_givenPath, _keep);
+            
+            /*--Writing results in a file--*/
+            
+            Writer writer;
+            
+            /*--Instance a different writer depending on passed cli option--*/
+            
+            if(cmd.hasOption("csv")){
+                _choosedResultFormat = "csv";
+            }
+            
+            writer = FactoryWriter.getInstance().getWriter(_choosedResultFormat);
+            
+            /*--Create a choosed format file in a given path or in the current directory 
+            *depending on passed optionn's argument
+            */
+            
+            if(cmd.hasOption("o")){
+                writer.Write(resultList, cmd.getOptionValue("o"));
+            }else {
+                writer.Write(resultList, System.getProperty("user.dir"));
+            }
 		}
 		
 
 	}
 	
+	/**
+	 * Methos to print the Command-Line Helper
+	 * 
+	 * @param options CLI Options
+	 */
 	private static void usage(Options options){
 
-		// Command line Help Usage
+		/*--Command line Help Usage--*/
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp( "CategoryChecker", options );
 	}

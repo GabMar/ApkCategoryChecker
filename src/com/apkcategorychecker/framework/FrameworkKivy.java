@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.framework;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,21 +25,39 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.apkcategorychecker.FileToString;
+
 /**
+ * Kivy Framework
  *
- * @author gabriele
+ * @author Gabriele Martini
  */
-public class FrameworkEnyo implements Framework {
+public class FrameworkKivy implements Framework{
+
+	/**
+	 * Name of Framework
+	 */
+    private final String FrameworkName = "Kivy";
     
-    private final String FrameworkName = "Enyo";
-    private final boolean isCordova = true;
-    private boolean Enyo = false;
+    /**
+     * Boolean to check if this Framework uses Apache Cordova
+     */
+    private boolean isCordova = false;
+    
+    /**
+     * Boolean to check if the APK matches the Framework
+     */
+    private boolean Kivy = false;
+    
+    /**
+     * Boolean used by the method searchString
+     */
     private boolean founded = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Enyo = this.searchString(_pathToAnalyze + "/assets/www/", "enyo");
-        return this.Enyo;
+        this.Kivy = this.searchString(_pathToAnalyze+"/AndroidManifest.xml", "PythonActivity");
+        return this.Kivy;
     }
 
     @Override
@@ -81,10 +99,17 @@ public class FrameworkEnyo implements Framework {
     
     @Override
     public void setoff(){
-        this.Enyo = false;
+        this.Kivy = false;
         this.founded = false;
     };
     
+    /**
+     * Method to search a given string in a file
+     * 
+     * @param _pathSearch Path of file
+     * @param _word Word to search
+     * @return
+     */
     private boolean searchString(String _pathSearch, String _word){
         
         if(this.founded == false){

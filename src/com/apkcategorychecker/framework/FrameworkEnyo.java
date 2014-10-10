@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.framework;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,21 +25,39 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.apkcategorychecker.FileToString;
+
 /**
+ * Enyo Framework
  *
- * @author gabriele
+ * @author Gabriele Martini
  */
-public class FrameworkIUI implements Framework{
+public class FrameworkEnyo implements Framework {
     
-    private final String FrameworkName = "IUI";
+	/**
+	 * Name of Framework
+	 */
+    private final String FrameworkName = "Enyo";
+    
+    /**
+     * Boolean to check if this Framework uses Apache Cordova
+     */
     private final boolean isCordova = true;
-    private boolean IUI = false;
+    
+    /**
+     * Boolean to check if the APK matches the Framework
+     */
+    private boolean Enyo = false;
+    
+    /**
+     * Boolean used by the method searchString
+     */
     private boolean founded = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.IUI = this.searchString(_pathToAnalyze + "/assets/www/", "iui");
-        return this.IUI;
+        this.Enyo = this.searchString(_pathToAnalyze + "/assets/www/", "enyo");
+        return this.Enyo;
     }
 
     @Override
@@ -81,10 +99,17 @@ public class FrameworkIUI implements Framework{
     
     @Override
     public void setoff(){
-        this.IUI = false;
+        this.Enyo = false;
         this.founded = false;
     };
     
+    /**
+     * Method to search a given string in a file
+     * 
+     * @param _pathSearch Path of file
+     * @param _word Word to search
+     * @return
+     */
     private boolean searchString(String _pathSearch, String _word){
         
         if(this.founded == false){

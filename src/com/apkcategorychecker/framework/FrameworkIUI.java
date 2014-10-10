@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.apkcategorychecker;
+package com.apkcategorychecker.framework;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,21 +25,39 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- *
- * @author gabriele
- */
-public class FrameworkTitanium implements Framework{
+import com.apkcategorychecker.FileToString;
 
-    private final String FrameworkName = "Titanium";
-    private boolean isCordova = false;
-    private boolean Titanium = false;
+/**
+ * IUI Framework
+ *
+ * @author Gabriele Martini
+ */
+public class FrameworkIUI implements Framework{
+    
+	/**
+	 * Name of Framework
+	 */
+    private final String FrameworkName = "IUI";
+    
+    /**
+     * Boolean to check if this Framework uses Apache Cordova
+     */
+    private final boolean isCordova = true;
+    
+    /**
+     * Boolean to check if the APK matches the Framework
+     */
+    private boolean IUI = false;
+    
+    /**
+     * Boolean used by the method searchString
+     */
     private boolean founded = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Titanium = this.searchString(_pathToAnalyze, "org.appcelerator.titanium");
-        return this.Titanium;
+        this.IUI = this.searchString(_pathToAnalyze + "/assets/www/", "iui");
+        return this.IUI;
     }
 
     @Override
@@ -81,10 +99,17 @@ public class FrameworkTitanium implements Framework{
     
     @Override
     public void setoff(){
-        this.Titanium = false;
+        this.IUI = false;
         this.founded = false;
     };
     
+    /**
+     * Method to search a given string in a file
+     * 
+     * @param _pathSearch Path of file
+     * @param _word Word to search
+     * @return
+     */
     private boolean searchString(String _pathSearch, String _word){
         
         if(this.founded == false){

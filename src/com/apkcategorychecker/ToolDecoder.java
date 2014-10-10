@@ -25,30 +25,67 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * This class decode an APK in a directory with the name of APK
  *
  * @author Gabriele Martini
  */
 public class ToolDecoder {
     
+	/**
+	 * Instance of ApkDecoder
+	 */
     private final ApkDecoder decoder = new ApkDecoder();
+    
+    /**
+     * Name of choosed APK
+     */
     private String ApkChoosedName;
+    
+    /**
+     * Path of APK
+     */
     private String ApkPath;
+    
+    /**
+     * Path of output directory
+     */
     private File outDir;
     
+    /**
+     * Method to decode an APK file using Apktool
+     * 
+     * @param _apkPath Path of APK file
+     * @return
+     * @throws AndrolibException
+     */
     public String DecodeApk(String _apkPath) throws AndrolibException{
         
         try {
-                File ApkChoosed = new File(_apkPath);
+        		/*--Create new file from given path--*/
+                
+        		File ApkChoosed = new File(_apkPath);
+                
+                /*--Set the APK file--*/
+        		
                 decoder.setApkFile(ApkChoosed);
+                
+                /*--Retrieve the name of the APK to give the name to the output directory--*/
+                
                 int ApkChoosedNameLength = ApkChoosed.getName().length();
                 ApkChoosedName = ApkChoosed.getName();
                 ApkChoosedName = ApkChoosedName.substring(0, ApkChoosedNameLength - 4);
+                
+                /*--Set the output directory--*/
+                
                 outDir = new File(_apkPath.substring(0, _apkPath.length() - 4));
                 ApkPath = outDir.getAbsolutePath();
                 try {
                         decoder.setOutDir(outDir);
                 } catch (AndrolibException e) {
                 }
+                
+                /*--Decode the APK with Apktool--*/
+                
                 try {
                         decoder.decode();
                 } catch (AndrolibException e) {
