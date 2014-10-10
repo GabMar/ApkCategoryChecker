@@ -48,6 +48,11 @@ public class Main {
 	private static String _givenPath;
 	
 	/**
+	 * String of current directory
+	 */
+	private static String _currentDirectory = System.getProperty("user.dir");
+	
+	/**
 	 * List of results
 	 */
     private static ArrayList resultList = new ArrayList<>();
@@ -71,6 +76,7 @@ public class Main {
 		
 		/*--Add options--*/
 		options.addOption("p", true, "Path of APK or Directory containing APKs");
+		options.addOption("d", false, "Use current directory");
 		options.addOption("csv", false, "To obtain a CSV file result");
         options.addOption("o", true, "Destination path for file result");
         options.addOption("k", false, "Keep the decoded APK on the filesystem");
@@ -89,45 +95,51 @@ public class Main {
 			
 			/*--Take the given path--*/
             _givenPath = cmd.getOptionValue("p");
-            
-            /*--Instance of new Analyzer--*/
-            
-            PathAnalyzer analyzer;
-            analyzer = new PathAnalyzer();
-            
-            /*--If k parameter is passed, the directory of decoded APK will be mantained--*/
-            
-            boolean _keep = false;
-            if(cmd.hasOption("k")){ 
-                _keep = true;
-            }
-            
-            /*--Analyze given path; return a ArrayList of results--*/
-            
-            resultList = analyzer.Analyze(_givenPath, _keep);
-            
-            /*--Writing results in a file--*/
-            
-            Writer writer;
-            
-            /*--Instance a different writer depending on passed cli option--*/
-            
-            if(cmd.hasOption("csv")){
-                _choosedResultFormat = "csv";
-            }
-            
-            writer = FactoryWriter.getInstance().getWriter(_choosedResultFormat);
-            
-            /*--Create a choosed format file in a given path or in the current directory 
-            *depending on passed optionn's argument
-            */
-            
-            if(cmd.hasOption("o")){
-                writer.Write(resultList, cmd.getOptionValue("o"));
-            }else {
-                writer.Write(resultList, System.getProperty("user.dir"));
-            }
+		
 		}
+		
+		if(cmd.hasOption("d")){
+			
+			_givenPath = _currentDirectory;
+		}
+		
+		/*--If k parameter is passed, the directory of decoded APK will be mantained--*/
+        
+        boolean _keep = false;
+        if(cmd.hasOption("k")){ 
+            _keep = true;
+        }
+		
+		/*--Instance of new Analyzer--*/
+        
+        PathAnalyzer analyzer;
+        analyzer = new PathAnalyzer();
+        
+        /*--Analyze given path; return a ArrayList of results--*/
+        
+        resultList = analyzer.Analyze(_givenPath, _keep);
+        
+        /*--Writing results in a file--*/
+        
+        Writer writer;
+        
+        /*--Instance a different writer depending on passed cli option--*/
+        
+        if(cmd.hasOption("csv")){
+            _choosedResultFormat = "csv";
+        }
+        
+        writer = FactoryWriter.getInstance().getWriter(_choosedResultFormat);
+        
+        /*--Create a choosed format file in a given path or in the current directory 
+        *depending on passed optionn's argument
+        */
+        
+        if(cmd.hasOption("o")){
+            writer.Write(resultList, cmd.getOptionValue("o"));
+        }else {
+            writer.Write(resultList, _currentDirectory);
+        }
 		
 
 	}
