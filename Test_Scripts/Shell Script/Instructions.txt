@@ -1,0 +1,5 @@
+In a terminal:
+
+chmod u+x Shell_Script.sh
+
+./Shell_Script.sh
