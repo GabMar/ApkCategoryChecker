@@ -23,6 +23,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.apkcategorychecker.cli.CommandLineInterface;
+import com.apkcategorychecker.writer.FactoryWriter;
+import com.apkcategorychecker.writer.Writer;
+
 /**
  * This class analyze a given path: if the path point to an APK file will be called a istance of APKAnalyzer,
  * if the path point a directory, the directory will be scanned and the APKs contained will be analyzed
@@ -59,9 +63,66 @@ public class PathAnalyzer {
      * @return 
      * @throws IOException
      */
-    public ArrayList Analyze(String _givenPath, boolean _keepDecodedPath) throws IOException {
+    public void Analyze(String[] args) throws IOException {
+    	
+    	/*--Get the path to analyze from the command-line--*/
+    	
+    	String givenPath = CommandLineInterface.getInstance(args).getPath();
+		
+    	/*--Get the boolean keep--*/
+    	
+    	boolean keepDecodedPath = CommandLineInterface.getInstance(args).getKeep();
+    	
+    	/*--Get the format of result file--*/
+    	
+    	String _format = CommandLineInterface.getInstance(args).getWriterFormat();
+    	
+    	/*--Get the output directory pf result file--*/
+    	
+    	String _outDir = CommandLineInterface.getInstance(args).getOutDir();
+		
+    	/*--Analyze the Path--*/
+    	
+		this.AnalyzePath(givenPath, keepDecodedPath);
         
-    	/*--Create a new file from given path--*/
+    	/*--Write the results in a file--*/
+		
+		this.Write(_format, _outDir, this._analyzerResult);
+    }
+
+    /**
+     * Write the results in a file
+     * 
+     * @param format Format of result file
+     * @param outDir Directory of result file
+     * @param analyzerResult List of results
+     */
+    private void Write(String format, String outDir, AnalyzerResult analyzerResult) {
+		
+    	/*--Instance of Writer--*/
+    	
+    	Writer writer;
+    	
+    	/*--Choose the correct writer--*/
+    	
+    	writer = FactoryWriter.getInstance().getWriter(format);
+    	
+    	/*--Write the results--*/
+    	
+    	writer.Write(resultList, outDir);
+		
+	}
+
+	/**
+     * Recursive method to find through a directory
+     * 
+     * @param _givenPath Path to analyze
+     * @param _keepDecodedPath If "true" the directory containing the decoded APK will be maintained
+     * @throws IOException
+     */
+	private void AnalyzePath(String _givenPath, boolean _keepDecodedPath) throws IOException {
+		
+		/*--Create a new file from given path--*/
     	
         File file_path = new File(_givenPath);
         
@@ -79,14 +140,13 @@ public class PathAnalyzer {
             for (int i = 0; i < length; i++) {
                 if (listOfFiles[i].isFile()) {
                     //Decode
-                    this.Analyze(listOfFiles[i].getAbsolutePath(), _keepDecodedPath);
+                    this.AnalyzePath(listOfFiles[i].getAbsolutePath(), _keepDecodedPath);
                   } else if (listOfFiles[i].isDirectory()) {
-                        this.Analyze(listOfFiles[i].getPath(), _keepDecodedPath);
+                        this.AnalyzePath(listOfFiles[i].getPath(), _keepDecodedPath);
                   }
             }
         }
-            
-        return this.resultList;
-    }
+		
+	}
 
 }
