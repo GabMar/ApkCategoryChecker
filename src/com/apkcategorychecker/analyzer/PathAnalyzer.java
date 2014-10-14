@@ -63,23 +63,23 @@ public class PathAnalyzer {
      * @return 
      * @throws IOException
      */
-    public void Analyze(String[] args) throws IOException {
+    public void Analyze() throws IOException {
     	
     	/*--Get the path to analyze from the command-line--*/
     	
-    	String givenPath = CommandLineInterface.getInstance(args).getPath();
+    	String givenPath = CommandLineInterface.getInstance().getPath();
 		
     	/*--Get the boolean keep--*/
     	
-    	boolean keepDecodedPath = CommandLineInterface.getInstance(args).getKeep();
+    	boolean keepDecodedPath = CommandLineInterface.getInstance().getKeep();
     	
     	/*--Get the format of result file--*/
     	
-    	String _format = CommandLineInterface.getInstance(args).getWriterFormat();
+    	String _format = CommandLineInterface.getInstance().getWriterFormat();
     	
     	/*--Get the output directory pf result file--*/
     	
-    	String _outDir = CommandLineInterface.getInstance(args).getOutDir();
+    	String _outDir = CommandLineInterface.getInstance().getOutDir();
 		
     	/*--Analyze the Path--*/
     	

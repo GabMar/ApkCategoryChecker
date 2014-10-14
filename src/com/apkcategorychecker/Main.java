@@ -42,7 +42,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		
 		/*--Initializing Command Line Interface--*/
-		CommandLineInterface.getInstance(args);
+		CommandLineInterface.getInstance().Initialize(args);
 		
 		/*--Instance of new Analyzer--*/
         
@@ -51,7 +51,7 @@ public class Main {
         
         /*--Analyze given path--*/
         
-        analyzer.Analyze(args);
+        analyzer.Analyze();
 
 	}
 	

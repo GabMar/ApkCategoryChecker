@@ -65,56 +65,9 @@ public class CommandLineInterface {
 	/**
 	 * Private Constructor - Pattern Singleton
 	 */
-	private CommandLineInterface(String[] args) {
+	private CommandLineInterface() {
 	
-		/*--CLI options creation--*/
 		
-		Options options = new Options();
-		
-		/*--Add options--*/
-		options.addOption("p", true, "Path of APK or Directory containing APKs");
-		options.addOption("d", false, "Use current directory");
-		options.addOption("csv", false, "To obtain a CSV file result");
-        options.addOption("o", true, "Destination path for file result");
-        options.addOption("k", false, "Keep the decoded APK on the filesystem");
-		
-		/*--CLI parser--*/
-		
-		CommandLineParser parser = new BasicParser();
-		CommandLine cmd;
-		try{
-			cmd = parser.parse(options, args);
-		}catch (ParseException pe){ usage(options); return; }
-		
-		/*--CLI options switch--*/
-		
-		if(cmd.hasOption("p")){
-			
-			/*--Take the given path--*/
-            this._givenPath = cmd.getOptionValue("p");
-		
-		}
-		
-		if(cmd.hasOption("d")){
-			
-			this._givenPath = _currentDirectory;
-		}
-		
-		/*--If k parameter is passed, the directory of decoded APK will be maintained--*/
-        
-        if(cmd.hasOption("k")){ 
-            this._keep = true;
-        }
-        
-        if(cmd.hasOption("csv")){
-        	this._choosedResultFormat = "csv";
-        }
-        
-        if(cmd.hasOption("o")){
-        	this._outDir = cmd.getOptionValue("o");
-        }else {
-        	this._outDir = _currentDirectory;
-        }
 	}
 	
 	/* --Methods--*/
@@ -123,9 +76,9 @@ public class CommandLineInterface {
 	 * 
 	 * @return
 	 */
-	public static CommandLineInterface getInstance(String[] args) {
+	public static CommandLineInterface getInstance() {
     	if(instance == null) {
-            instance = new CommandLineInterface(args);
+            instance = new CommandLineInterface();
          }
          return instance;
     }
@@ -176,6 +129,59 @@ public class CommandLineInterface {
 		/*--Command line Help Usage--*/
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp( "CategoryChecker", options );
+	}
+
+	public void Initialize(String[] args) {
+
+		/*--CLI options creation--*/
+		
+		Options options = new Options();
+		
+		/*--Add options--*/
+		options.addOption("p", true, "Path of APK or Directory containing APKs");
+		options.addOption("d", false, "Use current directory");
+		options.addOption("csv", false, "To obtain a CSV file result");
+        options.addOption("o", true, "Destination path for file result");
+        options.addOption("k", false, "Keep the decoded APK on the filesystem");
+		
+		/*--CLI parser--*/
+		
+		CommandLineParser parser = new BasicParser();
+		CommandLine cmd;
+		try{
+			cmd = parser.parse(options, args);
+		}catch (ParseException pe){ usage(options); return; }
+		
+		/*--CLI options switch--*/
+		
+		if(cmd.hasOption("p")){
+			
+			/*--Take the given path--*/
+            this._givenPath = cmd.getOptionValue("p");
+		
+		}
+		
+		if(cmd.hasOption("d")){
+			
+			this._givenPath = _currentDirectory;
+		}
+		
+		/*--If k parameter is passed, the directory of decoded APK will be maintained--*/
+        
+        if(cmd.hasOption("k")){ 
+            this._keep = true;
+        }
+        
+        if(cmd.hasOption("csv")){
+        	this._choosedResultFormat = "csv";
+        }
+        
+        if(cmd.hasOption("o")){
+        	this._outDir = cmd.getOptionValue("o");
+        }else {
+        	this._outDir = _currentDirectory;
+        }
+		
 	}
 
 }
