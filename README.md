@@ -4,7 +4,7 @@ Author: [Gabriele Martini](https://github.com/GabMar)
 
 ## DESCRIPTION ##
 
-A Command-Line Program written in Java to decode the APK using ApkTool and check what Framework it's been used to build the APK.
+A Command-Line Program written in [Java](http://en.wikipedia.org/wiki/Java_%28programming_language%29) to decode an APK file or a directory containing APK files using ApkTool and check what Framework it's been used to build the APK.
 
 ## COMMAND LINE PARAMETERS ##
 
@@ -13,7 +13,7 @@ A Command-Line Program written in Java to decode the APK using ApkTool and check
 
 * `-d` : Use current directory
 
-* `-csv` : Export the results in a CSV file
+* `-csv` : Export the results in a [CSV](http://it.wikipedia.org/wiki/Comma-separated_values) file
 
 * `-o` : The destination directory of the result's file. If this parameter is missing, the result's file will be exported on the working path
 
@@ -25,7 +25,7 @@ A Command-Line Program written in Java to decode the APK using ApkTool and check
 
 	`java -jar ApkCategoryChecker.jar -d -csv`
 
-* To analyze a directory or an APK file and put the CSV result file in a different directory, open a terminal, navgate in the directory containing the 'ApkCategoryChecker.jar' file and type:
+* To analyze a directory or an APK file and put the CSV result file in a different directory, open a terminal, navigate in the directory containing the 'ApkCategoryChecker.jar' file and type:
 
 	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv -o /Destination/Path/for/Result/File`
 
