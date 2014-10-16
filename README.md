@@ -39,7 +39,7 @@ This software requires Java 1.7 or higher
 
 ## LICENSE ##
 
-Copyright (C) <2014>  <Gabriele Martini>
+Copyright (C) 2014  Gabriele Martini
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
