@@ -1,6 +1,6 @@
 # Apk Category Checker #
 
-Author: Gabriele Martini
+Author: [Gabriele Martini](https://github.com/GabMar)
 
 ## DESCRIPTION ##
 
@@ -20,6 +20,8 @@ A Command-Line Program written in Java to decode the APK using ApkTool and check
 * `-k` : Keep the directory of the encoded APK 
 
 ## USAGE EXAMPLE ##
+
+This software requires Java 1.7 or higher
 
 * To analyze the directory containing the `ApkCategoryChecker.jar` and put the CSV result file in the same directory, open a terminal, navigate in the directory and type:
 
