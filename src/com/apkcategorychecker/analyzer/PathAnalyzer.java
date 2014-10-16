@@ -41,7 +41,7 @@ public class PathAnalyzer {
     /**
      * The Arraylist of AnalyzerResult
      */
-    private final ArrayList resultList = new ArrayList<>();
+    private final ArrayList<AnalyzerResult> resultList = new ArrayList<AnalyzerResult>();
     
     /**
      * The istance of APKAnalyzer

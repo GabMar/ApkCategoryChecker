@@ -21,6 +21,8 @@ package com.apkcategorychecker.writer;
 
 import java.util.ArrayList;
 
+import com.apkcategorychecker.analyzer.AnalyzerResult;
+
 /**
  * This class is an interface for Writer
  *
@@ -34,6 +36,6 @@ public interface Writer {
 	 * @param resultList List of results
 	 * @param _destinationPath Destination path for the file
 	 */
-    public void Write(ArrayList resultList, String _destinationPath);
+    public void Write(ArrayList<AnalyzerResult> resultList, String _destinationPath);
     
 }

@@ -46,11 +46,6 @@ public class ToolDecoder {
     private String ApkChoosedName;
     
     /**
-     * Path of APK
-     */
-    private String ApkPath;
-    
-    /**
      * Path of output directory
      */
     private File outDir;
@@ -82,7 +77,7 @@ public class ToolDecoder {
                 /*--Set the output directory--*/
                 
                 outDir = new File(_apkPath.substring(0, _apkPath.length() - 4));
-                ApkPath = outDir.getAbsolutePath();
+
                 try {
                         decoder.setOutDir(outDir);
                 } catch (AndrolibException e) {

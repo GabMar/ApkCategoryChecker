@@ -49,7 +49,7 @@ public class WriterCSV implements Writer {
     private String _destPath;
 
     @Override
-    public void Write(ArrayList resultList, String _destinationPath) {
+    public void Write(ArrayList<AnalyzerResult> resultList, String _destinationPath) {
         
         try {
 
@@ -58,6 +58,9 @@ public class WriterCSV implements Writer {
             */
             
             File Destination = new File(_destinationPath);
+            if(!Destination.exists()){
+            	Destination.mkdir();
+            }
             if(Destination.isDirectory()){
                 this._destPath = _destinationPath;
             }else if(Destination.isFile()){
