@@ -8,16 +8,13 @@ A Command-Line Program written in [Java](http://en.wikipedia.org/wiki/Java_%28pr
 
 ## COMMAND LINE PARAMETERS ##
 
-
-* `-p` : The Path of an APK or the Path of a directory containing APKs
-
-* `-d` : Use current directory
-
-* `-csv` : Export the results in a [CSV](http://it.wikipedia.org/wiki/Comma-separated_values) file
-
-* `-o` : The destination directory of the result's file. If this parameter is missing, the result's file will be exported on the working path
-
-* `-k` : Keep the directory of the encoded APK 
+Parameter | Description
+----------|------------
+`-p` | The Path of an APK or the Path of a directory containing APKs
+`-d` | Use current directory
+`-csv` | Export the results in a [CSV](http://it.wikipedia.org/wiki/Comma-separated_values) file
+`-o` | The destination directory of the result's file. If this parameter is missing, the result's file will be exported on the working path
+`-k` | Keep the directory of the encoded APK 
 
 ## USAGE EXAMPLE ##
 
