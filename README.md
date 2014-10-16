@@ -1,9 +1,12 @@
-ApkCategoryChecker
+# Apk Category Checker #
 ==================
+
+## DESCRIPTION ##
 
 A Command-Line Program written in Java to decode the APK using ApkTool and check what Framework it's been used to build the APK.
 
-<b>The command-line parameters:</b>
+## Command Line Parameters ##
+
 
 -p 		: 	The Path of an APK or the Path of a directory containing APKs
 
@@ -15,7 +18,7 @@ A Command-Line Program written in Java to decode the APK using ApkTool and check
 
 -k 		:	Keep the directory of the encoded APK 
 
-<b>3rd-part Applications:</b>
+## 3rd-part Applications: ##
 
 Apktool:   https://github.com/iBotPeaches/Apktool
 
