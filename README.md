@@ -1,4 +1,4 @@
-# Apk Category Checker #
+# APK CATEGORY CHECKER #
 
 Author: [Gabriele Martini](https://github.com/GabMar)
 
@@ -6,7 +6,7 @@ Author: [Gabriele Martini](https://github.com/GabMar)
 
 A Command-Line Program written in Java to decode the APK using ApkTool and check what Framework it's been used to build the APK.
 
-## Command Line Parameters ##
+## COMMAND LINE PARAMETERS ##
 
 
 * `-p` : The Path of an APK or the Path of a directory containing APKs
@@ -21,8 +21,6 @@ A Command-Line Program written in Java to decode the APK using ApkTool and check
 
 ## USAGE EXAMPLE ##
 
-This software requires Java 1.7 or higher
-
 * To analyze the directory containing the `ApkCategoryChecker.jar` and put the CSV result file in the same directory, open a terminal, navigate in the directory and type:
 
 	`java -jar ApkCategoryChecker.jar -d -csv`
@@ -35,7 +33,28 @@ This software requires Java 1.7 or higher
 
 	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv -k`
 
-## 3rd-part Applications: ##
+## MINIMUM REQUIREMENTS ##
+
+This software requires Java 1.7 or higher
+
+## LICENSE ##
+
+Copyright (C) <2014>  <Gabriele Martini>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+## 3RD-PART APPLICATIONS: ##
 
 Apktool:   https://github.com/iBotPeaches/Apktool
 
