@@ -1,5 +1,6 @@
 # Apk Category Checker #
-==================
+
+Author: Gabriele Martini
 
 ## DESCRIPTION ##
 
@@ -8,15 +9,15 @@ A Command-Line Program written in Java to decode the APK using ApkTool and check
 ## Command Line Parameters ##
 
 
--p 		: 	The Path of an APK or the Path of a directory containing APKs
+* `-p` : The Path of an APK or the Path of a directory containing APKs
 
--d		:	Use current directory
+* `-d` : Use current directory
 
--csv	:	Export the results in a CSV file
+* `-csv` : Export the results in a CSV file
 
--o 		:	The destination directory of the result's file. If this parameter is missing, the result's file will be exported on the working path
+* `-o` : The destination directory of the result's file. If this parameter is missing, the result's file will be exported on the working path
 
--k 		:	Keep the directory of the encoded APK 
+* `-k` : Keep the directory of the encoded APK 
 
 ## USAGE EXAMPLE ##
 
