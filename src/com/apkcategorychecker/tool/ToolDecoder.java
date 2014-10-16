@@ -19,10 +19,14 @@
  */
 package com.apkcategorychecker.tool;
 
-import brut.androlib.AndrolibException;
-import brut.androlib.ApkDecoder;
+
 import java.io.File;
 import java.io.IOException;
+
+import brut.androlib.AndrolibException;
+import brut.androlib.ApkDecoder;
+import brut.directory.DirectoryException;
+
 
 /**
  * This class decode an APK in a directory with the name of APK
@@ -86,10 +90,13 @@ public class ToolDecoder {
                 
                 /*--Decode the APK with Apktool--*/
                 
-                try {
-                        decoder.decode();
-                } catch (AndrolibException e) {
-                }
+                        try {
+							decoder.decode();
+						} catch (DirectoryException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
         } catch (IOException e) {
         }
         

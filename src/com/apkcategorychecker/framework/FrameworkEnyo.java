@@ -82,7 +82,7 @@ public class FrameworkEnyo implements Framework {
                     break;
             }
             String[] s = line.split("package=");
-            Fpackage = s[1].substring(1, s[1].length() -1);
+            Fpackage = s[1].substring(1, s[1].length() -2);
             br.close();
         } catch(IOException e) {
             System.out.println("read error: " + e.getMessage());
