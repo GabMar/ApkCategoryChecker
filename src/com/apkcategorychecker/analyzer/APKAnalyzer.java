@@ -74,6 +74,7 @@ public class APKAnalyzer{
     public AnalyzerResult Analyze(String path, String apkName, boolean _keepDecodedPath) throws IOException {
         try {
         	
+        	
         	/*Instance of ToolDecoder; decode an APK file in a Directory with the same name of APK*/
             ToolDecoder tooldecoder = new ToolDecoder();
             _decodedApkPath = tooldecoder.DecodeApk(path);
@@ -83,6 +84,8 @@ public class APKAnalyzer{
             
             /*For every Framework analyze the Decoded APK; if the Framework match return true*/
             for (int i = 0; i < this.listOfFramework.size(); i++) {
+            	
+            	
                 listOfFramework.get(i).setoff();
                 if(listOfFramework.get(i).Test(_decodedApkPath)){
                     

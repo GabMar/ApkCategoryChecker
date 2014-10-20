@@ -40,6 +40,12 @@ public class FrameworkPool {
     	/*Creates a new ArrayList*/
         this.listOfFramework = new ArrayList<Framework>();
         
+        /*Add UndefinedWebApp Framework*/
+        
+        Framework UndefinedWebApp;
+        UndefinedWebApp = new FrameworkUndefinedWebApp();
+        this.listOfFramework.add(UndefinedWebApp);
+        
         /*Add Corvova Framework*/
         
         Framework Cordova;
@@ -112,11 +118,6 @@ public class FrameworkPool {
         Titanium = new FrameworkTitanium();
         this.listOfFramework.add(Titanium);
         
-        /*Add UndefinedWebApp Framework*/
-        
-        Framework UndefinedWebApp;
-        UndefinedWebApp = new FrameworkUndefinedWebApp();
-        this.listOfFramework.add(UndefinedWebApp);
         
     }
     
