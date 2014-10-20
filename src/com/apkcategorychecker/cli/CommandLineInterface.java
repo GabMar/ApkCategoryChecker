@@ -63,6 +63,11 @@ public class CommandLineInterface {
 	private String _outDir;
 	
 	/**
+	 * How deep an hybrid app will be analyzed
+	 */
+	private int _deep;
+	
+	/**
 	 * Private Constructor - Pattern Singleton
 	 */
 	private CommandLineInterface() {
@@ -120,6 +125,14 @@ public class CommandLineInterface {
 	}
 	
 	/**
+	 * Get the depth level with which an APK will be analyzed
+	 * @return
+	 */
+	public int getDeep() {
+		return this._deep;
+	}
+	
+	/**
 	 * Method to print the Command-Line Helper
 	 * 
 	 * @param options CLI Options
@@ -143,6 +156,7 @@ public class CommandLineInterface {
 		options.addOption("csv", false, "To obtain a CSV file result");
         options.addOption("o", true, "Destination path for file result");
         options.addOption("k", false, "Keep the decoded APK on the filesystem");
+        options.addOption("deep", true, "How deep you want to analyze an hybrid app");
 		
 		/*--CLI parser--*/
 		
@@ -180,6 +194,10 @@ public class CommandLineInterface {
         	this._outDir = cmd.getOptionValue("o");
         }else {
         	this._outDir = _currentDirectory;
+        }
+        
+        if(cmd.hasOption("deep")){
+        	this._deep = Integer.parseInt(cmd.getOptionValue("deep"));
         }
 		
 	}

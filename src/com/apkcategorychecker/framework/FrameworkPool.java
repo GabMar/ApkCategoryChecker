@@ -112,6 +112,12 @@ public class FrameworkPool {
         Titanium = new FrameworkTitanium();
         this.listOfFramework.add(Titanium);
         
+        /*Add UndefinedWebApp Framework*/
+        
+        Framework UndefinedWebApp;
+        UndefinedWebApp = new FrameworkUndefinedWebApp();
+        this.listOfFramework.add(UndefinedWebApp);
+        
     }
     
     /**
