@@ -15,6 +15,7 @@ Parameter | Description
 -csv | Export the results in a [CSV](http://it.wikipedia.org/wiki/Comma-separated_values) file
 -o | The destination directory of the result's file. If this parameter is missing, the result's file will be exported on the working path
 -k | Keep the directory of the encoded APK 
+-deep | How deep you want to analyze an hybrid app
 
 ## USAGE EXAMPLE ##
 
@@ -29,6 +30,10 @@ Parameter | Description
 * If you want to maintain the directory containing the decoded APK, add the parameter -k:
 
 	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv -k`
+
+* To set the level of Analysis (number of web resource files to search) use the parameter -deep:
+
+	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv -deep 4`
 
 ## MINIMUM REQUIREMENTS ##
 
