@@ -56,7 +56,7 @@ public class FrameworkCordova implements Framework {
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Cordova = this.searchString(_pathToAnalyze+"/res/xml/config.xml", "org.apache.cordova.App");
+        this.Cordova = this.searchString(_pathToAnalyze+"/res/xml/config.xml", "org.apache.cordova");
         return this.Cordova;
     }
 
