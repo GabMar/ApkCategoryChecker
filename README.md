@@ -33,6 +33,8 @@ Parameter | Description
 
 * To set the level of Analysis (number of web resource files to search) use the parameter -deep:
 
+	(example with choosed level 4)
+	
 	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv -deep 4`
 
 ## MINIMUM REQUIREMENTS ##
