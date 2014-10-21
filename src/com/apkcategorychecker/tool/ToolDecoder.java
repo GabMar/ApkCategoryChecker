@@ -80,6 +80,9 @@ public class ToolDecoder {
 
                 try {
                         decoder.setOutDir(outDir);
+                        
+                        decoder.setDecodeSources((short) 0);
+                        
                 } catch (AndrolibException e) {
                 }
                 
