@@ -57,6 +57,27 @@ public interface Framework {
     public boolean checkCordova();
     
     /**
+     * Return the number of html files
+     * 
+     * @return
+     */
+    public int getHtml();
+    
+    /**
+     * Return the number of javascript files
+     * 
+     * @return
+     */
+    public int getJavascript();
+    
+    /**
+     * Return the number of css files
+     * 
+     * @return
+     */
+    public int getCSS();
+    
+    /**
      * Clean parameters
      */
     public void setoff();

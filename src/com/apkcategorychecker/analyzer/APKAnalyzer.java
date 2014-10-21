@@ -94,7 +94,10 @@ public class APKAnalyzer{
                                     path, 
                                     apkName,
                                     listOfFramework.get(i).getFrameworkName(),
-                                    this.listOfFramework.get(i).checkCordova());
+                                    this.listOfFramework.get(i).checkCordova(),
+                                    this.listOfFramework.get(i).getHtml(),
+                                    this.listOfFramework.get(i).getJavascript(),
+                                    this.listOfFramework.get(i).getCSS());
                 	}
                 	/*If none of the Framework is found, set the AnalyzerResult for Native App*/
                 	else if(!listOfFramework.get(i).Test(_decodedApkPath)){
@@ -102,7 +105,10 @@ public class APKAnalyzer{
                                     path, 
                                     apkName,
                                     "Native",
-                                    false);}
+                                    false,
+                                    0,
+                                    0,
+                                    0);}
                 }
         }
         } catch (AndrolibException ex) {
@@ -128,13 +134,19 @@ public class APKAnalyzer{
      * @param _apkname Name of APK
      * @param _framework Name of Framework used
      * @param _checkCordova If true the Framework uses Apache Cordova
+     * @param _html Number of html files
+     * @param _javascript Number of javascript files
+     * @param _css Number of css files
      * @return
      */
     private AnalyzerResult setResults(  String _apkpackage, 
                                         String _apkpath, 
                                         String _apkname, 
                                         String _framework,
-                                        boolean _checkCordova){
+                                        boolean _checkCordova,
+                                        int _html,
+                                        int _javascript,
+                                        int _css){
     	
     	/*Instance of AnalyzerResult*/
         AnalyzerResult _settedResults = new AnalyzerResult();
@@ -156,6 +168,16 @@ public class APKAnalyzer{
         }else if(!_checkCordova){
             _settedResults.set_APKFramework(_framework);
         }
+        
+        /*Set the number of html files*/
+        _settedResults.set_html(_html);
+        
+        /*Set the number of javascript files*/
+        _settedResults.set_js(_javascript);
+        
+        /*Set the number of css files*/
+        _settedResults.set_css(_css);
+        
         return _settedResults;
     }
     

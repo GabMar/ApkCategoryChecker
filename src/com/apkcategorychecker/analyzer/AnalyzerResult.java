@@ -54,39 +54,85 @@ public class AnalyzerResult {
 	 */
 	private String _APKFramework;
 	
+	/**
+	 * Number of HTML files
+	 */
+	private int _html;
+	
+	/**
+	 * Numer of Javascript files
+	 */
+	private int _js;
+	
+	/**
+	 * Number of CSS files
+	 */
+	private int _css;
+	
 	
 	/*--Methods--*/
 	
 	/**
+	 * Return the APK Package
 	 * 
-	 * @return Return the APK Package
+	 * @return 
 	 */
 	public String get_Package(){
 		return this._Package;
 	}
 	
 	/**
+	 * Return the APK Name
 	 * 
-	 * @return Return the APK Name
+	 * @return 
 	 */
 	public String get_APKName(){
 		return this._APKName;
 	}
 	
 	/**
+	 * Return the APK Path
 	 * 
-	 * @return Return the APK Path
+	 * @return 
 	 */
 	public String get_APKPath(){
 		return this._APKPath;
 	}
 	
 	/**
+	 * Return the APK Framework
 	 * 
-	 * @return Return the APK Framework
+	 * @return 
 	 */
 	public String get_APKFramework(){
 		return this._APKFramework;
+	}
+	
+	/**
+	 * Return the number of html files
+	 * 
+	 * @return
+	 */
+	public int get_html(){
+		return this._html;
+	}
+	
+	/**
+	 * Return the number of javascript files
+	 * 
+	 * @return
+	 */
+	public int get_js(){
+		return this._js;
+	}
+	
+	/**
+	 * Return the number of css files
+	 * 
+	 * @return
+	 */
+	public int get_css(){
+		return this._css;
 	}
 	
 	/**
@@ -119,6 +165,33 @@ public class AnalyzerResult {
 	 */
 	public void set_APKFramework(String _framework){
 		this._APKFramework = _framework;
+	}
+	
+	/**
+	 * Set the number of html files
+	 * 
+	 * @param html number of html files
+	 */
+	public void set_html(int html){
+		this._html = html;
+	}
+	
+	/**
+	 * Set the number of javascript files
+	 * 
+	 * @param js number of javascript files
+	 */
+	public void set_js(int js){
+		this._js = js;
+	}
+	
+	/**
+	 * Set the number of css files
+	 * 
+	 * @param css number of css files
+	 */
+	public void set_css(int css){
+		this._css = css;
 	}
 }
 

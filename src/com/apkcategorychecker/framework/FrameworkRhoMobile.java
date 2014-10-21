@@ -54,12 +54,30 @@ public class FrameworkRhoMobile implements Framework{
      */
     private boolean founded = false;
 
+    /**
+     * Number of html files
+     */
+    private int _html = 0;
+    
+    /**
+     * Number of javascript files
+     */
+    private int _javascript = 0;
+    
+    /**
+     * Number of css files
+     */
+    private int _css = 0;
+
     @Override
     public boolean Test(String _pathToAnalyze) {
         File isdirqc = new File(_pathToAnalyze + "/assets/rho.dat");
         this.RhoMobile = isdirqc.exists();
         if(!this.RhoMobile){
             this.RhoMobile = this.searchString(_pathToAnalyze, "rhomobile");
+        }
+        if(this.RhoMobile){
+            this.setWebResources(_pathToAnalyze);
         }
         return this.RhoMobile;
     }
@@ -105,6 +123,9 @@ public class FrameworkRhoMobile implements Framework{
     public void setoff(){
         this.RhoMobile = false;
         this.founded = false;
+        this._html = 0;
+        this._javascript = 0;
+        this._css = 0;
     };
     
     /**
@@ -139,6 +160,65 @@ public class FrameworkRhoMobile implements Framework{
             }
         }
         return this.founded;
+    }
+
+    private void setWebResources(String _pathToAnalyze){
+        
+        File search_file_path = new File(_pathToAnalyze);
+
+        /*--If _pathToAnalyze is a file update the counters, else if is 
+         * a directory call this.setWebResources--*/
+        
+        if(search_file_path.isFile()){
+            
+            if( search_file_path.getAbsolutePath().contains(".html")){
+                
+                this._html = this._html + 1;
+                
+            }else 
+            
+            if( search_file_path.getAbsolutePath().contains(".js")){
+                
+                this._javascript = this._javascript + 1;
+                
+            }else 
+                
+            if( search_file_path.getAbsolutePath().contains(".css")){
+                
+                this._css = this._css + 1;
+            }
+
+        }else if(search_file_path.isDirectory()){
+            File[] listOfFiles = search_file_path.listFiles();
+            int length = listOfFiles.length;
+            for (int i = 0; i < length; i++) {
+                if (listOfFiles[i].isFile()) {
+                    this.setWebResources(listOfFiles[i].getAbsolutePath());
+                  } else if (listOfFiles[i].isDirectory()) {
+                    this.setWebResources(listOfFiles[i].getAbsolutePath());
+                  }
+            }
+        }
+    }
+        
+    
+
+    @Override
+    public int getHtml() {
+        
+        return this._html;
+    }
+
+    @Override
+    public int getJavascript() {
+        
+        return this._javascript;
+    }
+
+    @Override
+    public int getCSS() {
+        
+        return this._css;
     }
     
 }
