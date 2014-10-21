@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 import com.apkcategorychecker.framework.Framework;
 import com.apkcategorychecker.framework.FrameworkPool;
 import com.apkcategorychecker.tool.ToolDecoder;
+import com.apkcategorychecker.tool.ToolDex2Jar;
+import org.apache.commons.io.IOUtils;
 
 
 /**
@@ -78,6 +80,10 @@ public class APKAnalyzer{
         	/*Instance of ToolDecoder; decode an APK file in a Directory with the same name of APK*/
             ToolDecoder tooldecoder = new ToolDecoder();
             _decodedApkPath = tooldecoder.DecodeApk(path);
+            
+            /*Instance of ToolDex2Jar; convert the .dex file in .jar file*/
+            ToolDex2Jar dex2jar = new ToolDex2Jar();
+            dex2jar.ConvertDex2Jar(_decodedApkPath.concat("/classes.dex"), _decodedApkPath);
             
             /*Get the list of Objects Framework*/
             this.listOfFramework = FrameworkPool.getInstance().getFramework();

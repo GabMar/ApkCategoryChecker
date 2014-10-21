@@ -23,6 +23,7 @@ package com.apkcategorychecker.tool;
 import java.io.File;
 import java.io.IOException;
 
+
 import brut.androlib.AndrolibException;
 import brut.androlib.ApkDecoder;
 import brut.directory.DirectoryException;
@@ -77,11 +78,14 @@ public class ToolDecoder {
                 /*--Set the output directory--*/
                 
                 outDir = new File(_apkPath.substring(0, _apkPath.length() - 4));
-
+                
+                
                 try {
                         decoder.setOutDir(outDir);
                         
                         decoder.setDecodeSources((short) 0);
+                        
+                        
                         
                 } catch (AndrolibException e) {
                 }
@@ -97,6 +101,7 @@ public class ToolDecoder {
 
         } catch (IOException e) {
         }
+        
         
         return _apkPath.substring(0, _apkPath.length() - 4);
     }

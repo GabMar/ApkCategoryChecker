@@ -6,6 +6,16 @@
 	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/commons-cli-1.2-sources.jar"/>
 	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/commons-csv-1.0.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/commons-lite-1.15.jar"/>
 	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/apktool.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/dex-reader-1.15.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/apktool_old.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/asm-all-3.3.1.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/dex-ir-1.12.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/dex-tools-0.0.9.15.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/dex-translator-0.0.9.15.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/dx.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/jar-rename-1.6.jar"/>
+	<classpathentry kind="lib" path="/Users/gabriele/Desktop/Documenti/GitHub/ApkCategoryChecker/lib/jasmin-p2.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
