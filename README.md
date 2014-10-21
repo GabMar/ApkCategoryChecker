@@ -37,6 +37,21 @@ Parameter | Description
 	
 	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv -deep 4`
 
+## FILE RESULT FORMAT##
+
+For now the only supported output format is CSV with the following columns
+
+Column | Description
+----------|------------
+ID | The id of analyzed APK
+APK Name | The APK name
+APK Path | The path of analyzed APK
+APK Package | The package of APK
+Framework | The Framework used to build the APK
+HTML | Number of ".html" file used to build the APK
+JS | Number of ".js" file used to build the APK
+CSS | Number of ".css" file used to build the APK
+
 ## MINIMUM REQUIREMENTS ##
 
 This software requires Java 1.7 or higher
