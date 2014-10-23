@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.apkcategorychecker.tool.ToolFileToString;
 
 /**
  * Mobl Framework
@@ -48,11 +47,6 @@ public class FrameworkMobl implements Framework{
      * Boolean to check if the APK matches the Framework
      */
     private boolean Mobl = false;
-    
-    /**
-     * Boolean used by the method searchString
-     */
-    private boolean founded = false;
 
     /**
      * Number of html files
@@ -71,7 +65,8 @@ public class FrameworkMobl implements Framework{
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Mobl = this.searchString(_pathToAnalyze + "/assets/www/", "mobl");
+        this.searchFile(_pathToAnalyze, "MoblGap.class");
+        if(!this.Mobl){ this.searchFile(_pathToAnalyze, ".mobl");}
         if(this.Mobl){
             this.setWebResources(_pathToAnalyze);
         }
@@ -118,46 +113,11 @@ public class FrameworkMobl implements Framework{
     @Override
     public void setoff(){
         this.Mobl = false;
-        this.founded = false;
         this._html = 0;
         this._javascript = 0;
         this._css = 0;
     };
     
-    /**
-     * Method to search a given string in a file
-     * 
-     * @param _pathSearch Path of file
-     * @param _word Word to search
-     * @return
-     */
-    private boolean searchString(String _pathSearch, String _word){
-        
-        if(this.founded == false){
-            File search_file_path = new File(_pathSearch);
-
-            //If File
-            if(search_file_path.isFile()){
-                ToolFileToString readStringifyedFile;
-                readStringifyedFile = new ToolFileToString();
-                String findWord = readStringifyedFile.readFile(_pathSearch);
-                this.founded = findWord.contains(_word);
-
-            }else if(search_file_path.isDirectory()){
-                File[] listOfFiles = search_file_path.listFiles();
-                int length = listOfFiles.length;
-                for (int i = 0; i < length; i++) {
-                    if (listOfFiles[i].isFile()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      } else if (listOfFiles[i].isDirectory()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      }
-                }
-            }
-        }
-        return this.founded;
-    }
-
     private void setWebResources(String _pathToAnalyze){
         
         File search_file_path = new File(_pathToAnalyze);
@@ -196,6 +156,39 @@ public class FrameworkMobl implements Framework{
             }
         }
     }
+    
+    /**
+     * Search a file in a directory
+     * 
+     * @param _pathToSearch Path to search in
+     * @param _fileToSearch File name to search
+     */
+    private void searchFile(String _pathToSearch, String _fileToSearch) {
+    	
+    	if(!this.Mobl){
+	    	File _path = new File(_pathToSearch);
+	
+	        /*--If _path is a file compare the name with _fileToSearch, else if is 
+	         * a directory call this.searchFile--*/
+	        
+	        if(_path.isFile()){
+	            
+	        	this.Mobl =  _path.getAbsolutePath().contains(_fileToSearch);
+	        	
+	        }else if(_path.isDirectory()){
+	            File[] listOfFiles = _path.listFiles();
+	            int length = listOfFiles.length;
+	            for (int i = 0; i < length; i++) {
+	                if (listOfFiles[i].isFile()) {
+	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
+	                  } else if (listOfFiles[i].isDirectory()) {
+	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
+	                  }
+	            }
+	        }
+	    }
+		
+	}
         
     
 

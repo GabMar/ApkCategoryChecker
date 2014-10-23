@@ -4,7 +4,7 @@ Author: [Gabriele Martini](https://github.com/GabMar)
 
 ## DESCRIPTION ##
 
-A Command-Line Program written in [Java](http://en.wikipedia.org/wiki/Java_%28programming_language%29) to decode an APK file or a directory containing APK files using ApkTool and check what Framework it's been used to build the APK.
+A Command-Line Program written in [Java](http://en.wikipedia.org/wiki/Java_%28programming_language%29) to decode an APK file or a directory containing APK files using ApkTool and Dex2Jar and check what Framework it's been used to build the APK.
 
 ## COMMAND LINE PARAMETERS ##
 
@@ -52,6 +52,25 @@ HTML | Number of ".html" file used to build the APK
 JS | Number of ".js" file used to build the APK
 CSS | Number of ".css" file used to build the APK
 
+## RECOGNITION FRAMEWORKS METHODS ##
+
+This section explains how each framework is recognised.
+
+Framework | Recognition method | Reliability
+----------|----------|----------
+[Apache Cordova](http://cordova.apache.org/) | If is present the string "org.apache.cordova" in a file, or if is present the file "CordovaActivity.class" | Strong
+[Canappi](http://www.canappi.com/) | If is present the string "canappi" in a file | Weak
+[Enyo](http://enyojs.com/) | If is present the string "enyo" in a file | Weak
+[IUI](http://www.iui-js.org/) | If is present the file "IUI.class" | Medium
+[Kivy](http://kivy.org/) | If is present the string "PythonActivity" in the "AndroidManifes.xml" | Medium
+[Mobl](http://www.mobl-lang.org/) | If is present the file "CordovaActivity.class" | Strong
+[MoSync](http://www.mosync.com/) | If is present the string "MoSyncService" in the "AndroidManifes.xml" | Medium
+[Next](http://nextinterfaces.com/b) | If is present the string "nextwebapp" in a file, or if is present the file "NextWebApp.class" | Strong
+[Quick Connect](http://www.quickconnectfamily.org/qc_hybrid) | If exists the file "QCJSLib", or if is present the string "qc.handleError" in a file | Strong
+[Rho Mobile](http://rhomobile.com/) | If exists the file "rho.dat" | Medium
+[Sencha](http://www.sencha.com/products/touch) | If is present the string "Sencha" in a file | Weak
+[Titanium](http://www.appcelerator.com/) | If is present the string "org.appcelerator.titanium" in a file | Medium
+
 ## MINIMUM REQUIREMENTS ##
 
 This software requires Java 1.7 or higher
@@ -76,6 +95,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## THIRD-PARTY APPLICATIONS: ##
 
 Apktool:   https://github.com/iBotPeaches/Apktool
+
+Dex2Jar:	https://code.google.com/p/dex2jar/
 
 Apache Commons CSV:   http://commons.apache.org/proper/commons-csv/
 

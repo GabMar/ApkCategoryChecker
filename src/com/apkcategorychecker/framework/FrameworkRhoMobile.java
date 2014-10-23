@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.apkcategorychecker.tool.ToolFileToString;
 
 /**
  * RhoMobile Framework
@@ -48,11 +47,6 @@ public class FrameworkRhoMobile implements Framework{
      * Boolean to check if the APK matches the Framework
      */
     private boolean RhoMobile = false;
-    
-    /**
-     * Boolean used by the method searchString
-     */
-    private boolean founded = false;
 
     /**
      * Number of html files
@@ -73,9 +67,6 @@ public class FrameworkRhoMobile implements Framework{
     public boolean Test(String _pathToAnalyze) {
         File isdirqc = new File(_pathToAnalyze + "/assets/rho.dat");
         this.RhoMobile = isdirqc.exists();
-        if(!this.RhoMobile){
-            this.RhoMobile = this.searchString(_pathToAnalyze, "rhomobile");
-        }
         if(this.RhoMobile){
             this.setWebResources(_pathToAnalyze);
         }
@@ -122,46 +113,11 @@ public class FrameworkRhoMobile implements Framework{
     @Override
     public void setoff(){
         this.RhoMobile = false;
-        this.founded = false;
         this._html = 0;
         this._javascript = 0;
         this._css = 0;
     };
     
-    /**
-     * Method to search a given string in a file
-     * 
-     * @param _pathSearch Path of file
-     * @param _word Word to search
-     * @return
-     */
-    private boolean searchString(String _pathSearch, String _word){
-        
-        if(this.founded == false){
-            File search_file_path = new File(_pathSearch);
-
-            //If File
-            if(search_file_path.isFile()){
-                ToolFileToString readStringifyedFile;
-                readStringifyedFile = new ToolFileToString();
-                String findWord = readStringifyedFile.readFile(_pathSearch);
-                this.founded = findWord.contains(_word);
-
-            }else if(search_file_path.isDirectory()){
-                File[] listOfFiles = search_file_path.listFiles();
-                int length = listOfFiles.length;
-                for (int i = 0; i < length; i++) {
-                    if (listOfFiles[i].isFile()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      } else if (listOfFiles[i].isDirectory()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      }
-                }
-            }
-        }
-        return this.founded;
-    }
-
     private void setWebResources(String _pathToAnalyze){
         
         File search_file_path = new File(_pathToAnalyze);

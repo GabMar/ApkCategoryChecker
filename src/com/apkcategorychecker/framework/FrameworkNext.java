@@ -72,13 +72,15 @@ public class FrameworkNext implements Framework{
     @Override
     public boolean Test(String _pathToAnalyze) {
         this.Next = this.searchString(_pathToAnalyze + "/assets/www/", "nextwebapp");
+        if(!this.Next){ this.searchFile(_pathToAnalyze, "NextWebApp.class");}
         if(this.Next){
             this.setWebResources(_pathToAnalyze);
         }
         return this.Next;
     }
 
-    @Override
+
+	@Override
     public String getFrameworkName() {
         return this.FrameworkName;
     }
@@ -196,6 +198,39 @@ public class FrameworkNext implements Framework{
             }
         }
     }
+    
+    /**
+     * Search a file in a directory
+     * 
+     * @param _pathToSearch Path to search in
+     * @param _fileToSearch File name to search
+     */
+    private void searchFile(String _pathToSearch, String _fileToSearch) {
+    	
+    	if(!this.Next){
+	    	File _path = new File(_pathToSearch);
+	
+	        /*--If _path is a file compare the name with _fileToSearch, else if is 
+	         * a directory call this.searchFile--*/
+	        
+	        if(_path.isFile()){
+	            
+	        	this.Next =  _path.getAbsolutePath().contains(_fileToSearch);
+	        	
+	        }else if(_path.isDirectory()){
+	            File[] listOfFiles = _path.listFiles();
+	            int length = listOfFiles.length;
+	            for (int i = 0; i < length; i++) {
+	                if (listOfFiles[i].isFile()) {
+	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
+	                  } else if (listOfFiles[i].isDirectory()) {
+	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
+	                  }
+	            }
+	        }
+	    }
+		
+	}
         
     
 

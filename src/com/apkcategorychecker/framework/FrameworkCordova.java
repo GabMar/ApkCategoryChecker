@@ -72,6 +72,7 @@ public class FrameworkCordova implements Framework {
     @Override
     public boolean Test(String _pathToAnalyze) {
         this.Cordova = this.searchString(_pathToAnalyze+"/res/xml/config.xml", "org.apache.cordova");
+        if(!this.Cordova){ this.searchFile(_pathToAnalyze, "CordovaActivity.class");}
         if(this.Cordova){
             this.setWebResources(_pathToAnalyze);
         }
@@ -196,6 +197,39 @@ public class FrameworkCordova implements Framework {
             }
         }
     }
+    
+    /**
+     * Search a file in a directory
+     * 
+     * @param _pathToSearch Path to search in
+     * @param _fileToSearch File name to search
+     */
+    private void searchFile(String _pathToSearch, String _fileToSearch) {
+    	
+    	if(!this.Cordova){
+	    	File _path = new File(_pathToSearch);
+	
+	        /*--If _path is a file compare the name with _fileToSearch, else if is 
+	         * a directory call this.searchFile--*/
+	        
+	        if(_path.isFile()){
+	            
+	        	this.Cordova =  _path.getAbsolutePath().contains(_fileToSearch);
+	        	
+	        }else if(_path.isDirectory()){
+	            File[] listOfFiles = _path.listFiles();
+	            int length = listOfFiles.length;
+	            for (int i = 0; i < length; i++) {
+	                if (listOfFiles[i].isFile()) {
+	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
+	                  } else if (listOfFiles[i].isDirectory()) {
+	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
+	                  }
+	            }
+	        }
+	    }
+		
+	}
         
     
 

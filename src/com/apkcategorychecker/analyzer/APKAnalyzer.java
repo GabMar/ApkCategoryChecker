@@ -31,7 +31,9 @@ import com.apkcategorychecker.framework.Framework;
 import com.apkcategorychecker.framework.FrameworkPool;
 import com.apkcategorychecker.tool.ToolDecoder;
 import com.apkcategorychecker.tool.ToolDex2Jar;
-import org.apache.commons.io.IOUtils;
+import com.apkcategorychecker.tool.ToolJar2Class;
+
+//import org.apache.commons.io.IOUtils;
 
 
 /**
@@ -85,6 +87,10 @@ public class APKAnalyzer{
             ToolDex2Jar dex2jar = new ToolDex2Jar();
             dex2jar.ConvertDex2Jar(_decodedApkPath.concat("/classes.dex"), _decodedApkPath);
             
+            /*--Instance of ToolJar2Class; extract the content of a .jar--*/
+            ToolJar2Class jar2class = new ToolJar2Class();
+            jar2class.ConvertJar2Class(_decodedApkPath + "/classes/ApkDecodeddex2jar.jar", _decodedApkPath);
+            
             /*Get the list of Objects Framework*/
             this.listOfFramework = FrameworkPool.getInstance().getFramework();
             
@@ -112,9 +118,9 @@ public class APKAnalyzer{
                                     apkName,
                                     "Native",
                                     false,
-                                    0,
-                                    0,
-                                    0);}
+                                    this.listOfFramework.get(i).getHtml(),
+                                    this.listOfFramework.get(i).getJavascript(),
+                                    this.listOfFramework.get(i).getCSS());}
                 }
         }
         } catch (AndrolibException ex) {
