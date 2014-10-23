@@ -71,7 +71,7 @@ public class FrameworkSencha implements Framework{
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Sencha = this.searchString(_pathToAnalyze + "/assets/www/", "Sencha");
+        this.control(_pathToAnalyze);
         if(this.Sencha){
             this.setWebResources(_pathToAnalyze);
         }
@@ -123,6 +123,15 @@ public class FrameworkSencha implements Framework{
         this._javascript = 0;
         this._css = 0;
     };
+    
+    private void control(String _path){
+    	boolean _ext, _extjs = false;
+    	_ext = this.searchString(_path + "/assets/www/", "Ext.create");
+    	_extjs = this.searchString(_path + "/assets/www/", "ext-all.js");
+    	if(_ext && _extjs){
+    		this.Sencha = true;
+    	}
+    }
     
     /**
      * Method to search a given string in a file
