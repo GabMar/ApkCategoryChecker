@@ -25,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.apkcategorychecker.tool.ToolFileToString;
+import com.apkcategorychecker.tool.ToolSearch;
 
 /**
  * Enyo Framework
@@ -48,11 +48,6 @@ public class FrameworkEnyo implements Framework {
      * Boolean to check if the APK matches the Framework
      */
     private boolean Enyo = false;
-    
-    /**
-     * Boolean used by the method searchString
-     */
-    private boolean founded = false;
 
     /**
      * Number of html files
@@ -71,7 +66,7 @@ public class FrameworkEnyo implements Framework {
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Enyo = this.searchString(_pathToAnalyze + "/assets/www/", "enyo");
+    	this.control(_pathToAnalyze);
         if(this.Enyo){
             this.setWebResources(_pathToAnalyze);
         }
@@ -118,44 +113,25 @@ public class FrameworkEnyo implements Framework {
     @Override
     public void setoff(){
         this.Enyo = false;
-        this.founded = false;
         this._html = 0;
         this._javascript = 0;
         this._css = 0;
     };
     
     /**
-     * Method to search a given string in a file
+     * Multiple control of framework
      * 
-     * @param _pathSearch Path of file
-     * @param _word Word to search
-     * @return
+     * @param _path APK decoded path
      */
-    private boolean searchString(String _pathSearch, String _word){
-        
-        if(this.founded == false){
-            File search_file_path = new File(_pathSearch);
-
-            //If File
-            if(search_file_path.isFile()){
-                ToolFileToString readStringifyedFile;
-                readStringifyedFile = new ToolFileToString();
-                String findWord = readStringifyedFile.readFile(_pathSearch);
-                this.founded = findWord.contains(_word);
-
-            }else if(search_file_path.isDirectory()){
-                File[] listOfFiles = search_file_path.listFiles();
-                int length = listOfFiles.length;
-                for (int i = 0; i < length; i++) {
-                    if (listOfFiles[i].isFile()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      } else if (listOfFiles[i].isDirectory()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      }
-                }
-            }
-        }
-        return this.founded;
+    private void control(String _path){
+    	boolean _ext, _extjs = false;
+    	ToolSearch Searcher = new ToolSearch();
+    	_ext = Searcher.searchStringInFileTextExt(_path + "/assets/www/", "enyo.machine", ".js");
+    	_extjs = Searcher.searchStringInFileTextExt(_path + "/assets/www/", "enyo.kind", ".js");
+    	System.out.println(_ext + "-enyo-" + _extjs);
+    	if(_ext && _extjs){
+    		this.Enyo = true;
+    	}
     }
 
     private void setWebResources(String _pathToAnalyze){

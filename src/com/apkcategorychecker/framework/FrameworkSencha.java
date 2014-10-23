@@ -25,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.apkcategorychecker.tool.ToolFileToString;
+import com.apkcategorychecker.tool.ToolSearch;
 
 /**
  * Sencha Framework
@@ -48,11 +48,6 @@ public class FrameworkSencha implements Framework{
      * Boolean to check if the APK matches the Framework
      */
     private boolean Sencha = false;
-    
-    /**
-     * Boolean used by the method searchString
-     */
-    private boolean founded = false;
 
     /**
      * Number of html files
@@ -68,6 +63,7 @@ public class FrameworkSencha implements Framework{
      * Number of css files
      */
     private int _css = 0;
+    
 
     @Override
     public boolean Test(String _pathToAnalyze) {
@@ -118,54 +114,27 @@ public class FrameworkSencha implements Framework{
     @Override
     public void setoff(){
         this.Sencha = false;
-        this.founded = false;
         this._html = 0;
         this._javascript = 0;
         this._css = 0;
     };
     
+    /**
+     * Multiple control of framework
+     * 
+     * @param _path APK decoded path
+     */
     private void control(String _path){
     	boolean _ext, _extjs = false;
-    	_ext = this.searchString(_path + "/assets/www/", "Ext.create");
-    	_extjs = this.searchString(_path + "/assets/www/", "ext-all.js");
+    	ToolSearch Searcher = new ToolSearch();
+    	_ext = Searcher.searchStringInFileText(_path + "/assets/www/", "Ext.create");
+    	_extjs = Searcher.searchStringInFileTextExt(_path + "/assets/www/", "ext-all.js", ".js");
+    	System.out.println(_ext + "-" + _extjs);
     	if(_ext && _extjs){
     		this.Sencha = true;
     	}
     }
     
-    /**
-     * Method to search a given string in a file
-     * 
-     * @param _pathSearch Path of file
-     * @param _word Word to search
-     * @return
-     */
-    private boolean searchString(String _pathSearch, String _word){
-        
-        if(this.founded == false){
-            File search_file_path = new File(_pathSearch);
-
-            //If File
-            if(search_file_path.isFile()){
-                ToolFileToString readStringifyedFile;
-                readStringifyedFile = new ToolFileToString();
-                String findWord = readStringifyedFile.readFile(_pathSearch);
-                this.founded = findWord.contains(_word);
-
-            }else if(search_file_path.isDirectory()){
-                File[] listOfFiles = search_file_path.listFiles();
-                int length = listOfFiles.length;
-                for (int i = 0; i < length; i++) {
-                    if (listOfFiles[i].isFile()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      } else if (listOfFiles[i].isDirectory()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      }
-                }
-            }
-        }
-        return this.founded;
-    }
 
     private void setWebResources(String _pathToAnalyze){
         
