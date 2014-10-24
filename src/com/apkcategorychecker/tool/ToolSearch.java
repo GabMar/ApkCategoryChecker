@@ -14,6 +14,11 @@ public class ToolSearch {
 	 */
 	private boolean _boolSearchStringInFileTextExt = false;
 	
+	/**
+	 * Boolean used by the method searchFile
+	 */
+	private boolean _boolSearchFile = false;
+	
 	
 	/**
 	 * Search a string in a file
@@ -23,7 +28,7 @@ public class ToolSearch {
 	 * @return
 	 */
 	public boolean searchStringInFileText(String _path, String _word){
-		if(!_boolSearchStringInFileText){
+		if(!this._boolSearchStringInFileText){
             File search_file_path = new File(_path);
 
             //If File
@@ -57,7 +62,7 @@ public class ToolSearch {
 	 * @return
 	 */
 	public boolean searchStringInFileTextExt(String _path, String _word, String _ext){
-		if(!_boolSearchStringInFileTextExt){
+		if(!this._boolSearchStringInFileTextExt){
             File search_file_path = new File(_path);
 
             //If File
@@ -80,6 +85,36 @@ public class ToolSearch {
             }
 		}
         return this._boolSearchStringInFileText;
+	}
+	
+	/**
+	 * Search a specific file by the name
+	 * 
+	 * @param _path File path
+	 * @param _filename File name to search for
+	 * @return
+	 */
+	public boolean searchFile(String _path, String _filename){
+		if(!this._boolSearchFile){
+			
+			File search_file_path = new File(_path);
+			
+			if(search_file_path.isFile() && search_file_path.getName().contentEquals(_filename)){
+                this._boolSearchFile = true;
+
+            }else if(search_file_path.isDirectory()){
+                File[] listOfFiles = search_file_path.listFiles();
+                int length = listOfFiles.length;
+                for (int i = 0; i < length; i++) {
+                    if (listOfFiles[i].isFile()) {
+                        this.searchFile(listOfFiles[i].getAbsolutePath(), _filename);
+                      } else if (listOfFiles[i].isDirectory()) {
+                        this.searchFile(listOfFiles[i].getAbsolutePath(), _filename);
+                      }
+                }
+            }
+		}
+		return this._boolSearchFile;
 	}
 
 }

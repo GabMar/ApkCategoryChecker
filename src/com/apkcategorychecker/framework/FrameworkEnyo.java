@@ -128,7 +128,6 @@ public class FrameworkEnyo implements Framework {
     	ToolSearch Searcher = new ToolSearch();
     	_ext = Searcher.searchStringInFileTextExt(_path + "/assets/www/", "enyo.machine", ".js");
     	_extjs = Searcher.searchStringInFileTextExt(_path + "/assets/www/", "enyo.kind", ".js");
-    	System.out.println(_ext + "-enyo-" + _extjs);
     	if(_ext && _extjs){
     		this.Enyo = true;
     	}

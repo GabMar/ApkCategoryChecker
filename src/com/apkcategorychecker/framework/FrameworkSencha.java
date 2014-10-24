@@ -129,7 +129,6 @@ public class FrameworkSencha implements Framework{
     	ToolSearch Searcher = new ToolSearch();
     	_ext = Searcher.searchStringInFileText(_path + "/assets/www/", "Ext.create");
     	_extjs = Searcher.searchStringInFileTextExt(_path + "/assets/www/", "ext-all.js", ".js");
-    	System.out.println(_ext + "-" + _extjs);
     	if(_ext && _extjs){
     		this.Sencha = true;
     	}
