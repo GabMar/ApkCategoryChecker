@@ -66,7 +66,13 @@ public class FrameworkCordova implements Framework {
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.control(_pathToAnalyze);
+    	boolean _boolString, _boolFile = false;
+    	ToolSearch Searcher = new ToolSearch();
+    	_boolString = Searcher.searchStringInFileText(_pathToAnalyze+"/res/xml/config.xml", "org.apache.cordova");
+    	_boolFile = Searcher.searchFile(_pathToAnalyze, "CordovaActivity.class");
+    	if(_boolString && _boolFile){
+    		this.Cordova = true;
+    	}
         if(this.Cordova){
             this.setWebResources(_pathToAnalyze);
         }
@@ -116,21 +122,6 @@ public class FrameworkCordova implements Framework {
         this._html = 0;
         this._javascript = 0;
         this._css = 0;
-    }
-    
-    /**
-     * Multiple control of framework
-     * 
-     * @param _path APK decoded path
-     */
-    private void control(String _path){
-    	boolean _boolString, _boolFile = false;
-    	ToolSearch Searcher = new ToolSearch();
-    	_boolString = Searcher.searchStringInFileText(_path+"/res/xml/config.xml", "org.apache.cordova");
-    	_boolFile = Searcher.searchFile(_path, "CordovaActivity.class");
-    	if(_boolString && _boolFile){
-    		this.Cordova = true;
-    	}
     }
 
     private void setWebResources(String _pathToAnalyze){

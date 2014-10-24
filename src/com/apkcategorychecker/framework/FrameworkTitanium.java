@@ -25,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.apkcategorychecker.tool.ToolFileToString;
+import com.apkcategorychecker.tool.ToolSearch;
 
 /**
  * Titanium Framework
@@ -48,11 +48,6 @@ public class FrameworkTitanium implements Framework{
      * Boolean to check if the APK matches the Framework
      */
     private boolean Titanium = false;
-    
-    /**
-     * Boolean used by the method searchString
-     */
-    private boolean founded = false;
 
     /**
      * Number of html files
@@ -71,7 +66,13 @@ public class FrameworkTitanium implements Framework{
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.Titanium = this.searchString(_pathToAnalyze, "org.appcelerator.titanium");
+    	boolean _boolFile1, _boolFile2 = false;
+    	ToolSearch Searcher = new ToolSearch();
+    	_boolFile1 = Searcher.searchFile(_pathToAnalyze, "TitaniumModule.class");
+    	_boolFile2 = Searcher.searchFile(_pathToAnalyze, "TiActivity.class");
+    	if(_boolFile1 && _boolFile2){
+    		this.Titanium = true;
+    	}
         if(this.Titanium){
             this.setWebResources(_pathToAnalyze);
         }
@@ -118,46 +119,11 @@ public class FrameworkTitanium implements Framework{
     @Override
     public void setoff(){
         this.Titanium = false;
-        this.founded = false;
         this._html = 0;
         this._javascript = 0;
         this._css = 0;
     };
     
-    /**
-     * Method to search a given string in a file
-     * 
-     * @param _pathSearch Path of file
-     * @param _word Word to search
-     * @return
-     */
-    private boolean searchString(String _pathSearch, String _word){
-        
-        if(this.founded == false){
-            File search_file_path = new File(_pathSearch);
-
-            //If File
-            if(search_file_path.isFile()){
-                ToolFileToString readStringifyedFile;
-                readStringifyedFile = new ToolFileToString();
-                String findWord = readStringifyedFile.readFile(_pathSearch);
-                this.founded = findWord.contains(_word);
-
-            }else if(search_file_path.isDirectory()){
-                File[] listOfFiles = search_file_path.listFiles();
-                int length = listOfFiles.length;
-                for (int i = 0; i < length; i++) {
-                    if (listOfFiles[i].isFile()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      } else if (listOfFiles[i].isDirectory()) {
-                        this.searchString(listOfFiles[i].getAbsolutePath(), _word);
-                      }
-                }
-            }
-        }
-        return this.founded;
-    }
-
     private void setWebResources(String _pathToAnalyze){
         
         File search_file_path = new File(_pathToAnalyze);

@@ -66,7 +66,13 @@ public class FrameworkEnyo implements Framework {
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	this.control(_pathToAnalyze);
+    	boolean _boolStringExt1, _boolStringExt2 = false;
+    	ToolSearch Searcher = new ToolSearch();
+    	_boolStringExt1 = Searcher.searchStringInFileTextExt(_pathToAnalyze + "/assets/www/", "enyo.machine", ".js");
+    	_boolStringExt2 = Searcher.searchStringInFileTextExt(_pathToAnalyze + "/assets/www/", "enyo.kind", ".js");
+    	if(_boolStringExt1 && _boolStringExt2){
+    		this.Enyo = true;
+    	}
         if(this.Enyo){
             this.setWebResources(_pathToAnalyze);
         }
@@ -116,21 +122,6 @@ public class FrameworkEnyo implements Framework {
         this._html = 0;
         this._javascript = 0;
         this._css = 0;
-    };
-    
-    /**
-     * Multiple control of framework
-     * 
-     * @param _path APK decoded path
-     */
-    private void control(String _path){
-    	boolean _ext, _extjs = false;
-    	ToolSearch Searcher = new ToolSearch();
-    	_ext = Searcher.searchStringInFileTextExt(_path + "/assets/www/", "enyo.machine", ".js");
-    	_extjs = Searcher.searchStringInFileTextExt(_path + "/assets/www/", "enyo.kind", ".js");
-    	if(_ext && _extjs){
-    		this.Enyo = true;
-    	}
     }
 
     private void setWebResources(String _pathToAnalyze){

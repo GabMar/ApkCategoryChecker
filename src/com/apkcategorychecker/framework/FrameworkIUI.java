@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.apkcategorychecker.tool.ToolSearch;
+
 
 /**
  * IUI Framework
@@ -65,7 +67,12 @@ public class FrameworkIUI implements Framework{
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.searchFile(_pathToAnalyze, "IUI.class");
+    	boolean _boolFile = false;
+    	ToolSearch Searcher = new ToolSearch();
+    	_boolFile = Searcher.searchFile(_pathToAnalyze, "IUI.class");
+    	if(_boolFile){
+    		this.IUI = true;
+    	}
         if(this.IUI){
             this.setWebResources(_pathToAnalyze);
         }
@@ -156,41 +163,6 @@ public class FrameworkIUI implements Framework{
         }
     }
     
-    /**
-     * Search a file in a directory
-     * 
-     * @param _pathToSearch Path to search in
-     * @param _fileToSearch File name to search
-     */
-    private void searchFile(String _pathToSearch, String _fileToSearch) {
-    	
-    	if(!this.IUI){
-	    	File _path = new File(_pathToSearch);
-	
-	        /*--If _path is a file compare the name with _fileToSearch, else if is 
-	         * a directory call this.searchFile--*/
-	        
-	        if(_path.isFile()){
-	            
-	        	this.IUI =  _path.getAbsolutePath().contains(_fileToSearch);
-	        	
-	        }else if(_path.isDirectory()){
-	            File[] listOfFiles = _path.listFiles();
-	            int length = listOfFiles.length;
-	            for (int i = 0; i < length; i++) {
-	                if (listOfFiles[i].isFile()) {
-	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
-	                  } else if (listOfFiles[i].isDirectory()) {
-	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
-	                  }
-	            }
-	        }
-	    }
-		
-	}
-        
-    
-
     @Override
     public int getHtml() {
         

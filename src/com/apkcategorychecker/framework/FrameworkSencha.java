@@ -67,7 +67,13 @@ public class FrameworkSencha implements Framework{
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.control(_pathToAnalyze);
+    	boolean _boolStringExt, _boolString = false;
+    	ToolSearch Searcher = new ToolSearch();
+    	_boolStringExt = Searcher.searchStringInFileTextExt(_pathToAnalyze + "/assets/www/", "Ext.create", ".js");
+    	_boolString = Searcher.searchStringInFileText(_pathToAnalyze + "/assets/www/", "ext-all.js");
+    	if(_boolStringExt && _boolString){
+    		this.Sencha = true;
+    	}
         if(this.Sencha){
             this.setWebResources(_pathToAnalyze);
         }
@@ -118,21 +124,6 @@ public class FrameworkSencha implements Framework{
         this._javascript = 0;
         this._css = 0;
     };
-    
-    /**
-     * Multiple control of framework
-     * 
-     * @param _path APK decoded path
-     */
-    private void control(String _path){
-    	boolean _ext, _extjs = false;
-    	ToolSearch Searcher = new ToolSearch();
-    	_ext = Searcher.searchStringInFileText(_path + "/assets/www/", "Ext.create");
-    	_extjs = Searcher.searchStringInFileTextExt(_path + "/assets/www/", "ext-all.js", ".js");
-    	if(_ext && _extjs){
-    		this.Sencha = true;
-    	}
-    }
     
 
     private void setWebResources(String _pathToAnalyze){

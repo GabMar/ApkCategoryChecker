@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.apkcategorychecker.tool.ToolSearch;
+
 
 /**
  * RhoMobile Framework
@@ -65,8 +67,12 @@ public class FrameworkRhoMobile implements Framework{
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        File isdirqc = new File(_pathToAnalyze + "/assets/rho.dat");
-        this.RhoMobile = isdirqc.exists();
+        boolean _boolFile = false;
+    	ToolSearch Searcher = new ToolSearch();
+    	_boolFile = Searcher.searchFile(_pathToAnalyze, "rho.dat");
+    	if(_boolFile){
+    		this.RhoMobile = true;
+    	}
         if(this.RhoMobile){
             this.setWebResources(_pathToAnalyze);
         }

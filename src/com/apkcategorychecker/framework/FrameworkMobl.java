@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.apkcategorychecker.tool.ToolSearch;
+
 
 /**
  * Mobl Framework
@@ -65,8 +67,13 @@ public class FrameworkMobl implements Framework{
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.searchFile(_pathToAnalyze, "MoblGap.class");
-        if(!this.Mobl){ this.searchFile(_pathToAnalyze, ".mobl");}
+    	boolean _boolFile1, _boolFile2 = false;
+    	ToolSearch Searcher = new ToolSearch();
+    	_boolFile1 = Searcher.searchFile(_pathToAnalyze, "MoblGap.class");
+    	_boolFile2 = Searcher.searchFile(_pathToAnalyze, ".mobl");
+    	if(_boolFile1 && _boolFile2){
+    		this.Mobl = true;
+    	}
         if(this.Mobl){
             this.setWebResources(_pathToAnalyze);
         }
@@ -157,41 +164,6 @@ public class FrameworkMobl implements Framework{
         }
     }
     
-    /**
-     * Search a file in a directory
-     * 
-     * @param _pathToSearch Path to search in
-     * @param _fileToSearch File name to search
-     */
-    private void searchFile(String _pathToSearch, String _fileToSearch) {
-    	
-    	if(!this.Mobl){
-	    	File _path = new File(_pathToSearch);
-	
-	        /*--If _path is a file compare the name with _fileToSearch, else if is 
-	         * a directory call this.searchFile--*/
-	        
-	        if(_path.isFile()){
-	            
-	        	this.Mobl =  _path.getAbsolutePath().contains(_fileToSearch);
-	        	
-	        }else if(_path.isDirectory()){
-	            File[] listOfFiles = _path.listFiles();
-	            int length = listOfFiles.length;
-	            for (int i = 0; i < length; i++) {
-	                if (listOfFiles[i].isFile()) {
-	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
-	                  } else if (listOfFiles[i].isDirectory()) {
-	                    this.searchFile(listOfFiles[i].getAbsolutePath(), _fileToSearch);
-	                  }
-	            }
-	        }
-	    }
-		
-	}
-        
-    
-
     @Override
     public int getHtml() {
         
