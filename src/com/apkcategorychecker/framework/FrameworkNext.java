@@ -19,12 +19,6 @@
  */
 package com.apkcategorychecker.framework;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import com.apkcategorychecker.tool.ToolSearch;
 
 /**
@@ -49,21 +43,6 @@ public class FrameworkNext implements Framework{
      */
     private boolean Next = false;
 
-    /**
-     * Number of html files
-     */
-    private int _html = 0;
-    
-    /**
-     * Number of javascript files
-     */
-    private int _javascript = 0;
-    
-    /**
-     * Number of css files
-     */
-    private int _css = 0;
-
     @Override
     public boolean Test(String _pathToAnalyze) {
     	boolean _boolString, _boolFile = false;
@@ -73,9 +52,6 @@ public class FrameworkNext implements Framework{
     	if(_boolString && _boolFile){
     		this.Next = true;
     	}
-        if(this.Next){
-            this.setWebResources(_pathToAnalyze);
-        }
         return this.Next;
     }
 
@@ -86,33 +62,6 @@ public class FrameworkNext implements Framework{
     }
 
     @Override
-    public String getPackage(String _pathToAnalyze) {
-        
-        String target = "package";
-        String path = _pathToAnalyze+"/AndroidManifest.xml";
-        String Fpackage = null;
-        try {
-            File file = new File(path);
-            BufferedReader br = new BufferedReader(
-                                new InputStreamReader(
-                                new FileInputStream(file)));
-            String line;
-            while((line = br.readLine()) != null) {
-                if(line.indexOf(target) != -1)
-                    break;
-            }
-            String[] s = line.split("package=");
-            Fpackage = s[1].substring(1, s[1].length() -2);
-            br.close();
-        } catch(IOException e) {
-            System.out.println("read error: " + e.getMessage());
-        }
-        
-        
-        return Fpackage;
-    }
-
-    @Override
     public boolean checkCordova() {
         return this.isCordova;
     }
@@ -120,66 +69,5 @@ public class FrameworkNext implements Framework{
     @Override
     public void setoff(){
         this.Next = false;
-        this._html = 0;
-        this._javascript = 0;
-        this._css = 0;
-    };
-    
-    private void setWebResources(String _pathToAnalyze){
-        
-        File search_file_path = new File(_pathToAnalyze);
-
-        /*--If _pathToAnalyze is a file update the counters, else if is 
-         * a directory call this.setWebResources--*/
-        
-        if(search_file_path.isFile()){
-            
-            if( search_file_path.getAbsolutePath().contains(".html")){
-                
-                this._html = this._html + 1;
-                
-            }else 
-            
-            if( search_file_path.getAbsolutePath().contains(".js")){
-                
-                this._javascript = this._javascript + 1;
-                
-            }else 
-                
-            if( search_file_path.getAbsolutePath().contains(".css")){
-                
-                this._css = this._css + 1;
-            }
-
-        }else if(search_file_path.isDirectory()){
-            File[] listOfFiles = search_file_path.listFiles();
-            int length = listOfFiles.length;
-            for (int i = 0; i < length; i++) {
-                if (listOfFiles[i].isFile()) {
-                    this.setWebResources(listOfFiles[i].getAbsolutePath());
-                  } else if (listOfFiles[i].isDirectory()) {
-                    this.setWebResources(listOfFiles[i].getAbsolutePath());
-                  }
-            }
-        }
     }
-    
-    @Override
-    public int getHtml() {
-        
-        return this._html;
-    }
-
-    @Override
-    public int getJavascript() {
-        
-        return this._javascript;
-    }
-
-    @Override
-    public int getCSS() {
-        
-        return this._css;
-    }
-    
 }

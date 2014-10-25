@@ -124,7 +124,7 @@ public class FrameworkPool {
     /**
      * Applying Singleton Design-Pattern
      * 
-     * @return
+     * @return Instance
      */
     public static FrameworkPool getInstance() {
     	if(instance == null) {
@@ -136,7 +136,7 @@ public class FrameworkPool {
     /**
      * Get the list of Frameworks
      * 
-     * @return
+     * @return List of Frameworks
      */
     public ArrayList<Framework> getFramework(){
         return this.listOfFramework;

@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import com.apkcategorychecker.framework.Framework;
 import com.apkcategorychecker.framework.FrameworkPool;
+import com.apkcategorychecker.tool.ToolApkParameters;
 import com.apkcategorychecker.tool.ToolDecoder;
 import com.apkcategorychecker.tool.ToolDex2Jar;
 import com.apkcategorychecker.tool.ToolJar2Class;
@@ -100,27 +101,30 @@ public class APKAnalyzer{
             	
                 listOfFramework.get(i).setoff();
                 if(listOfFramework.get(i).Test(_decodedApkPath)){
+                	
+                	/*Set the number of html, css and javascript files*/
+                	ToolApkParameters.getInstance().setWebResources(_decodedApkPath);
                     
                 	/*If the Framework match, set the AnalyzerResult Object*/
-                    this._results = this.setResults(listOfFramework.get(i).getPackage(_decodedApkPath), 
+                    this._results = this.setResults(ToolApkParameters.getInstance().getPackage(_decodedApkPath), 
                                     path, 
                                     apkName,
                                     listOfFramework.get(i).getFrameworkName(),
                                     this.listOfFramework.get(i).checkCordova(),
-                                    this.listOfFramework.get(i).getHtml(),
-                                    this.listOfFramework.get(i).getJavascript(),
-                                    this.listOfFramework.get(i).getCSS());
+                                    ToolApkParameters.getInstance().getHtml(),
+                                    ToolApkParameters.getInstance().getJavascript(),
+                                    ToolApkParameters.getInstance().getCSS());
                 	}
                 	/*If none of the Framework is found, set the AnalyzerResult for Native App*/
                 	else if(!listOfFramework.get(i).Test(_decodedApkPath)){
-                    if(this._results == null){this._results = this.setResults(listOfFramework.get(i).getPackage(_decodedApkPath), 
+                    if(this._results == null){this._results = this.setResults(ToolApkParameters.getInstance().getPackage(_decodedApkPath), 
                                     path, 
                                     apkName,
                                     "Native",
                                     false,
-                                    this.listOfFramework.get(i).getHtml(),
-                                    this.listOfFramework.get(i).getJavascript(),
-                                    this.listOfFramework.get(i).getCSS());}
+                                    ToolApkParameters.getInstance().getHtml(),
+                                    ToolApkParameters.getInstance().getJavascript(),
+                                    ToolApkParameters.getInstance().getCSS());}
                 }
         }
         } catch (AndrolibException ex) {

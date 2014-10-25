@@ -42,40 +42,11 @@ public interface Framework {
     public String getFrameworkName();
     
     /**
-     * Get the Package of APK
-     * 
-     * @param _pathToAnalyze Path of decoded APK
-     * @return
-     */
-    public String getPackage(String _pathToAnalyze);
-    
-    /**
      * Check if a Framework uses Apache Cordova
      * 
      * @return
      */
     public boolean checkCordova();
-    
-    /**
-     * Return the number of html files
-     * 
-     * @return
-     */
-    public int getHtml();
-    
-    /**
-     * Return the number of javascript files
-     * 
-     * @return
-     */
-    public int getJavascript();
-    
-    /**
-     * Return the number of css files
-     * 
-     * @return
-     */
-    public int getCSS();
     
     /**
      * Clean parameters
