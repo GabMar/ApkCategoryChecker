@@ -37,23 +37,18 @@ public class FrameworkEnyo implements Framework {
      * Boolean to check if this Framework uses Apache Cordova
      */
     private final boolean isCordova = true;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean Enyo = false;
 
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	boolean _boolStringExt1, _boolStringExt2 = false;
+    	boolean _boolStringExt1, _boolStringExt2, _Enyo = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolStringExt1 = Searcher.searchStringInFileTextExt(_pathToAnalyze + "/assets/www/", "enyo.machine", ".js");
     	_boolStringExt2 = Searcher.searchStringInFileTextExt(_pathToAnalyze + "/assets/www/", "enyo.kind", ".js");
     	if(_boolStringExt1 && _boolStringExt2){
-    		this.Enyo = true;
+    		_Enyo = true;
     	}
-        return this.Enyo;
+        return _Enyo;
     }
 
     @Override
@@ -64,10 +59,5 @@ public class FrameworkEnyo implements Framework {
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.Enyo = false;
     }
 }

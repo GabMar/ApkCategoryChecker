@@ -38,22 +38,17 @@ public class FrameworkTitanium implements Framework{
      * Boolean to check if this Framework uses Apache Cordova
      */
     private boolean isCordova = false;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean Titanium = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	boolean _boolFile1, _boolFile2 = false;
+    	boolean _boolFile1, _boolFile2, _Titanium = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolFile1 = Searcher.searchFile(_pathToAnalyze, "TitaniumModule.class");
     	_boolFile2 = Searcher.searchFile(_pathToAnalyze, "TiActivity.class");
     	if(_boolFile1 && _boolFile2){
-    		this.Titanium = true;
+    		_Titanium = true;
     	}
-        return this.Titanium;
+        return _Titanium;
     }
 
     @Override
@@ -64,10 +59,5 @@ public class FrameworkTitanium implements Framework{
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.Titanium = false;
     }
 }

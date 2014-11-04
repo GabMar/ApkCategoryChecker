@@ -37,22 +37,17 @@ public class FrameworkNext implements Framework{
      * Boolean to check if this Framework uses Apache Cordova
      */
     private final boolean isCordova = true;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean Next = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	boolean _boolString, _boolFile = false;
+    	boolean _boolString, _boolFile, _Next = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolString = Searcher.searchStringInFileText(_pathToAnalyze + "/assets/www/", "nextwebapp");
     	_boolFile = Searcher.searchFile(_pathToAnalyze, "NextWebApp.class");
     	if(_boolString && _boolFile){
-    		this.Next = true;
+    		_Next = true;
     	}
-        return this.Next;
+        return _Next;
     }
 
 
@@ -64,10 +59,5 @@ public class FrameworkNext implements Framework{
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.Next = false;
     }
 }

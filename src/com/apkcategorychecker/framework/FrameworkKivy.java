@@ -37,21 +37,16 @@ public class FrameworkKivy implements Framework{
      * Boolean to check if this Framework uses Apache Cordova
      */
     private boolean isCordova = false;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean Kivy = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	boolean _boolString = false;
+    	boolean _boolString, _Kivy = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolString = Searcher.searchStringInFileText(_pathToAnalyze+"/AndroidManifest.xml", "PythonActivity");
     	if(_boolString){
-    		this.Kivy = true;
+    		_Kivy = true;
     	}
-        return this.Kivy;
+        return _Kivy;
     }
 
     @Override
@@ -62,10 +57,5 @@ public class FrameworkKivy implements Framework{
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.Kivy = false;
     }
 }

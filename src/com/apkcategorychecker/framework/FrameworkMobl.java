@@ -38,22 +38,17 @@ public class FrameworkMobl implements Framework{
      * Boolean to check if this Framework uses Apache Cordova
      */
     private final boolean isCordova = true;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean Mobl = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	boolean _boolFile1, _boolFile2 = false;
+    	boolean _boolFile1, _boolFile2, _Mobl = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolFile1 = Searcher.searchFile(_pathToAnalyze, "MoblGap.class");
     	_boolFile2 = Searcher.searchFile(_pathToAnalyze, ".mobl");
     	if(_boolFile1 && _boolFile2){
-    		this.Mobl = true;
+    		_Mobl = true;
     	}
-        return this.Mobl;
+        return _Mobl;
     }
 
     @Override
@@ -64,10 +59,5 @@ public class FrameworkMobl implements Framework{
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.Mobl = false;
     }
 }

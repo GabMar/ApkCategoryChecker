@@ -48,9 +48,4 @@ public interface Framework {
      */
     public boolean checkCordova();
     
-    /**
-     * Clean parameters
-     */
-    public void setoff();
-    
 }

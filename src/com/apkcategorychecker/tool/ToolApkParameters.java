@@ -39,19 +39,9 @@ public class ToolApkParameters {
 	private static ToolApkParameters instance = null;
 	
 	/**
-     * Number of html files
-     */
-    private int _html = 0;
-    
-    /**
-     * Number of javascript files
-     */
-    private int _javascript = 0;
-    
-    /**
-     * Number of css files
-     */
-    private int _css = 0;
+	 * Counter
+	 */
+	private int _counter = 0;
 	
 	/**
 	 * Private Constructor - Pattern Singleton
@@ -103,11 +93,11 @@ public class ToolApkParameters {
 	    }
 	
 	/**
-	 * Set the numbers of html, css and javascript files
+	 * Get number of files
 	 * 
 	 * @param _pathToAnalyze Path of decoded APK
 	 */
-	public void setWebResources(String _pathToAnalyze){
+	public void getNumber(String _pathToAnalyze, String _extension){
     	
     	File search_file_path = new File(_pathToAnalyze);
 
@@ -116,21 +106,10 @@ public class ToolApkParameters {
     	
         if(search_file_path.isFile()){
             
-        	if(	search_file_path.getAbsolutePath().contains(".html")){
+        	if(	search_file_path.getAbsolutePath().contains(_extension)){
         		
-        		this._html = this._html + 1;
+        		this._counter = this._counter + 1;
         		
-        	}else 
-    		
-    		if(	search_file_path.getAbsolutePath().contains(".js")){
-        		
-        		this._javascript = this._javascript + 1;
-        		
-        	}else 
-        		
-    		if(	search_file_path.getAbsolutePath().contains(".css")){
-        		
-        		this._css = this._css + 1;
         	}
 
         }else if(search_file_path.isDirectory()){
@@ -138,9 +117,9 @@ public class ToolApkParameters {
             int length = listOfFiles.length;
             for (int i = 0; i < length; i++) {
                 if (listOfFiles[i].isFile()) {
-                    this.setWebResources(listOfFiles[i].getAbsolutePath());
+                    this.getNumber(listOfFiles[i].getAbsolutePath(), _extension);
                   } else if (listOfFiles[i].isDirectory()) {
-                    this.setWebResources(listOfFiles[i].getAbsolutePath());
+                    this.getNumber(listOfFiles[i].getAbsolutePath(), _extension);
                   }
             }
         }
@@ -151,11 +130,11 @@ public class ToolApkParameters {
 	 * 
 	 * @return
 	 */
-	public int getHtml() {
+	public int getHtml(String _pathToAnalyze) {
 		
-		int html = this._html;
-		this._html = 0;
-		return html;
+		this._counter = 0;
+		this.getNumber(_pathToAnalyze, ".html");
+		return this._counter;
 	}
 
 	/**
@@ -163,11 +142,11 @@ public class ToolApkParameters {
 	 * 
 	 * @return
 	 */
-	public int getJavascript() {
+	public int getJavascript(String _pathToAnalyze) {
 		
-		int javascript = this._javascript;
-		this._javascript = 0;
-		return javascript;
+		this._counter = 0;
+		this.getNumber(_pathToAnalyze, ".js");
+		return this._counter;
 	}
 
 	/**
@@ -175,11 +154,11 @@ public class ToolApkParameters {
 	 * 
 	 * @return
 	 */
-	public int getCSS() {
+	public int getCSS(String _pathToAnalyze) {
 		
-		int css = this._css;
-		this._css = 0;
-		return css;
+		this._counter = 0;
+		this.getNumber(_pathToAnalyze, ".css");
+		return this._counter;
 	}
 	
 	}

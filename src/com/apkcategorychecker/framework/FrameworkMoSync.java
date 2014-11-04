@@ -37,22 +37,16 @@ public class FrameworkMoSync implements Framework{
      * Boolean to check if this Framework uses Apache Cordova
      */
     private boolean isCordova = false;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean MoSync = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        //this.MoSync = this.searchString(_pathToAnalyze+"/AndroidManifest.xml", "MoSyncService");
-        boolean _boolString = false;
+        boolean _boolString, _MoSync = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolString = Searcher.searchStringInFileText(_pathToAnalyze+"/AndroidManifest.xml", "MoSyncService");
     	if(_boolString){
-    		this.MoSync = true;
+    		_MoSync = true;
     	}
-        return this.MoSync;
+        return _MoSync;
     }
 
     @Override
@@ -63,10 +57,5 @@ public class FrameworkMoSync implements Framework{
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.MoSync = false;
     }
 }

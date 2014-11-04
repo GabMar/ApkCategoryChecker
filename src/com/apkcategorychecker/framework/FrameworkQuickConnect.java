@@ -37,22 +37,17 @@ public class FrameworkQuickConnect implements Framework{
      * Boolean to check if this Framework uses Apache Cordova
      */
     private boolean isCordova = false;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean QuickConnect = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        boolean _boolString1, _boolString2 = false;
+        boolean _boolString1, _boolString2, _QuickConnect = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolString1 = Searcher.searchStringInFileText(_pathToAnalyze, "qc.handleError");
     	_boolString2 = Searcher.searchStringInFileText(_pathToAnalyze, "function QCNativeFooter");
     	if(_boolString1 && _boolString2){
-    		this.QuickConnect = true;
+    		_QuickConnect = true;
     	}
-        return this.QuickConnect;
+        return _QuickConnect;
     }
 
     @Override
@@ -63,10 +58,5 @@ public class FrameworkQuickConnect implements Framework{
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.QuickConnect = false;
     }
 }

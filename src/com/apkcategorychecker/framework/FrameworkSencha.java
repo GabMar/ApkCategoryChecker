@@ -39,22 +39,17 @@ public class FrameworkSencha implements Framework{
      */
     private final boolean isCordova = true;
     
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean Sencha = false;
-    
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	boolean _boolStringExt, _boolString = false;
+    	boolean _boolStringExt, _boolString, _Sencha = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolStringExt = Searcher.searchStringInFileTextExt(_pathToAnalyze + "/assets/www/", "Ext.create", ".js");
     	_boolString = Searcher.searchStringInFileText(_pathToAnalyze + "/assets/www/", "ext-all.js");
     	if(_boolStringExt && _boolString){
-    		this.Sencha = true;
+    		_Sencha = true;
     	}
-        return this.Sencha;
+        return _Sencha;
     }
 
     @Override
@@ -65,10 +60,5 @@ public class FrameworkSencha implements Framework{
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.Sencha = false;
     }
 }

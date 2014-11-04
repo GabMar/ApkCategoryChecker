@@ -37,22 +37,17 @@ public class FrameworkCordova implements Framework {
      * Boolean to check if this Framework uses Apache Cordova
      */
     private final boolean isCordova = true;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean Cordova = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	boolean _boolString, _boolFile = false;
+    	boolean _boolString, _boolFile, _Cordova = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolString = Searcher.searchStringInFileText(_pathToAnalyze+"/res/xml/config.xml", "org.apache.cordova");
     	_boolFile = Searcher.searchFile(_pathToAnalyze, "CordovaActivity.class");
     	if(_boolString && _boolFile){
-    		this.Cordova = true;
+    		_Cordova = true;
     	}
-        return this.Cordova;
+        return _Cordova;
     }
 
     @Override
@@ -63,10 +58,5 @@ public class FrameworkCordova implements Framework {
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.Cordova = false;
     }
 }

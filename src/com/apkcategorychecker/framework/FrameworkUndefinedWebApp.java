@@ -19,9 +19,8 @@
  */
 package com.apkcategorychecker.framework;
 
-import java.io.File;
-
 import com.apkcategorychecker.cli.CommandLineInterface;
+import com.apkcategorychecker.tool.ToolApkParameters;
 
 /**
  * UndefinedWebApp Framework
@@ -41,29 +40,13 @@ public class FrameworkUndefinedWebApp implements Framework{
     private boolean isCordova = false;
     
     /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean UndefinedWebApp = false;
-    
-    /**
-     * Boolean used by the method searchString
-     */
-    private boolean founded = false;
-    
-    /**
      * Level of deepness
      */
     int _deep = CommandLineInterface.getInstance().getDeep();
-    
-    /**
-     * Number of Web Resource File founded
-     */
-    int i_res = 0;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        this.UndefinedWebApp = this.searchFile(_pathToAnalyze);
-        return this.UndefinedWebApp;
+        return this.compareParameters(_pathToAnalyze);
     }
 
     @Override
@@ -76,52 +59,24 @@ public class FrameworkUndefinedWebApp implements Framework{
         return this.isCordova;
     }
     
-    @Override
-    public void setoff(){
-        this.UndefinedWebApp = false;
-        this.founded = false; 
-        this.i_res = 0;
-    };
-    
-    
     /**
      * Method to search Web Resource Files
      * 
      * @param _pathSearch Path of file
      * @return
      */
-    private boolean searchFile(String _pathSearch){
+    private boolean compareParameters(String _pathSearch){
+    	
+    	int _html = ToolApkParameters.getInstance().getHtml(_pathSearch);
+    	int _javascript = ToolApkParameters.getInstance().getJavascript(_pathSearch);
+    	int _css = ToolApkParameters.getInstance().getCSS(_pathSearch);
+    	int _res = _html + _javascript + _css;
         
-        if(this.founded == false){
-            
-        	File search_file_path = new File(_pathSearch);
-
-            //If File
-            if(search_file_path.isFile()){
-                
-            	if(	search_file_path.getAbsolutePath().contains(".html") ||
-            		search_file_path.getAbsolutePath().contains(".js")	||
-            		search_file_path.getAbsolutePath().contains(".css")){
-            		
-            		this.i_res = this.i_res + 1;
-            	}
-
-            }else if(search_file_path.isDirectory()){
-                File[] listOfFiles = search_file_path.listFiles();
-                int length = listOfFiles.length;
-                for (int i = 0; i < length; i++) {
-                    if (listOfFiles[i].isFile()) {
-                        this.searchFile(listOfFiles[i].getAbsolutePath());
-                      } else if (listOfFiles[i].isDirectory()) {
-                        this.searchFile(listOfFiles[i].getAbsolutePath());
-                      }
-                }
-            }
-        }
+        boolean _compare = false;
         
-        if(this.i_res >= this._deep){
-        	this.founded = true;
+        if(_res >= this._deep && this._deep != 0){
+        	_compare = true;
         }
-        return this.founded;
+        return _compare;
     }
 }

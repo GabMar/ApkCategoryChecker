@@ -38,21 +38,16 @@ public class FrameworkIUI implements Framework{
      * Boolean to check if this Framework uses Apache Cordova
      */
     private final boolean isCordova = true;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean IUI = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	boolean _boolFile = false;
+    	boolean _boolFile, _IUI = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolFile = Searcher.searchFile(_pathToAnalyze, "IUI.class");
     	if(_boolFile){
-    		this.IUI = true;
+    		_IUI = true;
     	}
-        return this.IUI;
+        return _IUI;
     }
 
     @Override
@@ -63,10 +58,5 @@ public class FrameworkIUI implements Framework{
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.IUI = false;
     }
 }

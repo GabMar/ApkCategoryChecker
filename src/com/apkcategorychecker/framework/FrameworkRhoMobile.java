@@ -39,21 +39,16 @@ public class FrameworkRhoMobile implements Framework{
      * Boolean to check if this Framework uses Apache Cordova
      */
     private boolean isCordova = false;
-    
-    /**
-     * Boolean to check if the APK matches the Framework
-     */
-    private boolean RhoMobile = false;
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-        boolean _boolFile = false;
+        boolean _boolFile, _RhoMobile = false;
     	ToolSearch Searcher = new ToolSearch();
     	_boolFile = Searcher.searchFile(_pathToAnalyze, "rho.dat");
     	if(_boolFile){
-    		this.RhoMobile = true;
+    		_RhoMobile = true;
     	}
-        return this.RhoMobile;
+        return _RhoMobile;
     }
 
     @Override
@@ -64,10 +59,5 @@ public class FrameworkRhoMobile implements Framework{
     @Override
     public boolean checkCordova() {
         return this.isCordova;
-    }
-    
-    @Override
-    public void setoff(){
-        this.RhoMobile = false;
     }
 }

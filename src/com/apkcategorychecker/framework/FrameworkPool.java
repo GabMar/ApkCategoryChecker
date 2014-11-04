@@ -81,13 +81,6 @@ public class FrameworkPool {
         Framework Sencha;
         Sencha = new FrameworkSencha();
         this.listOfFramework.add(Sencha);
-        
-        /*Add Canappi Framework*/
-        
-        Framework Canappi;
-        Canappi = new FrameworkCanappi();
-        this.listOfFramework.add(Canappi);
-        
         /*Add Kivy Framework*/
         
         Framework Kivy;

@@ -98,12 +98,7 @@ public class APKAnalyzer{
             /*For every Framework analyze the Decoded APK; if the Framework match return true*/
             for (int i = 0; i < this.listOfFramework.size(); i++) {
             	
-            	
-                listOfFramework.get(i).setoff();
                 if(listOfFramework.get(i).Test(_decodedApkPath)){
-                	
-                	/*Set the number of html, css and javascript files*/
-                	ToolApkParameters.getInstance().setWebResources(_decodedApkPath);
                     
                 	/*If the Framework match, set the AnalyzerResult Object*/
                     this._results = this.setResults(ToolApkParameters.getInstance().getPackage(_decodedApkPath), 
@@ -111,9 +106,9 @@ public class APKAnalyzer{
                                     apkName,
                                     listOfFramework.get(i).getFrameworkName(),
                                     this.listOfFramework.get(i).checkCordova(),
-                                    ToolApkParameters.getInstance().getHtml(),
-                                    ToolApkParameters.getInstance().getJavascript(),
-                                    ToolApkParameters.getInstance().getCSS());
+                                    ToolApkParameters.getInstance().getHtml(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getJavascript(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getCSS(_decodedApkPath));
                 	}
                 	/*If none of the Framework is found, set the AnalyzerResult for Native App*/
                 	else if(!listOfFramework.get(i).Test(_decodedApkPath)){
@@ -122,9 +117,9 @@ public class APKAnalyzer{
                                     apkName,
                                     "Native",
                                     false,
-                                    ToolApkParameters.getInstance().getHtml(),
-                                    ToolApkParameters.getInstance().getJavascript(),
-                                    ToolApkParameters.getInstance().getCSS());}
+                                    ToolApkParameters.getInstance().getHtml(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getJavascript(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getCSS(_decodedApkPath));}
                 }
         }
         } catch (AndrolibException ex) {
