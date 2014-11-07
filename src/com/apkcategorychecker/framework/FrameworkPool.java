@@ -52,6 +52,12 @@ public class FrameworkPool {
         Cordova = new FrameworkCordova();
         this.listOfFramework.add(Cordova);
         
+        /*Add PhoneGap Framework*/
+        
+        Framework Phonegap;
+        Phonegap = new FrameworkPhonegap();
+        this.listOfFramework.add(Phonegap);
+        
         /*Add Enyo Framework*/
         
         Framework Enyo;
