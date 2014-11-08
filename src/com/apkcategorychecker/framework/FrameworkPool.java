@@ -64,6 +64,12 @@ public class FrameworkPool {
         Enyo = new FrameworkEnyo();
         this.listOfFramework.add(Enyo);
         
+        /*Add IBM Worklight Framework*/
+        
+        Framework Worklight;
+        Worklight = new FrameworkIBMWorklight();
+        this.listOfFramework.add(Worklight);
+        
         /*Add IUI Framework*/
         
         Framework IUI;

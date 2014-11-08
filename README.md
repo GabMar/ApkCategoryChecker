@@ -61,6 +61,7 @@ Framework | Recognition method | Reliability
 [Apache Cordova](http://cordova.apache.org/) | If is present the string "org.apache.cordova" in "/res/xml/config.xml" AND if is present the file "CordovaActivity.class" | Strong
 [Phonegap](http://phonegap.com/) | If is present the string "http://phonegap.com/ns/1.0" in "/res/xml/config.xml" AND if is present the file "CordovaActivity.class" | Medium
 [Enyo](http://enyojs.com/) | If is present the string "enyo.machine" AND "enyo.kind" in a .js file | Medium
+[IBM Worklight](http://www-03.ibm.com/software/products/it/worklight-foundation) | If is present the string "com.worklight.androidgap" in "/res/xml/config.xml" AND if is present the file "WLDroidGap.class" | Strong
 [IUI](http://www.iui-js.org/) | If is present the file "IUI.class" | Medium
 [Kivy](http://kivy.org/) | If is present the string "PythonActivity" in the "AndroidManifest.xml" | Medium
 [Mobl](http://www.mobl-lang.org/) | If is present the file "MoblGap.class", AND if present a file with extension ".mobl" | Strong
