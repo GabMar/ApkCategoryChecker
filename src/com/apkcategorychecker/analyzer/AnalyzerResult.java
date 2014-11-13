@@ -75,6 +75,16 @@ public class AnalyzerResult {
 	private int _css;
 	
 	/**
+	 * Value of Debuggable parameter
+	 */
+	private String _debuggable;
+	
+	/**
+	 * List of Android Permissions
+	 */
+	private String _permissions;
+	
+	/**
 	 * File Size
 	 */
 	private String _fileSize;
@@ -155,6 +165,24 @@ public class AnalyzerResult {
 	}
 	
 	/**
+	 * Return the value of Debuggable parameter
+	 * 
+	 * @return
+	 */
+	public String get_debuggable(){
+		return this._debuggable;
+	}
+	
+	/**
+	 * Return the list of Android Permissions
+	 * 
+	 * @return
+	 */
+	public String get_permissions(){
+		return this._permissions;
+	}
+	
+	/**
 	 * Return the File Size
 	 * 
 	 * @return
@@ -228,6 +256,24 @@ public class AnalyzerResult {
 	 */
 	public void set_css(int css){
 		this._css = css;
+	}
+	
+	/**
+	 * Set the Debuggable parameter
+	 * 
+	 * @param debuggable Value of debuggable
+	 */
+	public void set_debuggable(String debuggable){
+		this._debuggable = debuggable;
+	}
+	
+	/**
+	 * Set the list of Android Permissions
+	 * 
+	 * @param permissions
+	 */
+	public void set_permissions(String permissions){
+		this._permissions = permissions;
 	}
 	
 	/**

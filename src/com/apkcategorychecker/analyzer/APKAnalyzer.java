@@ -27,6 +27,10 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
 import com.apkcategorychecker.framework.Framework;
 import com.apkcategorychecker.framework.FrameworkPool;
 import com.apkcategorychecker.tool.ToolApkParameters;
@@ -109,6 +113,8 @@ public class APKAnalyzer{
                                     ToolApkParameters.getInstance().getHtml(_decodedApkPath),
                                     ToolApkParameters.getInstance().getJavascript(_decodedApkPath),
                                     ToolApkParameters.getInstance().getCSS(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getPermission(_decodedApkPath),
                                     ToolApkParameters.getInstance().getFileSize(path));
                 	}
                 	/*If none of the Framework is found, set the AnalyzerResult for Native App*/
@@ -121,10 +127,12 @@ public class APKAnalyzer{
                                     ToolApkParameters.getInstance().getHtml(_decodedApkPath),
                                     ToolApkParameters.getInstance().getJavascript(_decodedApkPath),
                                     ToolApkParameters.getInstance().getCSS(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getPermission(_decodedApkPath),
                                     ToolApkParameters.getInstance().getFileSize(path));}
                 }
         }
-        } catch (AndrolibException ex) {
+        } catch (AndrolibException | ParserConfigurationException | SAXException ex) {
             Logger.getLogger(APKAnalyzer.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -161,6 +169,8 @@ public class APKAnalyzer{
                                         int _html,
                                         int _javascript,
                                         int _css,
+                                        String _debuggable,
+                                        String _permissions,
                                         String _fileSize){
     	
     	/*Instance of AnalyzerResult*/
@@ -195,6 +205,12 @@ public class APKAnalyzer{
         
         /*Set the number of css files*/
         _settedResults.set_css(_css);
+        
+        /*Set the debuggable parameter*/
+        _settedResults.set_debuggable(_debuggable);
+        
+        /*List of Android Permission*/
+        _settedResults.set_permissions(_permissions);
         
         /*Set the File Size*/
         _settedResults.set_fileSize(_fileSize);

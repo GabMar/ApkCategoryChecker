@@ -19,11 +19,21 @@
  */
 package com.apkcategorychecker.tool;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+
 
 /**
  * Get the package of APK, the number of html, css and javascript file
@@ -65,32 +75,93 @@ public class ToolApkParameters {
 	 * 	
 	 * @param _pathToAnalyze Path of decoded APK
 	 * @return
+	 * @throws ParserConfigurationException 
+	 * @throws IOException 
+	 * @throws SAXException 
 	 */
-	public String getPackage(String _pathToAnalyze) {
+	public String getPackage(String _pathToAnalyze) throws ParserConfigurationException, SAXException, IOException {
 	        
-	        String target = "package";
 	        String path = _pathToAnalyze+"/AndroidManifest.xml";
 	        String Fpackage = null;
-	        try {
-	            File file = new File(path);
-	            BufferedReader br = new BufferedReader(
-	                                new InputStreamReader(
-	                                new FileInputStream(file)));
-	            String line;
-	            while((line = br.readLine()) != null) {
-	                if(line.indexOf(target) != -1)
-	                    break;
-	            }
-	            String[] s = line.split("package=");
-	            Fpackage = s[1].substring(1, s[1].length() -2);
-	            br.close();
-	        } catch(IOException e) {
-	            System.out.println("read error: " + e.getMessage());
-	        }
 	        
+	        File fXmlFile = new File(path);
+	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	    	Document doc = dBuilder.parse(fXmlFile);
+	    	doc.getDocumentElement().normalize();
+	    	
+	    	NodeList nList = doc.getElementsByTagName("manifest");
+	    	Node nNode = nList.item(0);
+	    	Element eElement = (Element) nNode;
+	    	Fpackage = eElement.getAttribute("package");
 	        
 	        return Fpackage;
 	    }
+	
+	/**
+	 * Return the Debuggable parameter from AndroidManifest
+	 * 
+	 * @param _pathToAnalyze Path of decoded APK
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	public String getDebuggable(String _pathToAnalyze) throws ParserConfigurationException, SAXException, IOException {
+        
+        String path = _pathToAnalyze+"/AndroidManifest.xml";
+        String Fpackage = null;
+        
+        File fXmlFile = new File(path);
+    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+    	Document doc = dBuilder.parse(fXmlFile);
+    	doc.getDocumentElement().normalize();
+    	
+    	NodeList nList = doc.getElementsByTagName("application");
+    	Node nNode = nList.item(0);
+    	Element eElement = (Element) nNode;
+    	Fpackage = eElement.getAttribute("android:debuggable");
+        
+        return Fpackage;
+    }
+	
+	/**
+	 * Return the list of Android Permission
+	 * 
+	 * @param _pathToAnalyze Path of decoded APK
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	public String getPermission(String _pathToAnalyze) throws ParserConfigurationException, SAXException, IOException {
+        
+        String path = _pathToAnalyze+"/AndroidManifest.xml";
+        ArrayList<String> _list = new ArrayList<String>();
+        File fXmlFile = new File(path);
+    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+    	Document doc = dBuilder.parse(fXmlFile);
+    	doc.getDocumentElement().normalize();
+    	
+    	NodeList nList = doc.getElementsByTagName("uses-permission");
+    	for (int temp = 0; temp < nList.getLength(); temp++) {
+    		 
+    		Node nNode = nList.item(temp);
+     
+    		if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+     
+    			Element eElement = (Element) nNode;
+    			String _current = eElement.getAttribute("android:name");
+    			_list.add(_current);
+     
+    		}
+    	}
+    	String _result = _list.toString().substring(1, _list.toString().length() - 1);
+        
+        return _result;
+    }
 	
 	/**
 	 * Get number of files
@@ -161,6 +232,12 @@ public class ToolApkParameters {
 		return this._counter;
 	}
 	
+	/**
+	 * Return the File Size
+	 * 
+	 * @param _path Path of File
+	 * @return
+	 */
 	public String getFileSize(String _path) {
 		long _size;
 		

@@ -50,6 +50,8 @@ Base_Framework | The Base Framework used to build the APK
 HTML | Number of ".html" file used to build the APK
 JS | Number of ".js" file used to build the APK
 CSS | Number of ".css" file used to build the APK
+Android_Debuggable | The value of Debuggable parameter in AndroidManifest.xml
+Android_Permissions | List of Android Permission
 File_Size(bytes) | File size (in bytes) of APK
 
 ## RECOGNITION FRAMEWORKS METHODS ##
