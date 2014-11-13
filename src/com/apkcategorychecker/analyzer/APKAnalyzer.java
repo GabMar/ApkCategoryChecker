@@ -108,7 +108,8 @@ public class APKAnalyzer{
                                     this.listOfFramework.get(i).checkCordova(),
                                     ToolApkParameters.getInstance().getHtml(_decodedApkPath),
                                     ToolApkParameters.getInstance().getJavascript(_decodedApkPath),
-                                    ToolApkParameters.getInstance().getCSS(_decodedApkPath));
+                                    ToolApkParameters.getInstance().getCSS(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getFileSize(path));
                 	}
                 	/*If none of the Framework is found, set the AnalyzerResult for Native App*/
                 	else if(!listOfFramework.get(i).Test(_decodedApkPath)){
@@ -119,7 +120,8 @@ public class APKAnalyzer{
                                     false,
                                     ToolApkParameters.getInstance().getHtml(_decodedApkPath),
                                     ToolApkParameters.getInstance().getJavascript(_decodedApkPath),
-                                    ToolApkParameters.getInstance().getCSS(_decodedApkPath));}
+                                    ToolApkParameters.getInstance().getCSS(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getFileSize(path));}
                 }
         }
         } catch (AndrolibException ex) {
@@ -148,6 +150,7 @@ public class APKAnalyzer{
      * @param _html Number of html files
      * @param _javascript Number of javascript files
      * @param _css Number of css files
+     * @param _fileSize File size
      * @return
      */
     private AnalyzerResult setResults(  String _apkpackage, 
@@ -157,7 +160,8 @@ public class APKAnalyzer{
                                         boolean _checkCordova,
                                         int _html,
                                         int _javascript,
-                                        int _css){
+                                        int _css,
+                                        String _fileSize){
     	
     	/*Instance of AnalyzerResult*/
         AnalyzerResult _settedResults = new AnalyzerResult();
@@ -173,11 +177,14 @@ public class APKAnalyzer{
         
         /*Set the Framework used*/
         if(_checkCordova && !"Apache Cordova".equals(_framework)){
-            _settedResults.set_APKFramework("Apache Cordova + " + _framework);
+            _settedResults.set_APKBaseFramework("Apache Cordova");
+            _settedResults.set_APKMainFramework(_framework);
         }else if(_checkCordova && "Apache Cordova".equals(_framework)){
-            _settedResults.set_APKFramework(_framework);
+        	_settedResults.set_APKBaseFramework("");
+            _settedResults.set_APKMainFramework(_framework);
         }else if(!_checkCordova){
-            _settedResults.set_APKFramework(_framework);
+        	_settedResults.set_APKBaseFramework("");
+            _settedResults.set_APKMainFramework(_framework);
         }
         
         /*Set the number of html files*/
@@ -188,6 +195,9 @@ public class APKAnalyzer{
         
         /*Set the number of css files*/
         _settedResults.set_css(_css);
+        
+        /*Set the File Size*/
+        _settedResults.set_fileSize(_fileSize);
         
         return _settedResults;
     }

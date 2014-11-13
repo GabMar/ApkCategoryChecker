@@ -161,4 +161,15 @@ public class ToolApkParameters {
 		return this._counter;
 	}
 	
+	public String getFileSize(String _path) {
+		long _size;
+		
+		File _file = new File(_path);
+		_size = _file.length();
+		String _s = String.valueOf(_size);
+		
+		
+		return _s;
+	}
+	
 	}

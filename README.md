@@ -41,14 +41,16 @@ For now the only supported output format is CSV with the following columns
 
 Column | Description
 ----------|------------
-ID | The id of analyzed APK
-APK Name | The APK name
-APK Path | The path of analyzed APK
-APK Package | The package of APK
-Framework | The Framework used to build the APK
+App_ID | The id of analyzed APK
+APK_File_Name | The APK name
+APK_File_Path | The path of analyzed APK
+APK_Package | The package of APK
+Main_Framework | The Main Framework used to build the APK
+Base_Framework | The Base Framework used to build the APK
 HTML | Number of ".html" file used to build the APK
 JS | Number of ".js" file used to build the APK
 CSS | Number of ".css" file used to build the APK
+File_Size(bytes) | File size (in bytes) of APK
 
 ## RECOGNITION FRAMEWORKS METHODS ##
 

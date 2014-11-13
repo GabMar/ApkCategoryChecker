@@ -50,9 +50,14 @@ public class AnalyzerResult {
 	private String _APKPath;
 	
 	/**
-	 * Framework used
+	 * Main Framework used
 	 */
-	private String _APKFramework;
+	private String _APKMainFramework;
+	
+	/**
+	 * Base Framework used
+	 */
+	private String _APKBaseFramework;
 	
 	/**
 	 * Number of HTML files
@@ -68,6 +73,11 @@ public class AnalyzerResult {
 	 * Number of CSS files
 	 */
 	private int _css;
+	
+	/**
+	 * File Size
+	 */
+	private String _fileSize;
 	
 	
 	/*--Methods--*/
@@ -100,12 +110,21 @@ public class AnalyzerResult {
 	}
 	
 	/**
-	 * Return the APK Framework
+	 * Return the APK Main Framework
 	 * 
 	 * @return 
 	 */
-	public String get_APKFramework(){
-		return this._APKFramework;
+	public String get_APKMainFramework(){
+		return this._APKMainFramework;
+	}
+	
+	/**
+	 * Return the APK Base Framework
+	 * 
+	 * @return 
+	 */
+	public String get_APKBaseFramework(){
+		return this._APKBaseFramework;
 	}
 	
 	/**
@@ -136,6 +155,15 @@ public class AnalyzerResult {
 	}
 	
 	/**
+	 * Return the File Size
+	 * 
+	 * @return
+	 */
+	public String get_fileSize(){
+		return this._fileSize;
+	}
+	
+	/**
 	 * 
 	 * @param _i String of APK Package
 	 */
@@ -161,10 +189,18 @@ public class AnalyzerResult {
 	
 	/**
 	 * 
-	 * @param _framework String of APK Framework
+	 * @param _framework String of APK Main Framework
 	 */
-	public void set_APKFramework(String _framework){
-		this._APKFramework = _framework;
+	public void set_APKMainFramework(String _framework){
+		this._APKMainFramework = _framework;
+	}
+	
+	/**
+	 * 
+	 * @param _framework String of APK Base Framework
+	 */
+	public void set_APKBaseFramework(String _framework){
+		this._APKBaseFramework = _framework;
 	}
 	
 	/**
@@ -192,6 +228,15 @@ public class AnalyzerResult {
 	 */
 	public void set_css(int css){
 		this._css = css;
+	}
+	
+	/**
+	 * Set the File Size
+	 * 
+	 * @param fileSize File Size in bytes
+	 */
+	public void set_fileSize(String fileSize){
+		this._fileSize = fileSize;
 	}
 }
 

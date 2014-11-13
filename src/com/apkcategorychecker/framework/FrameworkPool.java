@@ -51,12 +51,18 @@ public class FrameworkPool {
         Framework Cordova;
         Cordova = new FrameworkCordova();
         this.listOfFramework.add(Cordova);
-        
+
         /*Add PhoneGap Framework*/
         
         Framework Phonegap;
         Phonegap = new FrameworkPhonegap();
         this.listOfFramework.add(Phonegap);
+
+        /*Add Titanium Framework*/
+        
+        Framework Titanium;
+        Titanium = new FrameworkTitanium();
+        this.listOfFramework.add(Titanium);
         
         /*Add Enyo Framework*/
         
@@ -93,6 +99,7 @@ public class FrameworkPool {
         Framework Sencha;
         Sencha = new FrameworkSencha();
         this.listOfFramework.add(Sencha);
+        
         /*Add Kivy Framework*/
         
         Framework Kivy;
@@ -116,13 +123,6 @@ public class FrameworkPool {
         Framework RhoMobile;
         RhoMobile = new FrameworkRhoMobile();
         this.listOfFramework.add(RhoMobile);
-        
-        /*Add Titanium Framework*/
-        
-        Framework Titanium;
-        Titanium = new FrameworkTitanium();
-        this.listOfFramework.add(Titanium);
-        
         
     }
     

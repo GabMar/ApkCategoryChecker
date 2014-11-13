@@ -81,7 +81,16 @@ public class WriterCSV implements Writer {
             printer = new CSVPrinter(_out, format.withDelimiter('#'));
             System.out.println("********");
             try {
-                printer.printRecord("ID","APK Name","APK Path","APK Package","Framework","HTML","JS","CSS");
+                printer.printRecord("App_ID",
+                					"APK_File_Name",
+                					"APK_File_Path",
+                					"APK_Package",
+                					"Main_Framework",
+                					"Base_Framework",
+                					"HTML",
+                					"JS",
+                					"CSS",
+                					"File_Size(Bytes)");
             } catch (IOException ex) {
                 Logger.getLogger(WriterCSV.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -98,10 +107,12 @@ public class WriterCSV implements Writer {
                 resultData.add(_resultElement.get_APKName());
                 resultData.add(_resultElement.get_APKPath());
                 resultData.add(_resultElement.get_Package());
-                resultData.add(_resultElement.get_APKFramework());
+                resultData.add(_resultElement.get_APKMainFramework());
+                resultData.add(_resultElement.get_APKBaseFramework());
                 resultData.add(String.valueOf(_resultElement.get_html()));
                 resultData.add(String.valueOf(_resultElement.get_js()));
                 resultData.add(String.valueOf(_resultElement.get_css()));
+                resultData.add(_resultElement.get_fileSize());
                 i++;
                 printer.printRecord(resultData);
             }
