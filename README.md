@@ -11,31 +11,29 @@ A Command-Line Program written in [Java](http://en.wikipedia.org/wiki/Java_%28pr
 Parameter | Description
 ----------|------------
 -p | The Path of an APK or the Path of a directory containing APKs
--d | Use current directory
--csv | Export the results in a [CSV](http://it.wikipedia.org/wiki/Comma-separated_values) file
--o | The destination directory of the result's file. If this parameter is missing, the result's file will be exported on the working path
+-csv | Export the results in a [CSV](http://it.wikipedia.org/wiki/Comma-separated_values) file with specified path
 -k | Keep the directory of the encoded APK 
--deep | How deep you want to analyze an hybrid app
+-deep | Number of threshold to detect if defined APK is hybrid
 
 ## USAGE EXAMPLE ##
 
 * To analyze the directory containing the `ApkCategoryChecker.jar` and put the CSV result file in the same directory, open a terminal, navigate in the directory and type:
 
-	`java -jar ApkCategoryChecker.jar -d -csv`
+	`java -jar ApkCategoryChecker.jar -p . -csv .`
 
 * To analyze a directory or an APK file and put the CSV result file in a different directory, open a terminal, navigate in the directory containing the 'ApkCategoryChecker.jar' file and type:
 
-	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv -o /Destination/Path/for/Result/File`
+	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv /Destination/Path/for/Result/File`
 
 * If you want to maintain the directory containing the decoded APK, add the parameter -k:
 
-	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv -k`
+	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv . -k .`
 
 * To set the level of Analysis (number of web resource files to search) use the parameter -deep:
 
 	(example with choosed level 4)
 	
-	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv -deep 4`
+	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv . -deep 4`
 
 ## FILE RESULT FORMAT##
 

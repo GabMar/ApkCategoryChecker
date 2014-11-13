@@ -43,11 +43,6 @@ public class CommandLineInterface {
 	private String _givenPath;
 	
 	/**
-	 * String of current directory
-	 */
-	private String _currentDirectory = System.getProperty("user.dir");
-	
-	/**
 	 * Boolean for keep decoded Apk
 	 */
 	private boolean _keep = false;
@@ -61,6 +56,11 @@ public class CommandLineInterface {
 	 * Output directory
 	 */
 	private String _outDir;
+	
+	/**
+	 * Destination path of decoded APK
+	 */
+	private String _outDecoded;
 	
 	/**
 	 * How deep an hybrid app will be analyzed
@@ -125,6 +125,15 @@ public class CommandLineInterface {
 	}
 	
 	/**
+	 * Method to set the decoded apk path
+	 * 
+	 * @return
+	 */
+	public String getDecodedPath() {
+		return this._outDecoded;
+	}
+	
+	/**
 	 * Get the depth level with which an APK will be analyzed
 	 * @return
 	 */
@@ -152,10 +161,8 @@ public class CommandLineInterface {
 		
 		/*--Add options--*/
 		options.addOption("p", true, "Path of APK or Directory containing APKs");
-		options.addOption("d", false, "Use current directory");
-		options.addOption("csv", false, "To obtain a CSV file result");
-        options.addOption("o", true, "Destination path for file result");
-        options.addOption("k", false, "Keep the decoded APK on the filesystem");
+		options.addOption("csv", true, "To obtain a CSV file result");
+        options.addOption("k", true, "Keep the decoded APK on the filesystem");
         options.addOption("deep", true, "How deep you want to analyze an hybrid app");
 		
 		/*--CLI parser--*/
@@ -169,31 +176,26 @@ public class CommandLineInterface {
 		/*--CLI options switch--*/
 		
 		if(cmd.hasOption("p")){
-			
 			/*--Take the given path--*/
-            this._givenPath = cmd.getOptionValue("p");
+			String _value = cmd.getOptionValue("p");
+			if(_value == "."){
+				this._givenPath = System.getProperty("user.dir");
+			}else{
+				this._givenPath = _value;
+			}
 		
-		}
-		
-		if(cmd.hasOption("d")){
-			
-			this._givenPath = _currentDirectory;
 		}
 		
 		/*--If k parameter is passed, the directory of decoded APK will be maintained--*/
         
         if(cmd.hasOption("k")){ 
             this._keep = true;
+            this._outDecoded = cmd.getOptionValue("k");
         }
         
         if(cmd.hasOption("csv")){
         	this._choosedResultFormat = "csv";
-        }
-        
-        if(cmd.hasOption("o")){
-        	this._outDir = cmd.getOptionValue("o");
-        }else {
-        	this._outDir = _currentDirectory;
+        	this._outDir = cmd.getOptionValue("csv");
         }
         
         if(cmd.hasOption("deep")){

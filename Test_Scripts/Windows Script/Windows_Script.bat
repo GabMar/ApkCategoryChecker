@@ -1,1 +1,1 @@
-java -jar ApkCategoryChecker.jar -d -csv
+java -jar ApkCategoryChecker.jar -p . -csv .

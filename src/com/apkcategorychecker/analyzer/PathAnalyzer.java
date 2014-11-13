@@ -73,6 +73,10 @@ public class PathAnalyzer {
     	
     	boolean keepDecodedPath = CommandLineInterface.getInstance().getKeep();
     	
+    	/*--Get the path of decoded APK--*/
+    	
+    	String _outDecoded = CommandLineInterface.getInstance().getDecodedPath();
+    	
     	/*--Get the format of result file--*/
     	
     	String _format = CommandLineInterface.getInstance().getWriterFormat();
@@ -83,7 +87,7 @@ public class PathAnalyzer {
 		
     	/*--Analyze the Path--*/
     	
-		this.AnalyzePath(givenPath, keepDecodedPath);
+		this.AnalyzePath(givenPath, keepDecodedPath, _outDecoded);
         
     	/*--Write the results in a file--*/
 		
@@ -120,7 +124,7 @@ public class PathAnalyzer {
      * @param _keepDecodedPath If "true" the directory containing the decoded APK will be maintained
      * @throws IOException
      */
-	private void AnalyzePath(String _givenPath, boolean _keepDecodedPath) throws IOException {
+	private void AnalyzePath(String _givenPath, boolean _keepDecodedPath, String _outDecoded) throws IOException {
 		
 		/*--Create a new file from given path--*/
     	
@@ -131,7 +135,7 @@ public class PathAnalyzer {
         if(file_path.isFile()){
             if(file_path.getAbsolutePath().contains(".apk")){
                 apkAnalyzer = new APKAnalyzer();
-                _analyzerResult = apkAnalyzer.Analyze(_givenPath, file_path.getName(), _keepDecodedPath);
+                _analyzerResult = apkAnalyzer.Analyze(_givenPath, file_path.getName(), _keepDecodedPath, _outDecoded);
                 this.resultList.add(_analyzerResult);
             }
         }else if(file_path.isDirectory()){
@@ -140,9 +144,9 @@ public class PathAnalyzer {
             for (int i = 0; i < length; i++) {
                 if (listOfFiles[i].isFile()) {
                     //Decode
-                    this.AnalyzePath(listOfFiles[i].getAbsolutePath(), _keepDecodedPath);
+                    this.AnalyzePath(listOfFiles[i].getPath(), _keepDecodedPath, _outDecoded);
                   } else if (listOfFiles[i].isDirectory()) {
-                        this.AnalyzePath(listOfFiles[i].getPath(), _keepDecodedPath);
+                        this.AnalyzePath(listOfFiles[i].getPath(), _keepDecodedPath, _outDecoded);
                   }
             }
         }

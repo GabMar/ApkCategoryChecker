@@ -76,13 +76,13 @@ public class APKAnalyzer{
      * @return
      * @throws IOException
      */
-    public AnalyzerResult Analyze(String path, String apkName, boolean _keepDecodedPath) throws IOException {
+    public AnalyzerResult Analyze(String path, String apkName, boolean _keepDecodedPath, String _outDecoded) throws IOException {
         try {
         	
         	
         	/*Instance of ToolDecoder; decode an APK file in a Directory with the same name of APK*/
             ToolDecoder tooldecoder = new ToolDecoder();
-            _decodedApkPath = tooldecoder.DecodeApk(path);
+            _decodedApkPath = tooldecoder.DecodeApk(path, _outDecoded);
             
             /*Instance of ToolDex2Jar; convert the .dex file in .jar file*/
             ToolDex2Jar dex2jar = new ToolDex2Jar();
