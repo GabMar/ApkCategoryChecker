@@ -80,7 +80,7 @@ public class APKAnalyzer{
      * @return
      * @throws IOException
      */
-    public AnalyzerResult Analyze(String path, String apkName, boolean _keepDecodedPath, String _outDecoded) throws IOException {
+    public AnalyzerResult Analyze(String path, String apkName, boolean _keepDecodedPath, String _outDecoded, long _startTime) throws IOException {
         try {
         	
         	
@@ -99,6 +99,7 @@ public class APKAnalyzer{
             /*Get the list of Objects Framework*/
             this.listOfFramework = FrameworkPool.getInstance().getFramework();
             
+            
             /*For every Framework analyze the Decoded APK; if the Framework match return true*/
             for (int i = 0; i < this.listOfFramework.size(); i++) {
             	
@@ -115,7 +116,8 @@ public class APKAnalyzer{
                                     ToolApkParameters.getInstance().getCSS(_decodedApkPath),
                                     ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
                                     ToolApkParameters.getInstance().getPermission(_decodedApkPath),
-                                    ToolApkParameters.getInstance().getFileSize(path));
+                                    ToolApkParameters.getInstance().getFileSize(path),
+                                    _startTime);
                 	}
                 	/*If none of the Framework is found, set the AnalyzerResult for Native App*/
                 	else if(!listOfFramework.get(i).Test(_decodedApkPath)){
@@ -129,7 +131,8 @@ public class APKAnalyzer{
                                     ToolApkParameters.getInstance().getCSS(_decodedApkPath),
                                     ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
                                     ToolApkParameters.getInstance().getPermission(_decodedApkPath),
-                                    ToolApkParameters.getInstance().getFileSize(path));}
+                                    ToolApkParameters.getInstance().getFileSize(path),
+                                    _startTime);}
                 }
         }
         } catch (AndrolibException | ParserConfigurationException | SAXException ex) {
@@ -171,7 +174,8 @@ public class APKAnalyzer{
                                         int _css,
                                         String _debuggable,
                                         String _permissions,
-                                        String _fileSize){
+                                        String _fileSize,
+                                        long _startTime){
     	
     	/*Instance of AnalyzerResult*/
         AnalyzerResult _settedResults = new AnalyzerResult();
@@ -214,6 +218,12 @@ public class APKAnalyzer{
         
         /*Set the File Size*/
         _settedResults.set_fileSize(_fileSize);
+        
+        /*Set the Start Time in milliseconds*/
+        _settedResults.set_startAnalysis(_startTime);
+        
+        /*Set the Duration Time in milliseconds*/
+        _settedResults.set_durationAnalysis(System.currentTimeMillis() - _startTime);
         
         return _settedResults;
     }

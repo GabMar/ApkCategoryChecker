@@ -92,7 +92,9 @@ public class WriterCSV implements Writer {
                 					"CSS",
                 					"Android_Debuggable",
                 					"Android_Permissions",
-                					"File_Size(Bytes)");
+                					"File_Size(Bytes)",
+                					"Start_Analysis_Time(milliseconds)",
+                					"Duration_Analysis_Time(milliseconds)");
             } catch (IOException ex) {
                 Logger.getLogger(WriterCSV.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -117,6 +119,8 @@ public class WriterCSV implements Writer {
                 resultData.add(_resultElement.get_debuggable());
                 resultData.add(_resultElement.get_permissions());
                 resultData.add(_resultElement.get_fileSize());
+                resultData.add(String.valueOf(_resultElement.get_startAnalysis()));
+                resultData.add(String.valueOf(_resultElement.get_durationAnalysis()));
                 i++;
                 printer.printRecord(resultData);
             }

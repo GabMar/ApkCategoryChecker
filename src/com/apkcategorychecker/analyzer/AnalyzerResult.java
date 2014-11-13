@@ -89,6 +89,16 @@ public class AnalyzerResult {
 	 */
 	private String _fileSize;
 	
+	/**
+	 * Start time
+	 */
+	private long _startAnalysis;
+	
+	/**
+	 * Duration time
+	 */
+	private long _durationAnalysis;
+	
 	
 	/*--Methods--*/
 	
@@ -192,6 +202,24 @@ public class AnalyzerResult {
 	}
 	
 	/**
+	 * Return the start time analysis in milliseconds
+	 * 
+	 * @return
+	 */
+	public long get_startAnalysis(){
+		return this._startAnalysis;
+	}
+	
+	/**
+	 * Return the duration time analysis in milliseconds
+	 * 
+	 * @return
+	 */
+	public long get_durationAnalysis(){
+		return this._durationAnalysis;
+	}
+	
+	/**
 	 * 
 	 * @param _i String of APK Package
 	 */
@@ -283,6 +311,24 @@ public class AnalyzerResult {
 	 */
 	public void set_fileSize(String fileSize){
 		this._fileSize = fileSize;
+	}
+	
+	/**
+	 * Set the start time analysis in milliseconds
+	 * 
+	 * @param _time
+	 */
+	public void set_startAnalysis(long _time){
+		this._startAnalysis = _time;
+	}
+	
+	/**
+	 * Set the duration time analysis in milliseconds
+	 * 
+	 * @param _time
+	 */
+	public void set_durationAnalysis(long _time){
+		this._durationAnalysis = _time;
 	}
 }
 

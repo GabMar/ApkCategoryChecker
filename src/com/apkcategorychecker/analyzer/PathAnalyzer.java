@@ -58,9 +58,6 @@ public class PathAnalyzer {
     /**
      * Method to analyze the given path
      * 
-     * @param _givenPath The given path from CLI interface
-     * @param _keepDecodedPath If "true" the directory containing the decoded APK will be manteined
-     * @return 
      * @throws IOException
      */
     public void Analyze() throws IOException {
@@ -135,7 +132,7 @@ public class PathAnalyzer {
         if(file_path.isFile()){
             if(file_path.getAbsolutePath().contains(".apk")){
                 apkAnalyzer = new APKAnalyzer();
-                _analyzerResult = apkAnalyzer.Analyze(_givenPath, file_path.getName(), _keepDecodedPath, _outDecoded);
+                _analyzerResult = apkAnalyzer.Analyze(_givenPath, file_path.getName(), _keepDecodedPath, _outDecoded, System.currentTimeMillis());
                 this.resultList.add(_analyzerResult);
             }
         }else if(file_path.isDirectory()){
