@@ -53,6 +53,8 @@ CSS | Number of ".css" file used to build the APK
 Android_Debuggable | The value of Debuggable parameter in AndroidManifest.xml
 Android_Permissions | List of Android Permission
 File_Size(bytes) | File size (in bytes) of APK
+Start_Analysis_Time(milliseconds) | UNIX Time of start
+Duration_Analysis_Time(milliseconds) | UNIX Time of duration
 
 ## RECOGNITION FRAMEWORKS METHODS ##
 
