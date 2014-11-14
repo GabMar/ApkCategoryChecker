@@ -73,7 +73,7 @@ Framework | Recognition method | Reliability
 [Next](http://nextinterfaces.com/b) | If is present the string "nextwebapp" in a file, AND if is present the file "NextWebApp.class" | Strong
 [Quick Connect](http://www.quickconnectfamily.org/qc_hybrid) | If is present the string "function QCNativeFooter", AND if is present the string "qc.handleError" in a file | Medium
 [Rho Mobile](http://rhomobile.com/) | If exists the file "rho.dat" | Medium
-[Sencha](http://www.sencha.com/products/touch) | If is present the string "Ext.create" in a file AND if is present the link to "ext-all.js" | Strong
+[Sencha](http://www.sencha.com/products/touch) | If is present the strings "Ext.create" AND "Ext.application" in a file javascript | Strong
 [Titanium](http://www.appcelerator.com/) | If is present the file "TitaniumModule.class", AND if is present the file "TiActivity.class"| Strong
 
 ## MINIMUM REQUIREMENTS ##
