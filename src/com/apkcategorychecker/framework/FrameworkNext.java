@@ -42,7 +42,8 @@ public class FrameworkNext implements Framework{
     public boolean Test(String _pathToAnalyze) {
     	boolean _boolString, _boolFile, _Next = false;
     	ToolSearch Searcher = new ToolSearch();
-    	_boolString = Searcher.searchStringInFileText(_pathToAnalyze + "/assets/www/", "nextwebapp");
+    	String _regEx = "(nextwebapp)";
+    	_boolString = Searcher.searchRegExInFileText(_pathToAnalyze + "/assets/www/", _regEx);
     	_boolFile = Searcher.searchFile(_pathToAnalyze, "NextWebApp.class");
     	if(_boolString && _boolFile){
     		_Next = true;

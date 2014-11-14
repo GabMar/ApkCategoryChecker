@@ -42,7 +42,8 @@ public class FrameworkKivy implements Framework{
     public boolean Test(String _pathToAnalyze) {
     	boolean _boolString, _Kivy = false;
     	ToolSearch Searcher = new ToolSearch();
-    	_boolString = Searcher.searchStringInFileText(_pathToAnalyze+"/AndroidManifest.xml", "PythonActivity");
+    	String _regEx = "(PythonActivity)";
+    	_boolString = Searcher.searchRegExInFileText(_pathToAnalyze+"/AndroidManifest.xml", _regEx);
     	if(_boolString){
     		_Kivy = true;
     	}

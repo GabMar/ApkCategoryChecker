@@ -42,7 +42,8 @@ public class FrameworkPhonegap implements Framework {
     public boolean Test(String _pathToAnalyze) {
     	boolean _boolString, _boolFile, _PhoneGap = false;
     	ToolSearch Searcher = new ToolSearch();
-    	_boolString = Searcher.searchStringInFileText(_pathToAnalyze+"/res/xml/config.xml", "http://phonegap.com/ns/1.0");
+    	String _regEx = "(http://phonegap.com/ns/1.0)";
+    	_boolString = Searcher.searchRegExInFileText(_pathToAnalyze+"/res/xml/config.xml", _regEx);
     	_boolFile = Searcher.searchFile(_pathToAnalyze, "CordovaActivity.class");
     	if(_boolString && _boolFile){
     		_PhoneGap = true;

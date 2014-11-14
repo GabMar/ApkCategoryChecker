@@ -42,7 +42,8 @@ public class FrameworkCordova implements Framework {
     public boolean Test(String _pathToAnalyze) {
     	boolean _boolString, _boolFile, _Cordova = false;
     	ToolSearch Searcher = new ToolSearch();
-    	_boolString = Searcher.searchStringInFileText(_pathToAnalyze+"/res/xml/config.xml", "org.apache.cordova");
+    	String _regEx = "(org.apache.cordova)";
+    	_boolString = Searcher.searchRegExInFileText(_pathToAnalyze+"/res/xml/config.xml", _regEx);
     	_boolFile = Searcher.searchFile(_pathToAnalyze, "CordovaActivity.class");
     	if(_boolString && _boolFile){
     		_Cordova = true;

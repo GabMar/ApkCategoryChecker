@@ -43,7 +43,8 @@ public class FrameworkIBMWorklight implements Framework {
     public boolean Test(String _pathToAnalyze) {
     	boolean _boolString, _boolFile, _Worklight = false;
     	ToolSearch Searcher = new ToolSearch();
-    	_boolString = Searcher.searchStringInFileText(_pathToAnalyze+"/res/xml/config.xml", "com.worklight.androidgap");
+    	String _regEx = "(com.worklight.androidgap)";
+    	_boolString = Searcher.searchRegExInFileText(_pathToAnalyze+"/res/xml/config.xml", _regEx);
     	_boolFile = Searcher.searchFile(_pathToAnalyze, "WLDroidGap.class");
     	if(_boolString && _boolFile){
     		_Worklight = true;

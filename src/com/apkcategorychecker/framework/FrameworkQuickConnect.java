@@ -42,8 +42,10 @@ public class FrameworkQuickConnect implements Framework{
     public boolean Test(String _pathToAnalyze) {
         boolean _boolString1, _boolString2, _QuickConnect = false;
     	ToolSearch Searcher = new ToolSearch();
-    	_boolString1 = Searcher.searchStringInFileText(_pathToAnalyze, "qc.handleError");
-    	_boolString2 = Searcher.searchStringInFileText(_pathToAnalyze, "function QCNativeFooter");
+    	String _regEx1 = "(qc.handleError)";
+    	String _regEx2 = "(function QCNativeFooter)";
+    	_boolString1 = Searcher.searchRegExInFileText(_pathToAnalyze, _regEx1);
+    	_boolString2 = Searcher.searchRegExInFileText(_pathToAnalyze, _regEx2);
     	if(_boolString1 && _boolString2){
     		_QuickConnect = true;
     	}

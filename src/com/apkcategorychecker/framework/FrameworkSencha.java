@@ -42,11 +42,13 @@ public class FrameworkSencha implements Framework{
 
     @Override
     public boolean Test(String _pathToAnalyze) {
-    	boolean _boolStringExt, _boolString, _Sencha = false;
+    	boolean _boolStringExt1, _boolStringExt2, _Sencha = false;
     	ToolSearch Searcher = new ToolSearch();
-    	_boolStringExt = Searcher.searchStringInFileTextExt(_pathToAnalyze + "/assets/www/", "Ext.create", ".js");
-    	_boolString = Searcher.searchStringInFileText(_pathToAnalyze + "/assets/www/", "ext-all.js");
-    	if(_boolStringExt && _boolString){
+    	String _regEx1 = "(Ext.create)";
+    	String _regEx2 = "(Ext.application)";
+    	_boolStringExt1 = Searcher.searchRegExInFileTextExt(_pathToAnalyze + "/assets/www/", _regEx1, ".js");
+    	_boolStringExt2 = Searcher.searchRegExInFileTextExt(_pathToAnalyze + "/assets/www/", _regEx2, ".js");
+    	if(_boolStringExt1 && _boolStringExt2){
     		_Sencha = true;
     	}
         return _Sencha;

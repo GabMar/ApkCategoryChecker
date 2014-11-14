@@ -1,6 +1,8 @@
 package com.apkcategorychecker.tool;
 
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ToolSearch {
 	
@@ -13,6 +15,16 @@ public class ToolSearch {
 	 * Boolean used by the method searchStringInFileTextExt
 	 */
 	private boolean _boolSearchStringInFileTextExt = false;
+	
+	/**
+	 * Boolean used by the method searchRegExInFileText
+	 */
+	private boolean _boolSearchRegExInFileText = false;
+	
+	/**
+	 * Boolean used by the method searchRegExInFileTextExt
+	 */
+	private boolean _boolSearchRegExInFileTextExt = false;
 	
 	/**
 	 * Boolean used by the method searchFile
@@ -85,6 +97,77 @@ public class ToolSearch {
             }
 		}
         return this._boolSearchStringInFileText;
+	}
+	
+	/**
+	 * Search a string in a file by regular expression
+	 * 
+	 * @param _path File path
+	 * @param _regEx Regular expression
+	 * @return
+	 */
+	public boolean searchRegExInFileText(String _path, String _regEx){
+		if(!this._boolSearchRegExInFileText){
+            File search_file_path = new File(_path);
+
+            //If File
+            if(search_file_path.isFile()){
+                ToolFileToString readStringifyedFile;
+                readStringifyedFile = new ToolFileToString();
+                String findWord = readStringifyedFile.readFile(_path);
+                Pattern _regExPattern = Pattern.compile(_regEx);
+                Matcher m = _regExPattern.matcher(findWord);
+                this._boolSearchRegExInFileText = m.find();
+
+            }else if(search_file_path.isDirectory()){
+                File[] listOfFiles = search_file_path.listFiles();
+                int length = listOfFiles.length;
+                for (int i = 0; i < length; i++) {
+                    if (listOfFiles[i].isFile()) {
+                        this.searchRegExInFileText(listOfFiles[i].getAbsolutePath(), _regEx);
+                      } else if (listOfFiles[i].isDirectory()) {
+                        this.searchRegExInFileText(listOfFiles[i].getAbsolutePath(), _regEx);
+                      }
+                }
+            }
+		}
+        return this._boolSearchRegExInFileText;
+	}
+	
+	/**
+	 * Search a string in a file with given extension by regular expression
+	 * 
+	 * @param _path File path
+	 * @param _regEx Regular expression
+	 * @param _ext Extension of the file
+	 * @return
+	 */
+	public boolean searchRegExInFileTextExt(String _path, String _regEx, String _ext){
+		if(!this._boolSearchRegExInFileTextExt){
+            File search_file_path = new File(_path);
+
+            //If File
+            if(search_file_path.isFile() && _path.contains(_ext)){
+                ToolFileToString readStringifyedFile;
+                readStringifyedFile = new ToolFileToString();
+                String findWord = readStringifyedFile.readFile(_path);
+                Pattern _regExPattern = Pattern.compile(_regEx);
+                Matcher m = _regExPattern.matcher(findWord);
+                this._boolSearchRegExInFileTextExt = m.find();
+
+            }else if(search_file_path.isDirectory()){
+                File[] listOfFiles = search_file_path.listFiles();
+                int length = listOfFiles.length;
+                for (int i = 0; i < length; i++) {
+                    if (listOfFiles[i].isFile()) {
+                        this.searchRegExInFileTextExt(listOfFiles[i].getAbsolutePath(), _regEx, _ext);
+                      } else if (listOfFiles[i].isDirectory()) {
+                        this.searchRegExInFileTextExt(listOfFiles[i].getAbsolutePath(), _regEx, _ext);
+                      }
+                }
+            }
+		}
+        return this._boolSearchRegExInFileTextExt;
 	}
 	
 	/**

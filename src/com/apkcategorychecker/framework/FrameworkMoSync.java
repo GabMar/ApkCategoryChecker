@@ -42,7 +42,8 @@ public class FrameworkMoSync implements Framework{
     public boolean Test(String _pathToAnalyze) {
         boolean _boolString, _MoSync = false;
     	ToolSearch Searcher = new ToolSearch();
-    	_boolString = Searcher.searchStringInFileText(_pathToAnalyze+"/AndroidManifest.xml", "MoSyncService");
+    	String _regEx = "(MoSyncService)";
+    	_boolString = Searcher.searchRegExInFileText(_pathToAnalyze+"/AndroidManifest.xml", _regEx);
     	if(_boolString){
     		_MoSync = true;
     	}

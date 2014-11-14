@@ -43,8 +43,10 @@ public class FrameworkEnyo implements Framework {
     public boolean Test(String _pathToAnalyze) {
     	boolean _boolStringExt1, _boolStringExt2, _Enyo = false;
     	ToolSearch Searcher = new ToolSearch();
-    	_boolStringExt1 = Searcher.searchStringInFileTextExt(_pathToAnalyze + "/assets/www/", "enyo.machine", ".js");
-    	_boolStringExt2 = Searcher.searchStringInFileTextExt(_pathToAnalyze + "/assets/www/", "enyo.kind", ".js");
+    	String _regEx1 = "(enyo.machine)";
+    	String _regEx2 = "(enyo.kind)";
+    	_boolStringExt1 = Searcher.searchRegExInFileTextExt(_pathToAnalyze + "/assets/www/", _regEx1, ".js");
+    	_boolStringExt2 = Searcher.searchRegExInFileTextExt(_pathToAnalyze + "/assets/www/", _regEx2, ".js");
     	if(_boolStringExt1 && _boolStringExt2){
     		_Enyo = true;
     	}
