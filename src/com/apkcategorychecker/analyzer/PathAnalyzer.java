@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import brut.androlib.AndrolibException;
+
 import com.apkcategorychecker.cli.CommandLineInterface;
 import com.apkcategorychecker.writer.FactoryWriter;
 import com.apkcategorychecker.writer.Writer;
@@ -59,8 +61,9 @@ public class PathAnalyzer {
      * Method to analyze the given path
      * 
      * @throws IOException
+     * @throws AndrolibException 
      */
-    public void Analyze() throws IOException {
+    public void Analyze() throws IOException, AndrolibException {
     	
     	/*--Get the path to analyze from the command-line--*/
     	
@@ -120,8 +123,9 @@ public class PathAnalyzer {
      * @param _givenPath Path to analyze
      * @param _keepDecodedPath If "true" the directory containing the decoded APK will be maintained
      * @throws IOException
+	 * @throws AndrolibException 
      */
-	private void AnalyzePath(String _givenPath, boolean _keepDecodedPath, String _outDecoded) throws IOException {
+	private void AnalyzePath(String _givenPath, boolean _keepDecodedPath, String _outDecoded) throws IOException, AndrolibException {
 		
 		/*--Create a new file from given path--*/
     	

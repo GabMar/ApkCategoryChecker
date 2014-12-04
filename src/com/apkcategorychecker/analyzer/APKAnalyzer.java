@@ -19,7 +19,6 @@
  */
 package com.apkcategorychecker.analyzer;
 
-import brut.androlib.AndrolibException;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +29,8 @@ import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
+
+import brut.androlib.AndrolibException;
 
 import com.apkcategorychecker.framework.Framework;
 import com.apkcategorychecker.framework.FrameworkPool;
@@ -79,8 +80,9 @@ public class APKAnalyzer{
      * @param _keepDecodedPath If "true" the directory containing the decoded APK will be mantained
      * @return
      * @throws IOException
+     * @throws AndrolibException 
      */
-    public AnalyzerResult Analyze(String path, String apkName, boolean _keepDecodedPath, String _outDecoded, long _startTime) throws IOException {
+    public AnalyzerResult Analyze(String path, String apkName, boolean _keepDecodedPath, String _outDecoded, long _startTime) throws IOException, AndrolibException {
         try {
         	
         	
@@ -135,7 +137,7 @@ public class APKAnalyzer{
                                     _startTime);}
                 }
         }
-        } catch (AndrolibException | ParserConfigurationException | SAXException ex) {
+        } catch (ParserConfigurationException | SAXException ex) {
             Logger.getLogger(APKAnalyzer.class.getName()).log(Level.SEVERE, null, ex);
         }
         

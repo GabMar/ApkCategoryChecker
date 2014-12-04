@@ -22,10 +22,21 @@ package com.apkcategorychecker.tool;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.ApkDecoder;
+import brut.androlib.err.CantFindFrameworkResException;
+import brut.androlib.err.InFileNotFoundException;
+import brut.androlib.err.OutDirExistsException;
 import brut.directory.DirectoryException;
+
 
 
 /**
@@ -51,6 +62,14 @@ public class ToolDecoder {
     private File outDir;
     
     /**
+     * Verbosity
+     *
+     */
+    private static enum Verbosity {
+        NORMAL, VERBOSE, QUIET;
+      }
+    
+    /**
      * Method to decode an APK file using Apktool
      * 
      * @param _apkPath Path of APK file
@@ -58,55 +77,129 @@ public class ToolDecoder {
      * @throws AndrolibException
      */
     public String DecodeApk(String _apkPath, String _outDecoded) throws AndrolibException{
+    	
+    	Verbosity verbosity = Verbosity.NORMAL;
+    	
+    	setupLogging(verbosity);
         
-        try {
-        		/*--Create new file from given path--*/
-                
-        		File ApkChoosed = new File(_apkPath);
-                
-                /*--Set the APK file--*/
-        		
-                decoder.setApkFile(ApkChoosed);
-                
-                /*--Retrieve the name of the APK to give the name to the output directory--*/
-                
-                int ApkChoosedNameLength = ApkChoosed.getName().length();
-                ApkChoosedName = ApkChoosed.getName();
-                ApkChoosedName = ApkChoosedName.substring(0, ApkChoosedNameLength - 4);
-                
-                /*--Set the output directory--*/
-                
-                //outDir = new File(_apkPath.substring(0, _apkPath.length() - 4));
-                if(_outDecoded == null){
-                	this.outDir = new File(ApkChoosedName);
-                }else{
-                	this.outDir = new File(_outDecoded+ "/" + ApkChoosedName);
-                }
-                
-                try {
-                        decoder.setOutDir(outDir);
-                        
-                        decoder.setDecodeSources((short) 0);
-                        
-                        
-                        
-                } catch (AndrolibException e) {
-                }
-                
-                /*--Decode the APK with Apktool--*/
-                
-                        try {
-							decoder.decode();
-						} catch (DirectoryException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+        File ApkChoosed = new File(_apkPath);
+		
+		/*--Set the APK file--*/
+		
+		decoder.setApkFile(ApkChoosed);
+		
+		/*--Retrieve the name of the APK to give the name to the output directory--*/
+		
+		int ApkChoosedNameLength = ApkChoosed.getName().length();
+		ApkChoosedName = ApkChoosed.getName();
+		ApkChoosedName = ApkChoosedName.substring(0, ApkChoosedNameLength - 4);
+		
+		/*--Set the output directory--*/
+		
+		//outDir = new File(_apkPath.substring(0, _apkPath.length() - 4));
+		if(_outDecoded == null){
+			this.outDir = new File(ApkChoosedName);
+		}else{
+			this.outDir = new File(_outDecoded+ "/" + ApkChoosedName);
+		}
+		
+		    decoder.setOutDir(outDir);
+		    
+		    decoder.setDecodeSources((short) 0);
+		    
+		    decoder.setKeepBrokenResources(true);
+		    
+		    decoder.setDebugMode(true);
+		    
+		    decoder.setBaksmaliDebugMode(false);
+		        
+		/*--Decode the APK with Apktool--*/
+		
+		try {
+			decoder.decode();
+		} catch (OutDirExistsException ex) {
+		    System.err.println("Destination directory (" + outDir.getAbsolutePath() + ") " + "already exists.");
 
-        } catch (IOException e) {
-        }
+		    System.exit(1);
+		  } catch (InFileNotFoundException ex) {
+		    System.err.println("Input file was not found or was not readable.");
+		    System.exit(1);
+		  } catch (CantFindFrameworkResException ex) {
+		    System.err.println("Can't find framework resources for package of id: " + String.valueOf(ex.getPkgId()) + ". You must install proper " + "framework files, see project website for more info.");
+
+		    System.exit(1);
+		  } catch (IOException ex) {
+		    System.err.println("Could not modify file. Please ensure you have permission.");
+		    System.exit(1);
+		  } catch (DirectoryException ex) {
+		    System.err.println("Could not modify internal dex files. Please ensure you have permission.");
+		    System.exit(1);
+		  }
         
         
         return this.outDir.getPath();
     }
     
+    /**
+     * Method to set log verbosity
+     * 
+     * @param verbosity
+     */
+    private static void setupLogging(Verbosity verbosity)
+    {
+      Logger logger = Logger.getLogger("");
+      for (Handler handler : logger.getHandlers()) {
+        logger.removeHandler(handler);
+      }
+      LogManager.getLogManager().reset();
+
+      if (verbosity == Verbosity.QUIET) {
+        return;
+      }
+
+      Handler handler = new Handler()
+      {
+        public void publish(LogRecord record) {
+          if (getFormatter() == null) {
+            setFormatter(new SimpleFormatter());
+          }
+          try
+          {
+            String message = getFormatter().format(record);
+            if (record.getLevel().intValue() >= Level.WARNING.intValue())
+              System.err.write(message.getBytes());
+            else
+              System.out.write(message.getBytes());
+          }
+          catch (Exception exception) {
+            reportError(null, exception, 5);
+          }
+        }
+
+        public void close()
+          throws SecurityException
+        {
+        }
+
+        public void flush()
+        {
+        }
+      };
+      logger.addHandler(handler);
+
+      if (verbosity == Verbosity.VERBOSE) {
+        handler.setLevel(Level.ALL);
+        logger.setLevel(Level.ALL);
+      } else {
+        handler.setFormatter(new Formatter()
+        {
+          public String format(LogRecord record) {
+            return record.getLevel().toString().charAt(0) + ": " + record.getMessage() + System.getProperty("line.separator");
+          }
+        });
+      }
+    }
+    
 }
+
+
