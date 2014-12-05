@@ -76,9 +76,8 @@ public class ToolDecoder {
      * 
      * @param _apkPath Path of APK file
      * @return
-     * @throws AndrolibException
      */
-    public String DecodeApk(String _apkPath, String _outDecoded) throws AndrolibException{
+    public String DecodeApk(String _apkPath, String _outDecoded){
     	
     	Verbosity verbosity = Verbosity.NORMAL;
     	
@@ -105,9 +104,19 @@ public class ToolDecoder {
 			this.outDir = new File(_outDecoded+ "/" + ApkChoosedName);
 		}
 		
-		    decoder.setOutDir(outDir);
+		    try {
+				decoder.setOutDir(outDir);
+			} catch (AndrolibException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		    
-		    decoder.setDecodeSources((short) 0);
+		    try {
+				decoder.setDecodeSources((short) 0);
+			} catch (AndrolibException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		    
 		    decoder.setKeepBrokenResources(true);
 		    
@@ -138,6 +147,9 @@ public class ToolDecoder {
 			System.err.println("Error: CantFind9PatchChunk.");
 			return null;
 		  } catch(UndefinedResObject ex) {
+			System.err.println("Could not decode whole apk, writing minimal results.");
+			return null;
+		  } catch(AndrolibException ex) {
 			System.err.println("Could not decode whole apk, writing minimal results.");
 			return null;
 		  }
