@@ -90,6 +90,23 @@ public class APKAnalyzer{
             ToolDecoder tooldecoder = new ToolDecoder();
             _decodedApkPath = tooldecoder.DecodeApk(path, _outDecoded);
             
+            /*If an error occurred while decoding apk set minimal information*/
+            if(_decodedApkPath == null){
+            	this._results = this.setResults("", 
+                                    path, 
+                                    apkName,
+                                    "",
+                                    false,
+                                    0,
+                                    0,
+                                    0,
+                                    "",
+                                    "",
+                                    "",
+                                    _startTime);
+            	return this._results;
+            }
+            
             /*Instance of ToolDex2Jar; convert the .dex file in .jar file*/
             ToolDex2Jar dex2jar = new ToolDex2Jar();
             dex2jar.ConvertDex2Jar(_decodedApkPath.concat("/classes.dex"), _decodedApkPath);

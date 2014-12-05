@@ -32,9 +32,11 @@ import java.util.logging.SimpleFormatter;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.ApkDecoder;
+import brut.androlib.err.CantFind9PatchChunk;
 import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
+import brut.androlib.err.UndefinedResObject;
 import brut.directory.DirectoryException;
 
 
@@ -119,21 +121,25 @@ public class ToolDecoder {
 			decoder.decode();
 		} catch (OutDirExistsException ex) {
 		    System.err.println("Destination directory (" + outDir.getAbsolutePath() + ") " + "already exists.");
-
-		    System.exit(1);
+		    return null;
 		  } catch (InFileNotFoundException ex) {
 		    System.err.println("Input file was not found or was not readable.");
-		    System.exit(1);
+		    return null;
 		  } catch (CantFindFrameworkResException ex) {
 		    System.err.println("Can't find framework resources for package of id: " + String.valueOf(ex.getPkgId()) + ". You must install proper " + "framework files, see project website for more info.");
-
-		    System.exit(1);
+		    return null;
 		  } catch (IOException ex) {
 		    System.err.println("Could not modify file. Please ensure you have permission.");
-		    System.exit(1);
+		    return null;
 		  } catch (DirectoryException ex) {
 		    System.err.println("Could not modify internal dex files. Please ensure you have permission.");
-		    System.exit(1);
+		    return null;
+		  } catch(CantFind9PatchChunk ex) {
+			System.err.println("Error: CantFind9PatchChunk.");
+			return null;
+		  } catch(UndefinedResObject ex) {
+			System.err.println("Could not decode whole apk, writing minimal results.");
+			return null;
 		  }
         
         
