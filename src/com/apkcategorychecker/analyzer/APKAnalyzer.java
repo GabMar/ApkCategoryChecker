@@ -38,6 +38,7 @@ import com.apkcategorychecker.tool.ToolApkParameters;
 import com.apkcategorychecker.tool.ToolDecoder;
 import com.apkcategorychecker.tool.ToolDex2Jar;
 import com.apkcategorychecker.tool.ToolJar2Class;
+import com.googlecode.dex2jar.DexException;
 
 //import org.apache.commons.io.IOUtils;
 
@@ -109,7 +110,24 @@ public class APKAnalyzer{
             
             /*Instance of ToolDex2Jar; convert the .dex file in .jar file*/
             ToolDex2Jar dex2jar = new ToolDex2Jar();
+            try {
             dex2jar.ConvertDex2Jar(_decodedApkPath.concat("/classes.dex"), _decodedApkPath);
+            } catch(DexException ex){
+            	System.err.println("Unable to convert file classes.dex, writing minimal results.");
+            	this._results = this.setResults(ToolApkParameters.getInstance().getPackage(_decodedApkPath), 
+                        path, 
+                        apkName,
+                        "",
+                        false,
+                        ToolApkParameters.getInstance().getHtml(_decodedApkPath),
+                        ToolApkParameters.getInstance().getJavascript(_decodedApkPath),
+                        ToolApkParameters.getInstance().getCSS(_decodedApkPath),
+                        ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
+                        ToolApkParameters.getInstance().getPermission(_decodedApkPath),
+                        ToolApkParameters.getInstance().getFileSize(path),
+                        _startTime);
+            	return this._results;
+            }
             
             /*--Instance of ToolJar2Class; extract the content of a .jar--*/
             ToolJar2Class jar2class = new ToolJar2Class();
