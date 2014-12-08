@@ -93,18 +93,19 @@ public class APKAnalyzer{
             
             /*If an error occurred while decoding apk set minimal information*/
             if(_decodedApkPath == null){
-            	this._results = this.setResults("", 
+            	this._results = this.setResults("UNDEFINED", 
                                     path, 
                                     apkName,
-                                    "",
+                                    "UNDEFINED",
                                     false,
                                     0,
                                     0,
                                     0,
-                                    "",
-                                    "",
-                                    "",
-                                    _startTime);
+                                    "UNDEFINED",
+                                    "UNDEFINED",
+                                    "UNDEFINED",
+                                    _startTime,
+                                    1);
             	return this._results;
             }
             
@@ -117,7 +118,7 @@ public class APKAnalyzer{
             	this._results = this.setResults(ToolApkParameters.getInstance().getPackage(_decodedApkPath), 
                         path, 
                         apkName,
-                        "",
+                        "UNDEFINED",
                         false,
                         ToolApkParameters.getInstance().getHtml(_decodedApkPath),
                         ToolApkParameters.getInstance().getJavascript(_decodedApkPath),
@@ -125,7 +126,8 @@ public class APKAnalyzer{
                         ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
                         ToolApkParameters.getInstance().getPermission(_decodedApkPath),
                         ToolApkParameters.getInstance().getFileSize(path),
-                        _startTime);
+                        _startTime,
+                        1);
             	return this._results;
             }
             
@@ -154,7 +156,8 @@ public class APKAnalyzer{
                                     ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
                                     ToolApkParameters.getInstance().getPermission(_decodedApkPath),
                                     ToolApkParameters.getInstance().getFileSize(path),
-                                    _startTime);
+                                    _startTime,
+                                    0);
                 	}
                 	/*If none of the Framework is found, set the AnalyzerResult for Native App*/
                 	else if(!listOfFramework.get(i).Test(_decodedApkPath)){
@@ -169,7 +172,8 @@ public class APKAnalyzer{
                                     ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
                                     ToolApkParameters.getInstance().getPermission(_decodedApkPath),
                                     ToolApkParameters.getInstance().getFileSize(path),
-                                    _startTime);}
+                                    _startTime,
+                                    0);}
                 }
         }
         } catch (ParserConfigurationException | SAXException ex) {
@@ -199,6 +203,7 @@ public class APKAnalyzer{
      * @param _javascript Number of javascript files
      * @param _css Number of css files
      * @param _fileSize File size
+     * @param _flag
      * @return
      */
     private AnalyzerResult setResults(  String _apkpackage, 
@@ -212,7 +217,8 @@ public class APKAnalyzer{
                                         String _debuggable,
                                         String _permissions,
                                         String _fileSize,
-                                        long _startTime){
+                                        long _startTime,
+                                        int _flag){
     	
     	/*Instance of AnalyzerResult*/
         AnalyzerResult _settedResults = new AnalyzerResult();
@@ -261,6 +267,9 @@ public class APKAnalyzer{
         
         /*Set the Duration Time in milliseconds*/
         _settedResults.set_durationAnalysis(System.currentTimeMillis() - _startTime);
+        
+        /*Set the Decode Flag*/
+        _settedResults.set_decodeSuccess(_flag);
         
         return _settedResults;
     }

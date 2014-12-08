@@ -99,6 +99,11 @@ public class AnalyzerResult {
 	 */
 	private long _durationAnalysis;
 	
+	/**
+	 * Decode success flag
+	 */
+	private int _decodeSuccess;
+	
 	
 	/*--Methods--*/
 	
@@ -220,6 +225,15 @@ public class AnalyzerResult {
 	}
 	
 	/**
+	 * Return the decode flag
+	 * 
+	 * @return
+	 */
+	public int get_decodeSuccess(){
+		return this._decodeSuccess;
+	}
+	
+	/**
 	 * 
 	 * @param _i String of APK Package
 	 */
@@ -329,6 +343,15 @@ public class AnalyzerResult {
 	 */
 	public void set_durationAnalysis(long _time){
 		this._durationAnalysis = _time;
+	}
+	
+	/**
+	 * Set the decode flag
+	 * 
+	 * @param _flag
+	 */
+	public void set_decodeSuccess(int _flag){
+		this._decodeSuccess = _flag;
 	}
 }
 
