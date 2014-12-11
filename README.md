@@ -55,6 +55,7 @@ Android_Permissions | List of Android Permission
 File_Size(bytes) | File size (in bytes) of APK
 Start_Analysis_Time(milliseconds) | UNIX Time of start
 Duration_Analysis_Time(milliseconds) | UNIX Time of duration
+Decode_Success | Flag to indicate the success of the decoding (0 success, 1 fail)
 
 ## RECOGNITION FRAMEWORKS METHODS ##
 
