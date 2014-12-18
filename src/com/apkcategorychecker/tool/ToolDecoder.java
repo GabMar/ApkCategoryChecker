@@ -123,6 +123,8 @@ public class ToolDecoder {
 		    decoder.setDebugMode(true);
 		    
 		    decoder.setBaksmaliDebugMode(false);
+		    
+		    decoder.setFrameworkDir(this.outDir.getAbsolutePath() + "/framework");
 		        
 		/*--Decode the APK with Apktool--*/
 		
