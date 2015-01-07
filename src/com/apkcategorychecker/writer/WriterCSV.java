@@ -92,6 +92,9 @@ public class WriterCSV implements Writer {
                 					"CSS",
                 					"Android_Debuggable",
                 					"Android_Permissions",
+                					"Android_MinSdkVersion",
+                					"Android_MaxSdkVersion",
+                					"Android_TargetSdkVersion",
                 					"File_Size(Bytes)",
                 					"Start_Analysis_Time(milliseconds)",
                 					"Duration_Analysis_Time(milliseconds)",
@@ -119,6 +122,9 @@ public class WriterCSV implements Writer {
                 resultData.add(String.valueOf(_resultElement.get_css()));
                 resultData.add(_resultElement.get_debuggable());
                 resultData.add(_resultElement.get_permissions());
+                resultData.add(_resultElement.get_minSdkVersion());
+                resultData.add(_resultElement.get_maxSdkVersion());
+                resultData.add(_resultElement.get_targetSdkVersion());
                 resultData.add(_resultElement.get_fileSize());
                 resultData.add(String.valueOf(_resultElement.get_startAnalysis()));
                 resultData.add(String.valueOf(_resultElement.get_durationAnalysis()));

@@ -104,6 +104,9 @@ public class APKAnalyzer{
                                     "UNDEFINED",
                                     "UNDEFINED",
                                     "UNDEFINED",
+                                    "UNDEFINED",
+                                    "UNDEFINED",
+                                    "UNDEFINED",
                                     _startTime,
                                     1);
             	return this._results;
@@ -125,6 +128,9 @@ public class APKAnalyzer{
                         ToolApkParameters.getInstance().getCSS(_decodedApkPath),
                         ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
                         ToolApkParameters.getInstance().getPermission(_decodedApkPath),
+                        ToolApkParameters.getInstance().getSdkVersion(_decodedApkPath, "min"),
+                        ToolApkParameters.getInstance().getSdkVersion(_decodedApkPath, "max"),
+                        ToolApkParameters.getInstance().getSdkVersion(_decodedApkPath, "target"),
                         ToolApkParameters.getInstance().getFileSize(path),
                         _startTime,
                         1);
@@ -155,6 +161,9 @@ public class APKAnalyzer{
                                     ToolApkParameters.getInstance().getCSS(_decodedApkPath),
                                     ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
                                     ToolApkParameters.getInstance().getPermission(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getSdkVersion(_decodedApkPath, "min"),
+                                    ToolApkParameters.getInstance().getSdkVersion(_decodedApkPath, "max"),
+                                    ToolApkParameters.getInstance().getSdkVersion(_decodedApkPath, "target"),
                                     ToolApkParameters.getInstance().getFileSize(path),
                                     _startTime,
                                     0);
@@ -171,6 +180,9 @@ public class APKAnalyzer{
                                     ToolApkParameters.getInstance().getCSS(_decodedApkPath),
                                     ToolApkParameters.getInstance().getDebuggable(_decodedApkPath),
                                     ToolApkParameters.getInstance().getPermission(_decodedApkPath),
+                                    ToolApkParameters.getInstance().getSdkVersion(_decodedApkPath, "min"),
+                                    ToolApkParameters.getInstance().getSdkVersion(_decodedApkPath, "max"),
+                                    ToolApkParameters.getInstance().getSdkVersion(_decodedApkPath, "target"),
                                     ToolApkParameters.getInstance().getFileSize(path),
                                     _startTime,
                                     0);}
@@ -193,16 +205,23 @@ public class APKAnalyzer{
     }
     
     /**
+     * Set the results
      * 
-     * @param _apkpackage Package of APK
-     * @param _apkpath Path of APK
-     * @param _apkname Name of APK
-     * @param _framework Name of Framework used
-     * @param _checkCordova If true the Framework uses Apache Cordova
-     * @param _html Number of html files
-     * @param _javascript Number of javascript files
-     * @param _css Number of css files
-     * @param _fileSize File size
+     * @param _apkpackage
+     * @param _apkpath
+     * @param _apkname
+     * @param _framework
+     * @param _checkCordova
+     * @param _html
+     * @param _javascript
+     * @param _css
+     * @param _debuggable
+     * @param _permissions
+     * @param _minSdkVersion
+     * @param _maxSdkVersion
+     * @param _targetSdkVersion
+     * @param _fileSize
+     * @param _startTime
      * @param _flag
      * @return
      */
@@ -216,6 +235,9 @@ public class APKAnalyzer{
                                         int _css,
                                         String _debuggable,
                                         String _permissions,
+                                        String _minSdkVersion,
+                                        String _maxSdkVersion,
+                                        String _targetSdkVersion,
                                         String _fileSize,
                                         long _startTime,
                                         int _flag){
@@ -258,6 +280,15 @@ public class APKAnalyzer{
         
         /*List of Android Permission*/
         _settedResults.set_permissions(_permissions);
+        
+        /*Value of minSdkVersion*/
+        _settedResults.set_minSdkVersion(_minSdkVersion);
+        
+        /*Value of maxSdkVersion*/
+        _settedResults.set_maxSdkVersion(_maxSdkVersion);
+        
+        /*Value of taregtSdkVersion*/
+        _settedResults.set_targetSdkVersion(_targetSdkVersion);
         
         /*Set the File Size*/
         _settedResults.set_fileSize(_fileSize);

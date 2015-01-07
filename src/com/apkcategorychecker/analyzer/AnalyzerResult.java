@@ -85,6 +85,21 @@ public class AnalyzerResult {
 	private String _permissions;
 	
 	/**
+	 * Min Sdk Version
+	 */
+	private String _minSdkVersion;
+	
+	/**
+	 * Max Sdk Version
+	 */
+	private String _maxSdkVersion;
+	
+	/**
+	 * Target Sdk Version
+	 */
+	private String _targetSdkVersion;
+	
+	/**
 	 * File Size
 	 */
 	private String _fileSize;
@@ -195,6 +210,33 @@ public class AnalyzerResult {
 	 */
 	public String get_permissions(){
 		return this._permissions;
+	}
+	
+	/**
+	 * Return the value of minSdkVersion
+	 * 
+	 * @return
+	 */
+	public String get_minSdkVersion(){
+		return this._minSdkVersion;
+	}
+	
+	/**
+	 * Return the value of maxSdkVersion
+	 * 
+	 * @return
+	 */
+	public String get_maxSdkVersion(){
+		return this._maxSdkVersion;
+	}
+	
+	/**
+	 * Return the value of targetSdkVersion
+	 * 
+	 * @return
+	 */
+	public String get_targetSdkVersion(){
+		return this._targetSdkVersion;
 	}
 	
 	/**
@@ -316,6 +358,33 @@ public class AnalyzerResult {
 	 */
 	public void set_permissions(String permissions){
 		this._permissions = permissions;
+	}
+	
+	/**
+	 * Set the value of minSdkVersion
+	 * 
+	 * @param minSdk
+	 */
+	public void set_minSdkVersion(String minSdk){
+		this._minSdkVersion = minSdk;
+	}
+	
+	/**
+	 * Set the value of maxSdkVersion
+	 * 
+	 * @param maxSdk
+	 */
+	public void set_maxSdkVersion(String maxSdk){
+		this._maxSdkVersion = maxSdk;
+	}
+	
+	/**
+	 * Set the value of targetSdkVersion
+	 * 
+	 * @param targetSdk
+	 */
+	public void set_targetSdkVersion(String targetSdk){
+		this._targetSdkVersion = targetSdk;
 	}
 	
 	/**

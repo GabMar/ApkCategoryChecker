@@ -164,6 +164,51 @@ public class ToolApkParameters {
     }
 	
 	/**
+	 * Return the value of choosed SdkVersion
+	 * 
+	 * @param _pathToAnalyze
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	public String getSdkVersion(String _pathToAnalyze, String _value) throws ParserConfigurationException, SAXException, IOException{
+		String path = _pathToAnalyze+"/AndroidManifest.xml";
+        ArrayList<String> _list = new ArrayList<String>();
+        File fXmlFile = new File(path);
+    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+    	Document doc = dBuilder.parse(fXmlFile);
+    	doc.getDocumentElement().normalize();
+    	
+    	NodeList nList = doc.getElementsByTagName("uses-sdk");
+    	if(nList.getLength() == 0){
+    		return "UNDEFINED";
+    	}
+    	for (int temp = 0; temp < nList.getLength(); temp++) {
+    		 
+    		Node nNode = nList.item(temp);
+     
+    		if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+     
+    			Element eElement = (Element) nNode;
+    			String _current = eElement.getAttribute("android:"+_value+"SdkVersion");
+    			if(	_current == "" || 
+					_current == null || 
+					_current == " "){
+    				
+    				_current = "UNDEFINED";
+    			}
+    			_list.add(_current);
+     
+    		}
+    	}
+    	String _result = _list.toString().substring(1, _list.toString().length() - 1);
+        
+        return _result;
+	}
+	
+	/**
 	 * Get number of files
 	 * 
 	 * @param _pathToAnalyze Path of decoded APK

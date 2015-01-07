@@ -52,6 +52,9 @@ JS | Number of ".js" file used to build the APK
 CSS | Number of ".css" file used to build the APK
 Android_Debuggable | The value of Debuggable parameter in AndroidManifest.xml
 Android_Permissions | List of Android Permission
+Android_MinSdkVersion | Value of minSdkVersion
+Android_MaxSdkVersion | Value of maxSdkVersion
+Android_TargetSdkVersion | Value of targetSdkVersion
 File_Size(bytes) | File size (in bytes) of APK
 Start_Analysis_Time(milliseconds) | UNIX Time of start
 Duration_Analysis_Time(milliseconds) | UNIX Time of duration
