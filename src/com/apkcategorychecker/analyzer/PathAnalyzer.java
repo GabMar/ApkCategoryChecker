@@ -33,8 +33,8 @@ import org.xml.sax.SAXException;
 import brut.androlib.AndrolibException;
 
 import com.apkcategorychecker.cli.CommandLineInterface;
-import com.apkcategorychecker.json.FactoryJsonBuilder;
-import com.apkcategorychecker.json.JsonBuilder;
+import com.apkcategorychecker.json.FactoryJsCSVBuilder;
+import com.apkcategorychecker.json.JsCSVBuilder;
 import com.apkcategorychecker.tool.ToolDecoder;
 import com.apkcategorychecker.tool.ToolDeleteDirectory;
 import com.apkcategorychecker.writer.FactoryWriter;
@@ -59,7 +59,7 @@ public class PathAnalyzer {
     /**
      * The Arraylist of JsonElement
      */
-    private final ArrayList<JsonElement> jsonList = new ArrayList<JsonElement>();
+    private final ArrayList<JsElement> jsonList = new ArrayList<JsElement>();
     
     /**
      * The istance of APKAnalyzer
@@ -74,7 +74,7 @@ public class PathAnalyzer {
     /**
      * Istance of JsonElement containing the list of js files
      */
-    private JsonElement _jsonElement;
+    private JsElement _jsonElement;
 
     /*--Methods--*/
     
@@ -164,15 +164,15 @@ public class PathAnalyzer {
     private void BuildJson(String outDir, String time){
     	
     	/*--Instance of JsonBuilder--*/
-    	JsonBuilder builder;
+    	JsCSVBuilder builder;
     	
     	/*--Choose the correct builder--*/
     	
-    	builder = FactoryJsonBuilder.getInstance().getJsonBuilder();
+    	builder = FactoryJsCSVBuilder.getInstance().getJsCSVBuilder();
     	
     	/*--Build the json file--*/
     	
-    	builder.BuildJson(this.jsonList, outDir, time);
+    	builder.BuildJs(this.jsonList, outDir, time);
     }
     
     private String GetTime(){

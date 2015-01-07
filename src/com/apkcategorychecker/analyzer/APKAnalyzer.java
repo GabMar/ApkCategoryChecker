@@ -63,7 +63,7 @@ public class APKAnalyzer{
     /**
      * Object containing the list of javascript files
      */
-    private JsonElement _jsonElement;
+    private JsElement _jsonElement;
     
     /**
      * Constructor
@@ -189,7 +189,7 @@ public class APKAnalyzer{
         return this._results;
     }
     
-    public JsonElement AnalyzeJsFiles(String _decodedApkPath) throws ParserConfigurationException, SAXException, IOException{
+    public JsElement AnalyzeJsFiles(String _decodedApkPath) throws ParserConfigurationException, SAXException, IOException{
     	
     	if(_decodedApkPath == null){
     		this._jsonElement = this.setElement("UNDEFINED", "UNDEFINED");
@@ -306,10 +306,10 @@ public class APKAnalyzer{
         return _settedResults;
     }
     
-    private JsonElement setElement(String _appId, String _jsList){
+    private JsElement setElement(String _appId, String _jsList){
     	
     	/*Instance of JsonElement*/
-    	JsonElement _element = new JsonElement();
+    	JsElement _element = new JsElement();
     	
     	/*Set the App Id*/
     	_element.set_id(_appId);

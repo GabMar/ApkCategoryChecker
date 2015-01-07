@@ -60,9 +60,9 @@ Start_Analysis_Time(milliseconds) | UNIX Time of start
 Duration_Analysis_Time(milliseconds) | UNIX Time of duration
 Decode_Success | Flag to indicate the success of the decoding (0 success, 1 fail)
 
-## JSON RESULT FILE ##
+## CSV CONTAINING THE COLLECTION OF .JS FILES ##
 
-Regardless of the format result file chosen, the script generates a file with .json extension containing the following values
+Regardless of the format result file chosen, the script generates a file with .csv extension containing the following values
 
 Column | Description
 ----------|------------

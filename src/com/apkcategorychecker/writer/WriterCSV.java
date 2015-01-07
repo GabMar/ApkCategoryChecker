@@ -74,7 +74,7 @@ public class WriterCSV implements Writer {
             FileWriter _out = new FileWriter(_fileCSV);
             CSVPrinter printer;
             printer = new CSVPrinter(_out, format.withDelimiter('#'));
-            System.out.println("********");
+            System.out.println("Creating " + "Results_"+time+".csv ....");
             try {
                 printer.printRecord("App_ID",
                 					"APK_File_Name",
@@ -130,6 +130,7 @@ public class WriterCSV implements Writer {
             
             /*--Close the printer--*/
             printer.close();
+            System.out.println("Results_"+time+".csv created");
             
         } catch (IOException ex) {
             Logger.getLogger(WriterCSV.class.getName()).log(Level.SEVERE, null, ex);
