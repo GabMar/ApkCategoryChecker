@@ -20,7 +20,6 @@
 package com.apkcategorychecker.analyzer;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -35,7 +34,6 @@ import brut.androlib.AndrolibException;
 import com.apkcategorychecker.framework.Framework;
 import com.apkcategorychecker.framework.FrameworkPool;
 import com.apkcategorychecker.tool.ToolApkParameters;
-import com.apkcategorychecker.tool.ToolDecoder;
 import com.apkcategorychecker.tool.ToolDex2Jar;
 import com.apkcategorychecker.tool.ToolJar2Class;
 import com.googlecode.dex2jar.DexException;
@@ -51,11 +49,6 @@ import com.googlecode.dex2jar.DexException;
 public class APKAnalyzer{
     
 	/*--Attributes--*/
-	
-	/**
-	 * Path of APK File
-	 */
-    private String _decodedApkPath;
     
     /**
      * List of Frameworks
@@ -68,10 +61,16 @@ public class APKAnalyzer{
     private AnalyzerResult _results;
     
     /**
+     * Object containing the list of javascript files
+     */
+    private JsonElement _jsonElement;
+    
+    /**
      * Constructor
      */
     public APKAnalyzer() {
         this._results = null;
+        this._jsonElement = null;
     }
 
     /**
@@ -83,14 +82,9 @@ public class APKAnalyzer{
      * @throws IOException
      * @throws AndrolibException 
      */
-    public AnalyzerResult Analyze(String path, String apkName, boolean _keepDecodedPath, String _outDecoded, long _startTime) throws IOException, AndrolibException {
+    public AnalyzerResult Analyze(String path, String _decodedApkPath, String apkName, String _outDecoded, long _startTime) throws IOException, AndrolibException {
         try {
         	
-        	
-        	/*Instance of ToolDecoder; decode an APK file in a Directory with the same name of APK*/
-            ToolDecoder tooldecoder = new ToolDecoder();
-            _decodedApkPath = tooldecoder.DecodeApk(path, _outDecoded);
-            
             /*If an error occurred while decoding apk set minimal information*/
             if(_decodedApkPath == null){
             	this._results = this.setResults("UNDEFINED", 
@@ -192,17 +186,24 @@ public class APKAnalyzer{
             Logger.getLogger(APKAnalyzer.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        /*If _keepDecodedPath is true do nothing, if false remove the directory
-         * containing the decoded APK*/
-        if(_keepDecodedPath == false){
-            File _pathToErase;
-            _pathToErase = new File(_decodedApkPath);
-            this.DeleteDirectory(_pathToErase);
-            
-        }
-        
         return this._results;
     }
+    
+    public JsonElement AnalyzeJsFiles(String _decodedApkPath) throws ParserConfigurationException, SAXException, IOException{
+    	
+    	if(_decodedApkPath == null){
+    		this._jsonElement = this.setElement("UNDEFINED", "UNDEFINED");
+    		return this._jsonElement;
+    	}
+    	
+    	this._jsonElement = this.setElement(
+    			ToolApkParameters.getInstance().getPackage(_decodedApkPath), 
+    			ToolApkParameters.getInstance().getJsFiles(_decodedApkPath)
+    			);
+    	
+    	return this._jsonElement;
+    }
+    
     
     /**
      * Set the results
@@ -305,39 +306,19 @@ public class APKAnalyzer{
         return _settedResults;
     }
     
-    /**
-     * Method to delete a directory
-     * 
-     * @param file Direcrory to delete
-     * @throws IOException
-     */
-    private void DeleteDirectory(File file)
-    throws IOException{
-	 if(file.isDirectory()){
-            //directory is empty, then delete it
-            if(file.list().length==0){
-               file.delete();
-            }else{
-               //list all the directory contents
-               String files[] = file.list();
-               for (String temp : files) {
-                  //construct the file structure
-                  File fileDelete = new File(file, temp);
-                  //recursive delete
-                 DeleteDirectory(fileDelete);
-               }
-               //check the directory again, if empty then delete it
-               if(file.list().length==0){
-                 file.delete();
-               }
-            }
-
-        }else{
-                //if file, then delete it
-                file.delete();
-        }
-	    }
-    
+    private JsonElement setElement(String _appId, String _jsList){
+    	
+    	/*Instance of JsonElement*/
+    	JsonElement _element = new JsonElement();
+    	
+    	/*Set the App Id*/
+    	_element.set_id(_appId);
+    	
+    	/*Set the list of js files*/
+    	_element.set_JsFiles(_jsList);
+    	
+    	return _element;
+    };
 
 }
 

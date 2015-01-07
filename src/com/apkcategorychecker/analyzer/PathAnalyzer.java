@@ -21,11 +21,22 @@ package com.apkcategorychecker.analyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import brut.androlib.AndrolibException;
 
 import com.apkcategorychecker.cli.CommandLineInterface;
+import com.apkcategorychecker.json.FactoryJsonBuilder;
+import com.apkcategorychecker.json.JsonBuilder;
+import com.apkcategorychecker.tool.ToolDecoder;
+import com.apkcategorychecker.tool.ToolDeleteDirectory;
 import com.apkcategorychecker.writer.FactoryWriter;
 import com.apkcategorychecker.writer.Writer;
 
@@ -46,14 +57,24 @@ public class PathAnalyzer {
     private final ArrayList<AnalyzerResult> resultList = new ArrayList<AnalyzerResult>();
     
     /**
+     * The Arraylist of JsonElement
+     */
+    private final ArrayList<JsonElement> jsonList = new ArrayList<JsonElement>();
+    
+    /**
      * The istance of APKAnalyzer
      */
     private APKAnalyzer apkAnalyzer;
     
     /**
-     * Istance of AnalyzerResult contained the result of a single APK
+     * Istance of AnalyzerResult containing the result of a single APK
      */
     private AnalyzerResult _analyzerResult; 
+    
+    /**
+     * Istance of JsonElement containing the list of js files
+     */
+    private JsonElement _jsonElement;
 
     /*--Methods--*/
     
@@ -62,8 +83,10 @@ public class PathAnalyzer {
      * 
      * @throws IOException
      * @throws AndrolibException 
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
      */
-    public void Analyze() throws IOException, AndrolibException {
+    public void Analyze() throws IOException, AndrolibException{
     	
     	/*--Get the path to analyze from the command-line--*/
     	
@@ -87,11 +110,26 @@ public class PathAnalyzer {
 		
     	/*--Analyze the Path--*/
     	
-		this.AnalyzePath(givenPath, keepDecodedPath, _outDecoded);
+		try {
+			this.AnalyzePath(givenPath, keepDecodedPath, _outDecoded);
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*--Get the current time*/
+		String time = this.GetTime();
         
     	/*--Write the results in a file--*/
 		
-		this.Write(_format, _outDir, this._analyzerResult);
+		this.Write(_format, _outDir, time);
+		
+		/*--Build a json file containing the name of all javascript files--*/
+		
+		this.BuildJson(_outDir, time);
     }
 
     /**
@@ -101,7 +139,7 @@ public class PathAnalyzer {
      * @param outDir Directory of result file
      * @param analyzerResult List of results
      */
-    private void Write(String format, String outDir, AnalyzerResult analyzerResult) {
+    private void Write(String format, String outDir, String time) {
 		
     	/*--Instance of Writer--*/
     	
@@ -113,9 +151,35 @@ public class PathAnalyzer {
     	
     	/*--Write the results--*/
     	
-    	writer.Write(resultList, outDir);
+    	writer.Write(this.resultList, outDir, time);
 		
 	}
+    
+    /**
+     * Build the json file containing the list of js files
+     * 
+     * @param outDir
+     * @param time
+     */
+    private void BuildJson(String outDir, String time){
+    	
+    	/*--Instance of JsonBuilder--*/
+    	JsonBuilder builder;
+    	
+    	/*--Choose the correct builder--*/
+    	
+    	builder = FactoryJsonBuilder.getInstance().getJsonBuilder();
+    	
+    	/*--Build the json file--*/
+    	
+    	builder.BuildJson(this.jsonList, outDir, time);
+    }
+    
+    private String GetTime(){
+    	DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss");
+    	Date date = new Date();
+    	return dateFormat.format(date);
+    }
 
 	/**
      * Recursive method to find through a directory
@@ -124,8 +188,10 @@ public class PathAnalyzer {
      * @param _keepDecodedPath If "true" the directory containing the decoded APK will be maintained
      * @throws IOException
 	 * @throws AndrolibException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
      */
-	private void AnalyzePath(String _givenPath, boolean _keepDecodedPath, String _outDecoded) throws IOException, AndrolibException {
+	private void AnalyzePath(String _givenPath, boolean _keepDecodedPath, String _outDecoded) throws IOException, AndrolibException, ParserConfigurationException, SAXException {
 		
 		/*--Create a new file from given path--*/
     	
@@ -135,9 +201,15 @@ public class PathAnalyzer {
         
         if(file_path.isFile()){
             if(file_path.getAbsolutePath().contains(".apk")){
+            	/*Instance of ToolDecoder; decode an APK file in a Directory with the same name of APK*/
+                ToolDecoder tooldecoder = new ToolDecoder();
+                String _decodedApkPath = tooldecoder.DecodeApk(_givenPath, _outDecoded);
                 apkAnalyzer = new APKAnalyzer();
-                _analyzerResult = apkAnalyzer.Analyze(_givenPath, file_path.getName(), _keepDecodedPath, _outDecoded, System.currentTimeMillis());
-                this.resultList.add(_analyzerResult);
+                this._analyzerResult = apkAnalyzer.Analyze(_givenPath, _decodedApkPath, file_path.getName(), _outDecoded, System.currentTimeMillis());
+                this._jsonElement = apkAnalyzer.AnalyzeJsFiles(_decodedApkPath);
+                this.resultList.add(this._analyzerResult);
+                this.jsonList.add(this._jsonElement);
+                this.deleteDirectory(_decodedApkPath, _keepDecodedPath);
             }
         }else if(file_path.isDirectory()){
             File[] listOfFiles = file_path.listFiles();
@@ -151,6 +223,18 @@ public class PathAnalyzer {
                   }
             }
         }
+		
+	}
+
+	private void deleteDirectory(String _decodedApkPath, boolean _keepDecodedPath) throws IOException {
+	
+		/*If _keepDecodedPath is true do nothing, if false remove the directory
+         * containing the decoded APK*/
+        if(_keepDecodedPath == false){
+        	ToolDeleteDirectory.getInstance().DeleteDirectory(_decodedApkPath);
+            
+        }
+		
 		
 	}
 

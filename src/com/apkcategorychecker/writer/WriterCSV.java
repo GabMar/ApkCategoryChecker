@@ -22,10 +22,7 @@ package com.apkcategorychecker.writer;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -49,7 +46,7 @@ public class WriterCSV implements Writer {
     private String _destPath;
 
     @Override
-    public void Write(ArrayList<AnalyzerResult> resultList, String _destinationPath) {
+    public void Write(ArrayList<AnalyzerResult> resultList, String _destinationPath, String time) {
         
         try {
 
@@ -73,9 +70,7 @@ public class WriterCSV implements Writer {
             
             /*--Writing in a CSV file--*/
             
-            DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss");
-            Date date = new Date();
-            File _fileCSV = new File(_destPath+"/Results_"+dateFormat.format(date)+".csv");
+            File _fileCSV = new File(_destPath+"/Results_"+time+".csv");
             FileWriter _out = new FileWriter(_fileCSV);
             CSVPrinter printer;
             printer = new CSVPrinter(_out, format.withDelimiter('#'));

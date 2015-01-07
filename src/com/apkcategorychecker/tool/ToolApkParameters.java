@@ -208,6 +208,49 @@ public class ToolApkParameters {
         return _result;
 	}
 	
+	private void getJsFilesFinder(String _pathToAnalyze, ArrayList<String> _list){
+		
+		
+		File search_file_path = new File(_pathToAnalyze);
+
+        /*--If _pathToAnalyze is a js file, put the name in the list--*/
+    	
+        if(search_file_path.isFile()){
+            
+        	if(	search_file_path.getAbsolutePath().contains(".js")){
+        		
+        		_list.add(search_file_path.getName());
+        		
+        	}
+
+        }else if(search_file_path.isDirectory()){
+            File[] listOfFiles = search_file_path.listFiles();
+            int length = listOfFiles.length;
+            for (int i = 0; i < length; i++) {
+                if (listOfFiles[i].isFile()) {
+                    this.getJsFilesFinder(listOfFiles[i].getAbsolutePath(), _list);
+                  } else if (listOfFiles[i].isDirectory()) {
+                    this.getJsFilesFinder(listOfFiles[i].getAbsolutePath(), _list);
+                  }
+            }
+        }
+        
+	}
+	
+	/**
+	 * Return a string containing the js files
+	 * 
+	 * @param _pathToAnalyze
+	 * @return
+	 */
+	public String getJsFiles(String _pathToAnalyze){
+		ArrayList<String> _list = new ArrayList<String>();
+		this.getJsFilesFinder(_pathToAnalyze, _list);
+		String _result = _list.toString().substring(1, _list.toString().length() - 1);
+        System.out.println(_result);
+        return _result;
+	}
+	
 	/**
 	 * Get number of files
 	 * 
@@ -293,5 +336,6 @@ public class ToolApkParameters {
 		
 		return _s;
 	}
+	
 	
 	}

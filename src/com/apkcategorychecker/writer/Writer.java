@@ -36,6 +36,6 @@ public interface Writer {
 	 * @param resultList List of results
 	 * @param _destinationPath Destination path for the file
 	 */
-    public void Write(ArrayList<AnalyzerResult> resultList, String _destinationPath);
+    public void Write(ArrayList<AnalyzerResult> resultList, String _destinationPath, String time);
     
 }
