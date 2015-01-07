@@ -35,7 +35,7 @@ Parameter | Description
 	
 	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv . -deep 4`
 
-## FILE RESULT FORMAT##
+## FILE RESULT FORMAT ##
 
 For now the only supported output format is CSV with the following columns
 
@@ -59,6 +59,15 @@ File_Size(bytes) | File size (in bytes) of APK
 Start_Analysis_Time(milliseconds) | UNIX Time of start
 Duration_Analysis_Time(milliseconds) | UNIX Time of duration
 Decode_Success | Flag to indicate the success of the decoding (0 success, 1 fail)
+
+## JSON RESULT FILE ##
+
+Regardless of the format result file chosen, the script generates a file with .json extension containing the following values
+
+Column | Description
+----------|------------
+appID | The id of analyzed APK
+jsFiles | List of js files contained in the APK
 
 ## RECOGNITION FRAMEWORKS METHODS ##
 

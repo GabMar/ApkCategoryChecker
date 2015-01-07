@@ -247,7 +247,6 @@ public class ToolApkParameters {
 		ArrayList<String> _list = new ArrayList<String>();
 		this.getJsFilesFinder(_pathToAnalyze, _list);
 		String _result = _list.toString().substring(1, _list.toString().length() - 1);
-        System.out.println(_result);
         return _result;
 	}
 	
