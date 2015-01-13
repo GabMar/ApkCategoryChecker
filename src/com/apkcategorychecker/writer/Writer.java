@@ -19,7 +19,7 @@
  */
 package com.apkcategorychecker.writer;
 
-import java.util.ArrayList;
+import java.io.IOException;
 
 import com.apkcategorychecker.analyzer.AnalyzerResult;
 
@@ -36,6 +36,14 @@ public interface Writer {
 	 * @param resultList List of results
 	 * @param _destinationPath Destination path for the file
 	 */
-    public void Write(ArrayList<AnalyzerResult> resultList, String _destinationPath, String time);
+    public void Write(AnalyzerResult resultList, String _destinationPath, int _counter);
+
+    /**
+     * Create the header
+     * 
+     * @param absolutePath
+     * @throws IOException 
+     */
+	public void createHeader(String absolutePath) throws IOException;
     
 }

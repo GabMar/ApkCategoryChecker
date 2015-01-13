@@ -49,7 +49,6 @@ public class ToolDeleteDirectory {
 	/**
      * Method to delete a directory
      * 
-     * @param file Direcrory to delete
      * @throws IOException
      */
     public void DeleteDirectory(String path) throws IOException{

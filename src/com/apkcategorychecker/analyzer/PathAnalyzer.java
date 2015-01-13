@@ -52,10 +52,10 @@ public class PathAnalyzer {
     /*--Attributes--*/
     
     /**
-     * The Arraylist of AnalyzerResult
+     * Counter
      */
-    private final ArrayList<AnalyzerResult> resultList = new ArrayList<AnalyzerResult>();
-    
+    private int counter = 0;
+	
     /**
      * The Arraylist of JsonElement
      */
@@ -65,11 +65,6 @@ public class PathAnalyzer {
      * The istance of APKAnalyzer
      */
     private APKAnalyzer apkAnalyzer;
-    
-    /**
-     * Istance of AnalyzerResult containing the result of a single APK
-     */
-    private AnalyzerResult _analyzerResult; 
     
     /**
      * Istance of JsonElement containing the list of js files
@@ -82,9 +77,7 @@ public class PathAnalyzer {
      * Method to analyze the given path
      * 
      * @throws IOException
-     * @throws AndrolibException 
-     * @throws SAXException 
-     * @throws ParserConfigurationException 
+     * @throws AndrolibException
      */
     public void Analyze() throws IOException, AndrolibException{
     	
@@ -100,18 +93,22 @@ public class PathAnalyzer {
     	
     	String _outDecoded = CommandLineInterface.getInstance().getDecodedPath();
     	
-    	/*--Get the format of result file--*/
-    	
-    	String _format = CommandLineInterface.getInstance().getWriterFormat();
-    	
     	/*--Get the output directory pf result file--*/
     	
     	String _outDir = CommandLineInterface.getInstance().getOutDir();
+    	
+    	/*--Get the current time*/
+		
+    	String time = this.GetTime();
+    	
+    	/*Create the CSV file*/
+    	
+    	String csvPath = this.createCSV(_outDir, time);
 		
     	/*--Analyze the Path--*/
     	
 		try {
-			this.AnalyzePath(givenPath, keepDecodedPath, _outDecoded);
+			this.AnalyzePath(givenPath, keepDecodedPath, _outDecoded, csvPath);
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -120,40 +117,10 @@ public class PathAnalyzer {
 			e.printStackTrace();
 		}
 		
-		/*--Get the current time*/
-		String time = this.GetTime();
-        
-    	/*--Write the results in a file--*/
-		
-		this.Write(_format, _outDir, time);
-		
 		/*--Build a json file containing the name of all javascript files--*/
 		
 		this.BuildJson(_outDir, time);
     }
-
-    /**
-     * Write the results in a file
-     * 
-     * @param format Format of result file
-     * @param outDir Directory of result file
-     * @param analyzerResult List of results
-     */
-    private void Write(String format, String outDir, String time) {
-		
-    	/*--Instance of Writer--*/
-    	
-    	Writer writer;
-    	
-    	/*--Choose the correct writer--*/
-    	
-    	writer = FactoryWriter.getInstance().getWriter(format);
-    	
-    	/*--Write the results--*/
-    	
-    	writer.Write(this.resultList, outDir, time);
-		
-	}
     
     /**
      * Build the json file containing the list of js files
@@ -191,7 +158,7 @@ public class PathAnalyzer {
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
      */
-	private void AnalyzePath(String _givenPath, boolean _keepDecodedPath, String _outDecoded) throws IOException, AndrolibException, ParserConfigurationException, SAXException {
+	private void AnalyzePath(String _givenPath, boolean _keepDecodedPath, String _outDecoded, String _csvPath) throws IOException, AndrolibException, ParserConfigurationException, SAXException {
 		
 		/*--Create a new file from given path--*/
     	
@@ -205,11 +172,11 @@ public class PathAnalyzer {
                 ToolDecoder tooldecoder = new ToolDecoder();
                 String _decodedApkPath = tooldecoder.DecodeApk(_givenPath, _outDecoded);
                 apkAnalyzer = new APKAnalyzer();
-                this._analyzerResult = apkAnalyzer.Analyze(_givenPath, _decodedApkPath, file_path.getName(), _outDecoded, System.currentTimeMillis());
+                apkAnalyzer.Analyze(_givenPath, _decodedApkPath, file_path.getName(), _outDecoded, System.currentTimeMillis(), _csvPath, counter);
                 this._jsonElement = apkAnalyzer.AnalyzeJsFiles(_decodedApkPath);
-                this.resultList.add(this._analyzerResult);
                 this.jsonList.add(this._jsonElement);
                 this.deleteDirectory(_decodedApkPath, _keepDecodedPath);
+                this.counter = this.counter + 1;
             }
         }else if(file_path.isDirectory()){
             File[] listOfFiles = file_path.listFiles();
@@ -217,9 +184,9 @@ public class PathAnalyzer {
             for (int i = 0; i < length; i++) {
                 if (listOfFiles[i].isFile()) {
                     //Decode
-                    this.AnalyzePath(listOfFiles[i].getPath(), _keepDecodedPath, _outDecoded);
+                    this.AnalyzePath(listOfFiles[i].getPath(), _keepDecodedPath, _outDecoded, _csvPath);
                   } else if (listOfFiles[i].isDirectory()) {
-                        this.AnalyzePath(listOfFiles[i].getPath(), _keepDecodedPath, _outDecoded);
+                        this.AnalyzePath(listOfFiles[i].getPath(), _keepDecodedPath, _outDecoded, _csvPath);
                   }
             }
         }
@@ -236,6 +203,50 @@ public class PathAnalyzer {
         }
 		
 		
+	}
+	
+	private String createCSV(String _destinationPath, String time){
+		
+		String format = CommandLineInterface.getInstance().getWriterFormat();
+		
+		/*--Instance of Writer--*/
+    	
+    	Writer writer;
+    	
+    	/*--Choose the correct writer--*/
+    	
+    	writer = FactoryWriter.getInstance().getWriter(format);
+    	
+    	
+		
+		String _pathCSV = "";
+		
+		/*Check if _destinationPath is an APK or a Directory in order to
+         *get the right destination path
+         */
+         
+         File Destination = new File(_destinationPath);
+         if(!Destination.exists()){
+         	Destination.mkdir();
+         }
+         if(Destination.isDirectory()){
+             _pathCSV = _destinationPath;
+         }else if(Destination.isFile()){
+             _pathCSV = _destinationPath.substring(0, _destinationPath.length() - 4);
+         }
+         
+         File _fileCSV = new File(_pathCSV+"/Results_"+time+".csv");
+         
+         /*--Write the results--*/
+     	
+         try {
+			writer.createHeader(_fileCSV.getAbsolutePath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         
+         return _fileCSV.getAbsolutePath();
 	}
 
 }

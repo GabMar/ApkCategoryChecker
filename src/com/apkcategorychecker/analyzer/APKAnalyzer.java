@@ -31,11 +31,14 @@ import org.xml.sax.SAXException;
 
 import brut.androlib.AndrolibException;
 
+import com.apkcategorychecker.cli.CommandLineInterface;
 import com.apkcategorychecker.framework.Framework;
 import com.apkcategorychecker.framework.FrameworkPool;
 import com.apkcategorychecker.tool.ToolApkParameters;
 import com.apkcategorychecker.tool.ToolDex2Jar;
 import com.apkcategorychecker.tool.ToolJar2Class;
+import com.apkcategorychecker.writer.FactoryWriter;
+import com.apkcategorychecker.writer.Writer;
 import com.googlecode.dex2jar.DexException;
 
 //import org.apache.commons.io.IOUtils;
@@ -82,7 +85,7 @@ public class APKAnalyzer{
      * @throws IOException
      * @throws AndrolibException 
      */
-    public AnalyzerResult Analyze(String path, String _decodedApkPath, String apkName, String _outDecoded, long _startTime) throws IOException, AndrolibException {
+    public void Analyze(String path, String _decodedApkPath, String apkName, String _outDecoded, long _startTime, String _csvPath, int _counter) throws IOException, AndrolibException {
         try {
         	
             /*If an error occurred while decoding apk set minimal information*/
@@ -103,7 +106,6 @@ public class APKAnalyzer{
                                     "UNDEFINED",
                                     _startTime,
                                     1);
-            	return this._results;
             }
             
             /*Instance of ToolDex2Jar; convert the .dex file in .jar file*/
@@ -128,7 +130,6 @@ public class APKAnalyzer{
                         ToolApkParameters.getInstance().getFileSize(path),
                         _startTime,
                         1);
-            	return this._results;
             }
             
             /*--Instance of ToolJar2Class; extract the content of a .jar--*/
@@ -186,7 +187,9 @@ public class APKAnalyzer{
             Logger.getLogger(APKAnalyzer.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return this._results;
+        /*--Write the results in a file--*/
+		this.Write(CommandLineInterface.getInstance().getWriterFormat(), _csvPath, _counter);
+      
     }
     
     public JsElement AnalyzeJsFiles(String _decodedApkPath) throws ParserConfigurationException, SAXException, IOException{
@@ -319,6 +322,29 @@ public class APKAnalyzer{
     	
     	return _element;
     };
+    
+    /**
+     * Write the results in a file
+     * 
+     * @param format Format of result file
+     * @param outDir Directory of result file
+     * @param analyzerResult List of results
+     */
+    private void Write(String format, String _csvPath, int _counter) {
+		
+    	/*--Instance of Writer--*/
+    	
+    	Writer writer;
+    	
+    	/*--Choose the correct writer--*/
+    	
+    	writer = FactoryWriter.getInstance().getWriter(format);
+    	
+    	/*--Write the results--*/
+    	
+    	writer.Write(this._results, _csvPath, _counter);
+		
+	}
 
 }
 

@@ -39,74 +39,33 @@ import com.apkcategorychecker.analyzer.AnalyzerResult;
  * @author Gabriele Martini
  */
 public class WriterCSV implements Writer {
-    
-	/**
-	 * Destination Path
-	 */
-    private String _destPath;
 
-    @Override
-    public void Write(ArrayList<AnalyzerResult> resultList, String _destinationPath, String time) {
+	@Override
+    public void Write(AnalyzerResult result, String _csvPath, int _counter) {
         
         try {
-
-            /*Check if _destinationPath is an APK or a Directory in order to
-            *get the right destination path
-            */
-            
-            File Destination = new File(_destinationPath);
-            if(!Destination.exists()){
-            	Destination.mkdir();
-            }
-            if(Destination.isDirectory()){
-                this._destPath = _destinationPath;
-            }else if(Destination.isFile()){
-                this._destPath = _destinationPath.substring(0, _destinationPath.length() - 4);
-            }
-            
+        	
+        	ArrayList<AnalyzerResult> resultList = new ArrayList<AnalyzerResult>();
+        	resultList.add(result);
+        	
             /*--Create the CSVFormat object--*/
             
-            CSVFormat format = CSVFormat.EXCEL.withHeader().withDelimiter(',');
+            CSVFormat format = CSVFormat.DEFAULT.withHeader();
             
             /*--Writing in a CSV file--*/
             
-            File _fileCSV = new File(_destPath+"/Results_"+time+".csv");
-            FileWriter _out = new FileWriter(_fileCSV);
+            FileWriter _out = new FileWriter(_csvPath, true);
             CSVPrinter printer;
             printer = new CSVPrinter(_out, format.withDelimiter('#'));
-            System.out.println("Creating " + "Results_"+time+".csv ....");
-            try {
-                printer.printRecord("App_ID",
-                					"APK_File_Name",
-                					"APK_File_Path",
-                					"APK_Package",
-                					"Main_Framework",
-                					"Base_Framework",
-                					"HTML",
-                					"JS",
-                					"CSS",
-                					"Android_Debuggable",
-                					"Android_Permissions",
-                					"Android_MinSdkVersion",
-                					"Android_MaxSdkVersion",
-                					"Android_TargetSdkVersion",
-                					"File_Size(Bytes)",
-                					"Start_Analysis_Time(milliseconds)",
-                					"Duration_Analysis_Time(milliseconds)",
-                					"Decode_Success");
-            } catch (IOException ex) {
-                Logger.getLogger(WriterCSV.class.getName()).log(Level.SEVERE, null, ex);
-            }
             
             /*--Retrieve APKResult and Write in file--*/
             
-            int i=0;
             Iterator<AnalyzerResult> it = resultList.iterator();
             while(it.hasNext())
             {
                 AnalyzerResult _resultElement = it.next();
                 List<String> resultData = new ArrayList<>();
-                resultData.add(String.valueOf(i));
+                resultData.add(String.valueOf(_counter));
                 resultData.add(_resultElement.get_APKName());
                 resultData.add(_resultElement.get_APKPath());
                 resultData.add(_resultElement.get_Package());
@@ -124,18 +83,57 @@ public class WriterCSV implements Writer {
                 resultData.add(String.valueOf(_resultElement.get_startAnalysis()));
                 resultData.add(String.valueOf(_resultElement.get_durationAnalysis()));
                 resultData.add(String.valueOf(_resultElement.get_decodeSuccess()));
-                i++;
                 printer.printRecord(resultData);
             }
             
             /*--Close the printer--*/
             printer.close();
-            System.out.println("Results_"+time+".csv created");
+            System.out.println("CSV file created created");
             
         } catch (IOException ex) {
             Logger.getLogger(WriterCSV.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }
+
+	@Override
+	public void createHeader(String _csvPath) throws IOException {
+		/*--Create the CSVFormat object--*/
+        
+        CSVFormat format = CSVFormat.EXCEL.withHeader().withDelimiter(',');
+        
+        /*--Writing in a CSV file--*/
+        
+        File _fileCSV = new File(_csvPath);
+        FileWriter _out;
+		_out = new FileWriter(_fileCSV);
+        CSVPrinter printer;
+		printer = new CSVPrinter(_out, format.withDelimiter('#'));
+        System.out.println("Creating the CSV file....");
+        try {
+            printer.printRecord("App_ID",
+            					"APK_File_Name",
+            					"APK_File_Path",
+            					"APK_Package",
+            					"Main_Framework",
+            					"Base_Framework",
+            					"HTML",
+            					"JS",
+            					"CSS",
+            					"Android_Debuggable",
+            					"Android_Permissions",
+            					"Android_MinSdkVersion",
+            					"Android_MaxSdkVersion",
+            					"Android_TargetSdkVersion",
+            					"File_Size(Bytes)",
+            					"Start_Analysis_Time(milliseconds)",
+            					"Duration_Analysis_Time(milliseconds)",
+            					"Decode_Success");
+        } catch (IOException ex) {
+            Logger.getLogger(WriterCSV.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        printer.close();
+		
+	}
     
 }

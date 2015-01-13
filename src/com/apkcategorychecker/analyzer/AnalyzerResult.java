@@ -122,6 +122,47 @@ public class AnalyzerResult {
 	
 	/*--Methods--*/
 	
+	public AnalyzerResult(
+			String App_ID,
+			String APK_File_Name,
+			String APK_File_Path,
+			String APK_Package,
+			String Main_Framework,
+			String Base_Framework,
+			String HTML,
+			String JS,
+			String CSS,
+			String Android_Debuggable,
+			String Android_Permissions,
+			String Android_MinSdkVersion,
+			String Android_MaxSdkVersion,
+			String Android_TargetSdkVersion,
+			String File_Size,
+			String Start_Analysis_Time,
+			String Duration_Analysis_Time,
+			String Decode_Success){
+		
+		this._APKBaseFramework = Main_Framework;
+		this._APKMainFramework = Main_Framework;
+		this._APKName = APK_File_Name;
+		this._APKPath = APK_File_Path;
+		this._css = Integer.parseInt(CSS);
+		this._debuggable = Android_Debuggable;
+		this._decodeSuccess = Integer.parseInt(Decode_Success);
+		this._durationAnalysis = Long.valueOf(Duration_Analysis_Time);
+		this._fileSize = File_Size;
+		this._html = Integer.parseInt(HTML);
+		this._js = Integer.parseInt(JS);
+		this._maxSdkVersion = Android_MaxSdkVersion;
+		this._minSdkVersion = Android_MinSdkVersion;
+		this._Package = APK_Package;
+		this._permissions = Android_Permissions;
+		this._startAnalysis = Long.valueOf(Start_Analysis_Time);
+		this._targetSdkVersion = Android_TargetSdkVersion;
+	}
+	
+	public AnalyzerResult(){};
+	
 	/**
 	 * Return the APK Package
 	 * 
