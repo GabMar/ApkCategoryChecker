@@ -19,7 +19,10 @@
  */
 package com.apkcategorychecker.writer;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,13 +91,46 @@ public class WriterCSV implements Writer {
             
             /*--Close the printer--*/
             printer.close();
-            System.out.println("CSV file created created");
+            System.out.println("Record added to CSV file");
+            this.removeBlankLines(_csvPath);
             
         } catch (IOException ex) {
             Logger.getLogger(WriterCSV.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }
+
+	private void removeBlankLines(String _csvPath) {
+		try {
+			FileReader fr = new FileReader(_csvPath); 
+			BufferedReader br = new BufferedReader(fr); 
+			FileWriter fw = new FileWriter(_csvPath + ".temp"); 
+			String line;
+	
+			while((line = br.readLine()) != null)
+			{ 
+			    //line = line.trim(); // remove leading and trailing whitespace
+			    if (line.length() != 0) // don't write out blank lines
+			    {
+			        fw.write(line, 0, line.length());
+			    	fw.append("\r");
+			    }
+			} 
+			fr.close();
+			fw.close();
+			File old = new File(_csvPath);
+			old.delete();
+			File clean = new File(_csvPath + ".temp");
+			clean.renameTo(old);
+		} catch(FileNotFoundException e){
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	  }
+		
+	
 
 	@Override
 	public void createHeader(String _csvPath) throws IOException {

@@ -77,13 +77,17 @@ public class APKAnalyzer{
     }
 
     /**
+     * Method to analyze an APK file
      * 
-     * @param path Given path of APK
-     * @param apkName Name of APK
-     * @param _keepDecodedPath If "true" the directory containing the decoded APK will be mantained
-     * @return
+     * @param path
+     * @param _decodedApkPath
+     * @param apkName
+     * @param _outDecoded
+     * @param _startTime
+     * @param _csvPath
+     * @param _counter
      * @throws IOException
-     * @throws AndrolibException 
+     * @throws AndrolibException
      */
     public void Analyze(String path, String _decodedApkPath, String apkName, String _outDecoded, long _startTime, String _csvPath, int _counter) throws IOException, AndrolibException {
         try {
