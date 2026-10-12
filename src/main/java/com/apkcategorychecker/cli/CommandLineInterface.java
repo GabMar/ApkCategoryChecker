@@ -178,7 +178,7 @@ public class CommandLineInterface {
 		if(cmd.hasOption("p")){
 			/*--Take the given path--*/
 			String _value = cmd.getOptionValue("p");
-			if(_value == "."){
+			if(".".equals(_value)){
 				this._givenPath = System.getProperty("user.dir");
 			}else{
 				this._givenPath = _value;

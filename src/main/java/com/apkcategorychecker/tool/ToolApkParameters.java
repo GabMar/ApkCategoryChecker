@@ -21,7 +21,11 @@ package com.apkcategorychecker.tool;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -173,6 +177,16 @@ public class ToolApkParameters {
 	 * @throws IOException
 	 */
 	public String getSdkVersion(String _pathToAnalyze, String _value) throws ParserConfigurationException, SAXException, IOException{
+		/*--apktool 2.x moves <uses-sdk> out of the manifest and into apktool.yml (sdkInfo)--*/
+		File apktoolYml = new File(_pathToAnalyze + "/apktool.yml");
+		if(apktoolYml.isFile()){
+			Pattern pattern = Pattern.compile("^\\s+" + _value + "SdkVersion:\\s*'?(\\w+)'?\\s*$", Pattern.MULTILINE);
+			Matcher matcher = pattern.matcher(new String(Files.readAllBytes(apktoolYml.toPath()), StandardCharsets.UTF_8));
+			if(matcher.find()){
+				return matcher.group(1);
+			}
+		}
+
 		String path = _pathToAnalyze+"/AndroidManifest.xml";
         ArrayList<String> _list = new ArrayList<String>();
         File fXmlFile = new File(path);

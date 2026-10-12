@@ -67,7 +67,7 @@ public class DefaultJsCSVBuilder implements JsCSVBuilder {
             
             /*--Create the CSVFormat object--*/
             
-            CSVFormat format = CSVFormat.EXCEL.withHeader().withDelimiter(',');
+            CSVFormat format = CSVFormat.EXCEL;
             
             /*--Writing in a CSV file--*/
             
