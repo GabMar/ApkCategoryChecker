@@ -55,6 +55,13 @@ object Frameworks {
         classInPackage("com.facebook.react"),
     )
 
+    /** Packages Python apps; its classes keep the `org.kivy.android` package for historical reasons. */
+    val PYTHON_FOR_ANDROID = anyOf(
+        "python-for-android",
+        classInPackage("org.kivy.android"),
+        manifestContains("PythonActivity"),
+    )
+
     /** Xamarin.Android and its successor. */
     val DOTNET = anyOf(".NET for Android", nativeLib("libmonodroid.so"), classInPackage("mono.android"))
 
@@ -72,7 +79,7 @@ object Frameworks {
         CAPACITOR,
         REACT_NATIVE,
         DOTNET,
-        anyOf("Kivy", classInPackage("org.kivy.android"), manifestContains("PythonActivity")),
+        PYTHON_FOR_ANDROID,
         allOf("Titanium", classNamed("TitaniumModule"), classNamed("TiActivity")),
         anyOf("NativeScript", nativeLib("libNativeScript.so"), classInPackage("com.tns")),
         anyOf("Flutter", nativeLib("libflutter.so"), classInPackage("io.flutter")),
@@ -81,6 +88,7 @@ object Frameworks {
             nativeLib(Regex("""libQt[56]Core.*\.so""")),
             classInPackage("org.qtproject.qt"), // Qt 6
             classInPackage("org.qtproject.qt5"),
+            runsOn = listOf(PYTHON_FOR_ANDROID), // PySide/PyQt apps
         ),
         anyOf("Unity", nativeLib("libunity.so"), classInPackage("com.unity3d.player")),
         anyOf(
@@ -106,6 +114,12 @@ object Frameworks {
         ),
 
         // Frameworks built on the runtimes above
+        allOf(
+            "Kivy",
+            classInPackage("org.kivy.android"),
+            either(nativeLib("libSDL2.so"), nativeLib("libSDL3.so")), // Kivy's bootstraps; Qt apps use the qt one
+            runsOn = listOf(PYTHON_FOR_ANDROID),
+        ),
         allOf(
             "Sencha",
             webAssetContains("Ext.create", ".js"),

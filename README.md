@@ -75,16 +75,17 @@ Framework | Signals | Base framework
 [Capacitor](https://capacitorjs.com/) | classes in `com.getcapacitor`, `assets/capacitor.config.json` |
 [React Native](https://reactnative.dev/) | `libreactnativejni.so` (up to 0.75), `libreactnative.so` (0.76+), `assets/index.android.bundle`, classes in `com.facebook.react` |
 [.NET for Android](https://learn.microsoft.com/dotnet/android/) (formerly Xamarin.Android) | `libmonodroid.so`, classes in `mono.android` |
-[Kivy](https://kivy.org/) | classes in `org.kivy.android`, "PythonActivity" in `AndroidManifest.xml` |
+[python-for-android](https://python-for-android.readthedocs.io/) | classes in `org.kivy.android`, "PythonActivity" in `AndroidManifest.xml` |
 [Titanium](https://titaniumsdk.com/) | classes `TitaniumModule` **and** `TiActivity` |
 [NativeScript](https://nativescript.org/) | `libNativeScript.so`, classes in `com.tns` |
 [Flutter](https://flutter.dev/) | `libflutter.so`, classes in `io.flutter` |
-[Qt](https://www.qt.io/) | `libQt5Core*.so` / `libQt6Core*.so`, classes in `org.qtproject.qt` / `org.qtproject.qt5` |
+[Qt](https://www.qt.io/) | `libQt5Core*.so` / `libQt6Core*.so`, classes in `org.qtproject.qt` / `org.qtproject.qt5` | python-for-android
 [Unity](https://unity.com/) | `libunity.so`, classes in `com.unity3d.player` |
 [Unreal Engine](https://www.unrealengine.com/) | `libUE4.so`, `libUnreal.so`, classes in `com.epicgames.ue4` / `com.epicgames.unreal` |
 [Godot](https://godotengine.org/) | `libgodot_android.so`, classes in `org.godotengine.godot` |
 [Cocos](https://www.cocos.com/) (Cocos2d-x, Cocos Creator) | `libcocos2dcpp.so`, `libcocos.so`, classes in `org.cocos2dx.lib` / `com.cocos.lib` |
 [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/) | classes in `org.jetbrains.compose.resources`, files under `composeResources/` |
+[Kivy](https://kivy.org/) | classes in `org.kivy.android` **and** `libSDL2.so` or `libSDL3.so` | python-for-android
 [Sencha](https://www.sencha.com/) | "Ext.create" **and** "Ext.application" in a `.js` web asset | Capacitor, Apache Cordova
 [Ionic](https://ionicframework.com/) | "ion-app" in a `.js` web asset | Capacitor, Apache Cordova
 [Expo](https://expo.dev/) | classes in `expo.modules` | React Native
@@ -92,6 +93,13 @@ Framework | Signals | Base framework
 [.NET MAUI](https://dotnet.microsoft.com/apps/maui) | class `MauiAppCompatActivity`, classes in `com.microsoft.maui` | .NET for Android
 
 Web assets are the files under `assets/www/` (Cordova) and `assets/public/` (Capacitor). With `--web-app-threshold N`, an app with at least N `.html`, `.js` and `.css` files and no other match is reported as `Undefined_Web_App`. An app matching none of the above is reported as `Native`.
+
+### Accuracy
+
+Besides the synthetic test cases, detection was checked on open source apps published on F-Droid and GitHub: Flutter (LocalSend), React Native and Expo (Joplin, Bangumi), Capacitor and Ionic (lichess, Voyager), Cordova (Acode), .NET MAUI and Xamarin.Forms (Bitwarden), NativeScript (OSS Weather), Kivy and Qt on python-for-android (Electrum 4.3 and 4.8), Godot (Godot editor), Compose Multiplatform (Animeko) and native apps (LibreTube, Kvaesitso). Known limitations:
+
+* **Compose Multiplatform** is only recognized through its resources library: on Android it otherwise uses the same Jetpack Compose libraries as a native app, so an app without Compose resources (or with them renamed by R8) is reported as `Native`.
+* **Unity, Unreal Engine and Cocos** are recognized by well-known native libraries and classes but have not been checked on real apps, as open source builds are hard to find.
 
 ## Building from source
 

@@ -148,8 +148,18 @@ class ApkAnalyzerTest {
     }
 
     @Test
-    fun `kivy is detected from the python activity`() {
-        assertEquals("Kivy", analyze(activities = listOf("org.kivy.android.PythonActivity")).mainFramework)
+    fun `python apps are reported as kivy only with the SDL bootstrap`() {
+        val pythonActivity = listOf("org.kivy.android.PythonActivity")
+        assertEquals("python-for-android", analyze(activities = pythonActivity).mainFramework)
+
+        val kivy = analyze(mapOf("lib/arm64-v8a/libSDL2.so" to ""), pythonActivity)
+        assertEquals("Kivy", kivy.mainFramework)
+        assertEquals("python-for-android", kivy.baseFramework)
+
+        // Like Electrum: a PySide app packaged by python-for-android with its Qt bootstrap.
+        val qt = analyze(mapOf("lib/arm64-v8a/libQt6Core_arm64-v8a.so" to ""), pythonActivity)
+        assertEquals("Qt", qt.mainFramework)
+        assertEquals("python-for-android", qt.baseFramework)
     }
 
     @Test
