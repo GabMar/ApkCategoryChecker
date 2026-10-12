@@ -1,0 +1,51 @@
+name: Corpus
+
+# Checks the detection on the latest versions of real apps (src/test/resources/corpus/apps.json).
+# Their frameworks change without any change in this repository, hence a schedule instead of a
+# push trigger. Downloads ~1 GB on a cold cache: only new app versions are downloaded afterwards.
+on:
+  schedule:
+    - cron: "17 5 1 * *" # monthly
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  corpus:
+    runs-on: ubuntu-latest
+    env:
+      CORPUS_CACHE: ${{ github.workspace }}/.corpus-cache
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - uses: actions/cache/restore@v6
+        with:
+          path: .corpus-cache
+          key: corpus-${{ github.run_id }}
+          restore-keys: corpus-
+
+      - name: Check the corpus
+        run: ./gradlew corpusTest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      # Saved even when a check fails, so that the next run doesn't download everything again.
+      - uses: actions/cache/save@v6
+        if: always()
+        with:
+          path: .corpus-cache
+          key: corpus-${{ github.run_id }}
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: corpus-report
+          path: build/reports/tests/corpusTest/

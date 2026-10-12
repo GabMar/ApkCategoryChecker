@@ -20,3 +20,6 @@ bin/
 
 # Analysis output
 *.csv
+
+# Corpus test downloads (CI)
+.corpus-cache/

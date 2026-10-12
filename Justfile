@@ -23,6 +23,10 @@ lint:
 format:
     ./gradlew ktlintFormat
 
+# Check the detection on real apps (downloads ~1 GB, cached in build/corpus)
+corpus:
+    GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null || true)}" ./gradlew corpusTest
+
 # Build the runnable jar
 jar:
     ./gradlew shadowJar

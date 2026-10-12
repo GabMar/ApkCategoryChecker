@@ -1,0 +1,128 @@
+{
+  "description": "Real apps checked by ./gradlew corpusTest. Sources: an F-Droid package (latest version), a GitHub release asset (latest release, or a fixed tag), or a fixed URL with its SHA-256. Expectations: mainFramework always; baseFramework when given (null = none); details as a subset.",
+  "apps": [
+    {
+      "name": "LocalSend",
+      "source": { "fdroid": "org.localsend.localsend_app" },
+      "expect": { "mainFramework": "Flutter", "baseFramework": null, "details": { "Flutter": { "build": "release" } } }
+    },
+    {
+      "name": "Joplin",
+      "source": { "fdroid": "net.cozic.joplin" },
+      "expect": { "mainFramework": "Expo", "baseFramework": "React Native", "details": { "React Native": { "engine": "Hermes" } } }
+    },
+    {
+      "name": "Godot editor",
+      "source": { "fdroid": "org.godotengine.editor.v4" },
+      "expect": { "mainFramework": "Godot" }
+    },
+    {
+      "name": "Electrum (Qt)",
+      "source": { "fdroid": "org.electrum.electrum" },
+      "expect": { "mainFramework": "Qt", "baseFramework": "python-for-android" }
+    },
+    {
+      "name": "Electrum 4.3 (Kivy)",
+      "source": {
+        "url": "https://download.electrum.org/4.3.4/Electrum-4.3.4.0-arm64-v8a-release.apk",
+        "sha256": "0cbb92241dd7d5638ae9e2cd7815a5305bb909112be4ad226782a86d6867a911"
+      },
+      "expect": { "mainFramework": "Kivy", "baseFramework": "python-for-android" }
+    },
+    {
+      "name": "Kvaesitso",
+      "source": { "fdroid": "de.mm20.launcher2.release" },
+      "expect": { "mainFramework": "Native", "details": { "Native": { "ui": "Jetpack Compose" } } }
+    },
+    {
+      "name": "LibreTube",
+      "source": { "fdroid": "com.github.libretube" },
+      "expect": { "mainFramework": "Native" }
+    },
+    {
+      "name": "lichess",
+      "source": { "github": "lichess-org/lichobile", "asset": "^app-release\\.apk$" },
+      "expect": { "mainFramework": "Capacitor", "baseFramework": null }
+    },
+    {
+      "name": "Voyager",
+      "source": { "github": "aeharding/voyager", "asset": "^Voyager-Android-.*\\.apk$" },
+      "expect": { "mainFramework": "Ionic", "baseFramework": "Capacitor" }
+    },
+    {
+      "name": "Bangumi",
+      "source": { "github": "czy0729/Bangumi", "asset": "^bangumi_.*_arm64-v8a\\.apk$" },
+      "expect": { "mainFramework": "Expo", "baseFramework": "React Native", "details": { "React Native": { "engine": "Hermes" } } }
+    },
+    {
+      "name": "OSS Weather",
+      "source": { "github": "ossappscollective/oss-weather", "asset": "^app-arm64-v8a-release\\.apk$" },
+      "expect": { "mainFramework": "NativeScript" }
+    },
+    {
+      "name": "Animeko",
+      "source": { "github": "open-ani/animeko", "asset": "^ani-[0-9.]+-arm64-v8a\\.apk$" },
+      "expect": { "mainFramework": "Compose Multiplatform" }
+    },
+    {
+      "name": "AB Download Manager (Compose Multiplatform without its resources library: a known limitation)",
+      "source": { "github": "amir1376/ab-download-manager", "asset": "^ABDownloadManager_.*_android_universal\\.apk$" },
+      "expect": { "mainFramework": "Native", "details": { "Native": { "ui": "Jetpack Compose" } } }
+    },
+    {
+      "name": "Acode",
+      "source": { "github": "Acode-Foundation/Acode", "asset": "^app-fdroid\\.apk$" },
+      "expect": { "mainFramework": "Apache Cordova" }
+    },
+    {
+      "name": "Revolt",
+      "source": { "github": "revoltchat/android-twa", "asset": "^app-release-signed\\.apk$" },
+      "expect": { "mainFramework": "Trusted Web Activity", "details": { "Trusted Web Activity": { "url": "https://app.revolt.chat/" } } }
+    },
+    {
+      "name": "EasyPocketMD",
+      "source": { "github": "sunhouy/EasyPocketMD", "asset": "^easypocketmd-.*-android\\.apk$" },
+      "expect": { "mainFramework": "Tauri" }
+    },
+    {
+      "name": "Lynx Explorer",
+      "source": { "github": "lynx-family/lynx", "asset": "^LynxExplorer-noasan-release\\.apk$" },
+      "expect": { "mainFramework": "Lynx" }
+    },
+    {
+      "name": "Shattered Pixel Dungeon",
+      "source": { "github": "00-Evan/shattered-pixel-dungeon", "asset": "^ShatteredPD-.*-Android\\.apk$" },
+      "expect": { "mainFramework": "libGDX" }
+    },
+    {
+      "name": "Unciv",
+      "source": { "github": "yairm210/Unciv", "asset": "^Unciv-signed\\.apk$" },
+      "expect": { "mainFramework": "libGDX" }
+    },
+    {
+      "name": "Ursa (Avalonia)",
+      "source": { "github": "irihitech/Ursa.Avalonia", "asset": "^com\\.irihitech\\.Ursa-Signed\\.apk$" },
+      "expect": { "mainFramework": "Avalonia", "baseFramework": ".NET for Android" }
+    },
+    {
+      "name": "Bacteriomatics",
+      "source": { "github": "Volnikan/Bacteriomatics", "tag": "v0.6.0-alpha", "asset": "^Bacteriomatics\\.apk$" },
+      "expect": { "mainFramework": "Solar2D" }
+    },
+    {
+      "name": "UTDR Textbox Generator",
+      "source": { "github": "SoupTaels/UTDR-SoupGen", "tag": "Soupy", "asset": "^UTDR\\.Textbox\\.Gen\\.apk$" },
+      "expect": { "mainFramework": "GameMaker" }
+    },
+    {
+      "name": "Bitwarden 2023.12 (Xamarin.Forms)",
+      "source": { "github": "bitwarden/mobile", "tag": "v2023.12.0", "asset": "^com\\.x8bit\\.bitwarden-fdroid\\.apk$" },
+      "expect": { "mainFramework": "Xamarin.Forms", "baseFramework": ".NET for Android", "details": { ".NET for Android": { "runtime": "Mono" } } }
+    },
+    {
+      "name": "Bitwarden 2024.10 (.NET MAUI)",
+      "source": { "github": "bitwarden/mobile", "tag": "v2024.10.0", "asset": "^com\\.x8bit\\.bitwarden-fdroid\\.apk$" },
+      "expect": { "mainFramework": ".NET MAUI", "baseFramework": ".NET for Android" }
+    }
+  ]
+}

@@ -127,7 +127,7 @@ An app matching none of the above is reported as `Native`, with the detail `ui`:
 
 ### Accuracy
 
-Besides the synthetic test cases, detection was checked on open source apps published on F-Droid and GitHub: Flutter (LocalSend), React Native and Expo (Joplin, Bangumi), Capacitor and Ionic (lichess, Voyager), Cordova (Acode), .NET MAUI and Xamarin.Forms (Bitwarden), Avalonia (Ursa), NativeScript (OSS Weather), Kivy and Qt on python-for-android (Electrum 4.3 and 4.8), Trusted Web Activity (Revolt), Tauri (EasyPocketMD), Lynx (Lynx Explorer), Godot (Godot editor), libGDX (Shattered Pixel Dungeon, Unciv), Solar2D (Bacteriomatics), GameMaker (UTDR Textbox Generator), Compose Multiplatform (Animeko) and native apps (LibreTube, Kvaesitso). Known limitations:
+Besides the synthetic test cases, detection is checked on open source apps published on F-Droid and GitHub, listed with their expected results in [`apps.json`](src/test/resources/corpus/apps.json) and tested in their latest versions every month by the [corpus workflow](.github/workflows/corpus.yml) (or locally with `just corpus`, which downloads about 1 GB): Flutter (LocalSend), React Native and Expo (Joplin, Bangumi), Capacitor and Ionic (lichess, Voyager), Cordova (Acode), .NET MAUI and Xamarin.Forms (Bitwarden), Avalonia (Ursa), NativeScript (OSS Weather), Kivy and Qt on python-for-android (Electrum 4.3 and 4.8), Trusted Web Activity (Revolt), Tauri (EasyPocketMD), Lynx (Lynx Explorer), Godot (Godot editor), libGDX (Shattered Pixel Dungeon, Unciv), Solar2D (Bacteriomatics), GameMaker (UTDR Textbox Generator), Compose Multiplatform (Animeko) and native apps (LibreTube, Kvaesitso). Known limitations:
 
 * **Compose Multiplatform** is only recognized through its resources library: on Android it otherwise uses the same Jetpack Compose libraries as a native app, so an app without Compose resources (or with them renamed by R8) is reported as `Native` with `ui` `Jetpack Compose`.
 * **Unity, Unreal Engine, Cocos, Defold and Kony** are recognized by well-known native libraries and classes but have not been checked on real apps, as open source builds are hard to find.
@@ -143,6 +143,7 @@ just jar                    # runnable jar in build/libs/ApkCategoryChecker.jar
 just run path/to/app.apk    # build and analyze
 just docker-build           # build the Docker image
 just docker-run app.apk     # analyze APKs in the current directory with the image
+just corpus                 # check the detection on real apps (downloads ~1 GB)
 ```
 
 Without `just`, use Gradle directly: `./gradlew build`, `./gradlew shadowJar`.

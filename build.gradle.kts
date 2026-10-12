@@ -49,8 +49,37 @@ tasks.shadowJar {
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform { excludeTags("corpus") }
     testLogging {
         events("passed", "skipped", "failed")
     }
 }
+
+// Real apps from F-Droid and GitHub releases, listed in src/test/resources/corpus/apps.json.
+// Downloads ~1 GB (cached), so it is not part of `build`: run it with `./gradlew corpusTest`.
+val corpusTest =
+    tasks.register<Test>("corpusTest") {
+        description = "Checks the detection on real APKs downloaded from F-Droid and GitHub releases."
+        group = "verification"
+        testClassesDirs =
+            sourceSets.test
+                .get()
+                .output.classesDirs
+        classpath = sourceSets.test.get().runtimeClasspath
+        useJUnitPlatform { includeTags("corpus") }
+        systemProperty(
+            "corpus.cache",
+            providers.environmentVariable("CORPUS_CACHE").getOrElse(
+                layout.buildDirectory
+                    .dir("corpus")
+                    .get()
+                    .asFile.path,
+            ),
+        )
+        providers.environmentVariable("GITHUB_TOKEN").orNull?.let { environment("GITHUB_TOKEN", it) }
+        outputs.upToDateWhen { false } // the latest releases change without any change here
+        testLogging {
+            events("passed", "skipped", "failed")
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
+    }
