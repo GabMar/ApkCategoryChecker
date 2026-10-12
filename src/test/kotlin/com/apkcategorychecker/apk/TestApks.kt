@@ -9,11 +9,13 @@ import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.outputStream
+import kotlin.io.path.readBytes
 
 /**
  * Builds a minimal synthetic APK with ARSCLib: a binary manifest declaring [activities], a DEX
  * defining [classes] (fully qualified names) and the given extra [files]. [resources] maps
  * `type/name` to a file path, written to `resources.arsc` (e.g. `xml/config` -> `res/ZW.xml`).
+ * With [split], the APK is a split of the [packageName] app (e.g. `config.arm64_v8a`).
  */
 internal fun syntheticApk(
     file: Path,
@@ -22,11 +24,15 @@ internal fun syntheticApk(
     packageName: String = "com.example.app",
     activities: List<String> = emptyList(),
     resources: Map<String, String> = emptyMap(),
-    dex: ByteArray = dex(classes),
+    dex: ByteArray? = dex(classes),
+    split: String? = null,
+    versionCode: Int = 1,
 ): Path {
     val manifest =
         AndroidManifestBlock().apply {
             setPackageName(packageName)
+            setVersionCode(versionCode)
+            if (split != null) setSplit(split, true)
             getOrCreateApplicationElement()
             activities.forEach { getOrCreateActivity(it, false) }
             refresh()
@@ -42,7 +48,7 @@ internal fun syntheticApk(
             zip.closeEntry()
         }
         add("AndroidManifest.xml", manifest.bytes)
-        add("classes.dex", dex)
+        if (dex != null) add("classes.dex", dex)
         if (resources.isNotEmpty()) add("resources.arsc", resourceTable(packageName, resources))
         files.forEach { (name, content) -> add(name, content.toByteArray()) }
     }
@@ -69,4 +75,25 @@ private fun resourceTable(
     }
     table.refresh()
     return table.bytes
+}
+
+/** A zip of APKs, like an XAPK, APKM or APKS file. */
+internal fun container(
+    file: Path,
+    apks: Map<String, Path>,
+    extraFiles: Map<String, String> = emptyMap(),
+): Path {
+    ZipOutputStream(file.outputStream()).use { zip ->
+        apks.forEach { (name, apk) ->
+            zip.putNextEntry(ZipEntry(name))
+            zip.write(apk.readBytes())
+            zip.closeEntry()
+        }
+        extraFiles.forEach { (name, content) ->
+            zip.putNextEntry(ZipEntry(name))
+            zip.write(content.toByteArray())
+            zip.closeEntry()
+        }
+    }
+    return file
 }

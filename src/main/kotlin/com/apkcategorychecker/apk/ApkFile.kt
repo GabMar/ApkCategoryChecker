@@ -2,7 +2,6 @@
 package com.apkcategorychecker.apk
 
 import com.reandroid.apk.ApkModule
-import java.io.Closeable
 import java.io.IOException
 import java.nio.file.Path
 
@@ -18,7 +17,7 @@ class ApkFormatException(
  */
 class ApkFile(
     val path: Path,
-) : Closeable {
+) : ApkContents {
     private val module =
         try {
             ApkModule.loadApkFile(path.toFile())
@@ -27,24 +26,19 @@ class ApkFile(
         }
 
     /** Paths of all the files in the archive, in archive order, e.g. `assets/www/index.html`. */
-    val entryNames: List<String> =
+    override val entryNames: List<String> =
         module.zipEntryMap
             .listInputSources()
             .map { it.alias }
             .filterNot { it.endsWith("/") }
 
-    fun read(name: String): ByteArray? =
+    override fun read(name: String): ByteArray? =
         module.zipEntryMap
             .getInputSource(name)
             ?.openStream()
             ?.use { it.readAllBytes() }
 
-    fun readText(name: String): String? = read(name)?.toString(Charsets.UTF_8)
-
-    /** Decodes a compiled XML file of the APK (e.g. `res/xml/config.xml`), or null if it doesn't exist. */
-    fun readBinaryXml(name: String): XmlElement? = read(name)?.let(BinaryXml::parse)
-
-    val manifest: AndroidManifest by lazy {
+    override val manifest: AndroidManifest by lazy {
         AndroidManifest(readBinaryXml(MANIFEST) ?: throw ApkFormatException("missing $MANIFEST"))
     }
 
@@ -52,7 +46,7 @@ class ApkFile(
      * The file of a resource according to `resources.arsc`, e.g. `res/xml/config.xml` for
      * `xml/config`. Release builds may shorten resource paths (to something like `res/ZW.xml`).
      */
-    fun resourceFile(
+    override fun resourceFile(
         type: String,
         name: String,
     ): String? =
@@ -68,14 +62,13 @@ class ApkFile(
      * Read with [DexReader] rather than ARSCLib, which builds a full model of every DEX:
      * several times slower and needing ~10x the memory.
      */
-    val classNames: Set<String> by lazy {
+    override val classNames: Set<String> by lazy {
         entryNames.filter { DEX_FILE.matches(it) }.flatMapTo(HashSet()) { DexReader.classNames(read(it)!!) }
     }
 
     private val simpleClassNames: Set<String> by lazy { classNames.mapTo(HashSet()) { it.substringAfterLast('.') } }
 
-    /** True if a class with this simple name (e.g. `CordovaActivity`) exists in any package. */
-    fun hasClassNamed(simpleName: String): Boolean = simpleName in simpleClassNames
+    override fun hasClassNamed(simpleName: String): Boolean = simpleName in simpleClassNames
 
     override fun close() = module.close()
 
@@ -90,6 +83,11 @@ class AndroidManifest(
     val root: XmlElement,
 ) {
     val packageName: String? get() = root.attributes["package"]
+
+    val versionCode: String? get() = root.attributes["android:versionCode"]
+
+    /** The name of the split (e.g. `config.arm64_v8a`) for split APKs, null for base or standalone APKs. */
+    val split: String? get() = root.attributes["split"]
 
     /** Raw value of `android:debuggable`, or null if not declared. */
     val debuggable: String? get() = root.findFirst("application")?.attributes?.get("android:debuggable")

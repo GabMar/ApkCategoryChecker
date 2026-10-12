@@ -38,9 +38,9 @@ class MainTest {
         assertEquals(0, result.exitCode)
         val lines = result.out.lines().filter { it.isNotEmpty() }
         assertEquals(2, lines.size)
-        assertTrue(lines[0].startsWith("file,path,file_size,package,main_framework,"))
+        assertTrue(lines[0].startsWith("file,path,splits,file_size,package,main_framework,"))
         assertTrue(",Flutter," in lines[1])
-        assertTrue("Analyzed 1 APK(s), 0 failed." in result.err)
+        assertTrue("Analyzed 1 app(s), 0 failed." in result.err)
     }
 
     @Test
@@ -75,7 +75,7 @@ class MainTest {
         assertEquals(0, result.exitCode)
         assertTrue("\"error\":" in result.out)
         assertTrue("Could not analyze" in result.err)
-        assertTrue("Analyzed 1 APK(s), 1 failed." in result.err)
+        assertTrue("Analyzed 1 app(s), 1 failed." in result.err)
     }
 
     @Test

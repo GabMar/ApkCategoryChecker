@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 package com.apkcategorychecker.framework
 
-import com.apkcategorychecker.apk.ApkFile
+import com.apkcategorychecker.apk.ApkContents
 import com.apkcategorychecker.apk.ApkFormatException
 import com.apkcategorychecker.apk.BinaryXml
 
 /** Caches the parts of an APK that several detectors look at. */
 class ApkInspection(
-    val apk: ApkFile,
+    val apk: ApkContents,
 ) {
     val entries: Set<String> by lazy { apk.entryNames.toHashSet() }
 

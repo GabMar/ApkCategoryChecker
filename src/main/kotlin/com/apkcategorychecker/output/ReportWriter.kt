@@ -53,6 +53,7 @@ class CsvReportWriter(
             printer.printRecord(
                 file,
                 path,
+                splits.joinToString(LIST_SEPARATOR),
                 fileSize,
                 packageName,
                 mainFramework,
@@ -82,6 +83,7 @@ class CsvReportWriter(
             arrayOf(
                 "file",
                 "path",
+                "splits",
                 "file_size",
                 "package",
                 "main_framework",

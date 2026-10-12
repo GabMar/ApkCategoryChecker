@@ -8,6 +8,9 @@ import kotlinx.serialization.Serializable
 data class ApkReport(
     val file: String,
     val path: String,
+    /** File names of the split APKs analyzed together with [path], the base APK or container. */
+    val splits: List<String> = emptyList(),
+    /** Total size of the app's APK files in bytes. */
     val fileSize: Long?,
     val packageName: String?,
     /** The most specific framework detected, or [NATIVE]. */

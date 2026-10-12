@@ -22,7 +22,12 @@ docker run --rm -v "$PWD:/data" --user "$(id -u):$(id -g)" ghcr.io/gabmar/apkcat
 java -jar ApkCategoryChecker.jar [OPTIONS] PATH...
 ```
 
-Each `PATH` is an APK file or a directory, searched recursively for `.apk` files. Results go to standard output (or to `--output`), progress and errors to standard error.
+Each `PATH` is an APK file, an APK container or a directory, searched recursively for both:
+
+* **Split APKs** of an app installed from an App Bundle (e.g. pulled from a device with `adb`: `base.apk`, `split_config.arm64_v8a.apk`, ...) are analyzed together when they are in the same directory: the manifest is in the base APK, but native libraries often only in a split.
+* **Containers** — `.xapk` (APKPure), `.apkm` (APKMirror) and `.apks` (bundletool) — are zip files of APKs, analyzed as one app. Their APKs are extracted to a temporary directory, deleted right after.
+
+Results go to standard output (or to `--output`), progress and errors to standard error.
 
 Option | Description
 -------|------------
@@ -54,8 +59,9 @@ APKs are reported in path order. JSON fields are camelCase (`mainFramework`); CS
 
 Field | Description
 ------|------------
-`file`, `path` | Name and path of the APK
-`fileSize` | Size of the APK in bytes
+`file`, `path` | Name and path of the APK, of the base APK for split APKs, or of the container
+`splits` | Names of the split APKs analyzed together with it
+`fileSize` | Total size of the app's files in bytes
 `packageName` | Package name from `AndroidManifest.xml`
 `mainFramework` | The most specific framework detected, or `Native`; null if the APK could not be analyzed
 `baseFramework` | The runtime the main framework is built on, if detected (e.g. `Capacitor` for `Ionic`)

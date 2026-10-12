@@ -3,6 +3,7 @@ package com.apkcategorychecker.cli
 
 import com.apkcategorychecker.analyzer.ApkAnalyzer
 import com.apkcategorychecker.analyzer.BatchAnalyzer
+import com.apkcategorychecker.apk.ApkInput
 import com.apkcategorychecker.framework.Frameworks
 import com.apkcategorychecker.output.OutputFormat
 import picocli.CommandLine
@@ -27,7 +28,14 @@ import kotlin.system.exitProcess
     usageHelpAutoWidth = true,
 )
 class ApkCategoryChecker : Callable<Int> {
-    @Parameters(arity = "1..*", paramLabel = "PATH", description = ["APK files, or directories searched recursively for .apk files."])
+    @Parameters(
+        arity = "1..*",
+        paramLabel = "PATH",
+        description = [
+            "APK files, APK containers (.xapk, .apks, .apkm) or directories searched recursively for them.",
+            "Split APKs of the same app in one directory are analyzed together.",
+        ],
+    )
     lateinit var paths: List<Path>
 
     @Option(names = ["-o", "--output"], paramLabel = "FILE", description = ["Write the results to FILE instead of standard output."])
@@ -64,13 +72,13 @@ class ApkCategoryChecker : Callable<Int> {
         }
         if (threads < 1) throw CommandLine.ParameterException(spec.commandLine(), "--threads must be at least 1")
 
-        val apks = BatchAnalyzer.findApks(paths)
+        val apps = ApkInput.find(paths)
         val outputFormat = format ?: output?.let { OutputFormat.fromExtension(it.fileName.toString()) } ?: OutputFormat.CSV
         val out = output?.bufferedWriter() ?: NonClosingWriter(spec.commandLine().out)
 
         var failures = 0
         outputFormat.writer(out).use { writer ->
-            BatchAnalyzer(ApkAnalyzer(Frameworks.all(webAppThreshold)), threads).analyze(apks) { report ->
+            BatchAnalyzer(ApkAnalyzer(Frameworks.all(webAppThreshold)), threads).analyze(apps) { report ->
                 writer.write(report)
                 if (!report.success) {
                     failures++
@@ -78,7 +86,7 @@ class ApkCategoryChecker : Callable<Int> {
                 }
             }
         }
-        err.println("Analyzed ${apks.size} APK(s), $failures failed.")
+        err.println("Analyzed ${apps.size} app(s), $failures failed.")
         return 0
     }
 }

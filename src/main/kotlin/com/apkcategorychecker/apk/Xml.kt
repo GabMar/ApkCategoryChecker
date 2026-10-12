@@ -103,6 +103,7 @@ object BinaryXml {
     private val KNOWN_ATTRIBUTES =
         mapOf(
             0x01010003 to "name",
+            0x0101021b to "versionCode",
             0x0101000f to "debuggable",
             0x0101020c to "minSdkVersion",
             0x01010270 to "targetSdkVersion",

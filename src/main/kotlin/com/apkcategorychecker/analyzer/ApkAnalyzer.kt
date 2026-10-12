@@ -1,27 +1,29 @@
 // SPDX-License-Identifier: MIT
 package com.apkcategorychecker.analyzer
 
-import com.apkcategorychecker.apk.ApkFile
+import com.apkcategorychecker.apk.ApkInput
 import com.apkcategorychecker.framework.ApkInspection
 import com.apkcategorychecker.framework.Framework
 import com.apkcategorychecker.framework.Frameworks
 import java.nio.file.Path
 import java.time.Instant
-import kotlin.io.path.fileSize
 import kotlin.io.path.name
 
-/** Analyzes a single APK, reading it directly without decoding it to disk. Thread-safe. */
+/** Analyzes an app (an APK, split APKs or a container), reading it without decoding it to disk. Thread-safe. */
 class ApkAnalyzer(
     private val frameworks: List<Framework> = Frameworks.all(),
 ) {
-    fun analyze(path: Path): ApkReport {
+    fun analyze(path: Path): ApkReport = analyze(ApkInput.of(path))
+
+    fun analyze(input: ApkInput): ApkReport {
+        val path = input.path
         val start = Instant.now()
         val startNanos = System.nanoTime()
 
         fun elapsedMs() = (System.nanoTime() - startNanos) / 1_000_000
 
         return try {
-            ApkFile(path).use { analyze(path, ApkInspection(it), start, ::elapsedMs) }
+            input.open().use { analyze(input, ApkInspection(it), start, ::elapsedMs) }
         } catch (e: Throwable) {
             // One broken APK must not stop the analysis of a whole directory: that includes a huge
             // APK running out of memory, or deeply nested XML overflowing the stack. Other errors
@@ -30,7 +32,7 @@ class ApkAnalyzer(
             ApkReport(
                 file = path.name,
                 path = path.toString(),
-                fileSize = runCatching { path.fileSize() }.getOrNull(),
+                fileSize = runCatching { input.size() }.getOrNull(),
                 packageName = null,
                 mainFramework = null,
                 baseFramework = null,
@@ -42,7 +44,7 @@ class ApkAnalyzer(
     }
 
     private fun analyze(
-        path: Path,
+        input: ApkInput,
         inspection: ApkInspection,
         start: Instant,
         elapsedMs: () -> Long,
@@ -52,9 +54,10 @@ class ApkAnalyzer(
         val main = matched.keys.lastOrNull()
 
         return ApkReport(
-            file = path.name,
-            path = path.toString(),
-            fileSize = path.fileSize(),
+            file = input.path.name,
+            path = input.path.toString(),
+            splits = inspection.apk.splitNames,
+            fileSize = input.size(),
             packageName = manifest.packageName,
             mainFramework = main?.name ?: ApkReport.NATIVE,
             baseFramework = main?.runsOn?.firstOrNull { it in matched }?.name,
