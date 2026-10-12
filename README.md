@@ -35,6 +35,8 @@ Option | Description
 `-f`, `--format FORMAT` | `csv`, `json` or `jsonl` ([JSON Lines](https://jsonlines.org)). Default: from the output file extension, otherwise `csv`
 `-j`, `--threads N` | APKs analyzed in parallel. Default: number of CPUs
 `--web-app-threshold N` | Report apps with at least N `.html`/`.js`/`.css` files and no other match as `Undefined_Web_App`. Default: disabled
+`--rules FILE` | Use the framework rules in `FILE` instead of the built-in ones
+`--print-rules` | Print the built-in framework rules, a starting point for `--rules`
 `-h`, `--help` | Show the help
 `-V`, `--version` | Show the version
 
@@ -81,6 +83,14 @@ Field | Description
 Each framework is recognised by a set of signals: native libraries (in any `lib/<abi>/` directory), classes in the DEX files, files in the archive, entries of the manifest or text in the web assets. Unless noted, any one signal is enough; where possible both native libraries and classes are checked, because split APKs from App Bundles keep the native libraries in a separate per-ABI APK, and R8 may rename classes.
 
 When more than one framework matches, the most specific one is reported as `mainFramework` and the runtime it is built on (if detected) as `baseFramework`. Some frameworks also report `details`.
+
+The rules below are data, in [`frameworks.json`](src/main/resources/rules/frameworks.json): to add or change a framework without rebuilding the tool, start from the built-in rules and pass your copy with `--rules`:
+
+```sh
+java -jar ApkCategoryChecker.jar --print-rules > my-rules.json
+# edit my-rules.json: the format is described in the comment at its top
+java -jar ApkCategoryChecker.jar ~/apks --rules my-rules.json
+```
 
 ### Runtimes and engines
 

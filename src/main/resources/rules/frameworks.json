@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 1,
+  "comment": [
+    "Framework rules of apk-category-checker. Pass a modified copy with --rules FILE; print this file with --print-rules.",
+    "Frameworks are listed from the most generic to the most specific: when several match, the last one is the main framework.",
+    "A framework matches when any of its signals is found (\"match\": \"all\" requires all of them). Signals:",
+    "  nativeLib: a native library file name in any lib/<abi>/ directory; nativeLibRegex: the same, as a regular expression",
+    "  classPackage: a class in the package or its subpackages; className: a class with this simple name in any package",
+    "  file: a file in the APK; fileUnder: any file under a directory",
+    "  manifestContains / configXmlContains: text in AndroidManifest.xml / Cordova's config.xml",
+    "  webAssetContains: text in a web asset (assets/www/, assets/public/), optionally only in files with \"extension\"",
+    "  hermesBytecode: a file compiled to Hermes bytecode; anyOf: the first of several signals that is found",
+    "runsOn lists the frameworks it may be built on: the first one detected is the base framework.",
+    "details: facts reported for a detected framework; options are tried in order, the first whose signal is found gives the value.",
+    "nativeDetails: details of apps without a cross-platform framework."
+  ],
+  "frameworks": [
+    {
+      "name": "Apache Cordova",
+      "match": "all",
+      "signals": [
+        { "className": "CordovaActivity" },
+        { "anyOf": [{ "configXmlContains": "org.apache.cordova" }, { "file": "assets/www/cordova.js" }] }
+      ]
+    },
+    {
+      "name": "Capacitor",
+      "comment": "Bundles the Cordova framework for plugin compatibility, so it must come after Apache Cordova.",
+      "signals": [{ "classPackage": "com.getcapacitor" }, { "file": "assets/capacitor.config.json" }]
+    },
+    {
+      "name": "Trusted Web Activity",
+      "comment": "A website in a full-screen Chrome tab: PWAs packaged with Bubblewrap or PWABuilder.",
+      "signals": [
+        { "manifestContains": "android.support.customtabs.trusted.DEFAULT_URL" },
+        { "manifestContains": "com.google.androidbrowserhelper.trusted" },
+        { "classPackage": "com.google.androidbrowserhelper.trusted" }
+      ],
+      "details": [{ "key": "url", "manifestMetaData": "android.support.customtabs.trusted.DEFAULT_URL" }]
+    },
+    {
+      "name": "React Native",
+      "signals": [
+        { "nativeLib": "libreactnativejni.so", "comment": "up to 0.75" },
+        { "nativeLib": "libreactnative.so", "comment": "0.76+" },
+        { "file": "assets/index.android.bundle" },
+        { "classPackage": "com.facebook.react" }
+      ],
+      "details": [
+        {
+          "key": "engine",
+          "options": [
+            {
+              "value": "Hermes",
+              "signal": { "anyOf": [{ "hermesBytecode": "assets/index.android.bundle" }, { "nativeLibRegex": "libhermes.*\\.so" }] }
+            },
+            {
+              "value": "JavaScriptCore",
+              "signal": { "anyOf": [{ "nativeLib": "libjsc.so" }, { "nativeLib": "libjscexecutor.so" }] }
+            }
+          ]
+        },
+        {
+          "key": "architecture",
+          "comment": "libappmodules.so holds the app's own C++ TurboModules, only built with the New Architecture.",
+          "options": [
+            { "value": "New", "signal": { "nativeLib": "libappmodules.so" } },
+            { "value": "Legacy", "signal": { "anyOf": [{ "nativeLib": "libreactnativejni.so" }, { "nativeLib": "libreactnative.so" }] } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": ".NET for Android",
+      "comment": "Xamarin.Android and its successor.",
+      "signals": [{ "nativeLib": "libmonodroid.so" }, { "classPackage": "mono.android" }],
+      "details": [
+        {
+          "key": "runtime",
+          "options": [
+            { "value": "CoreCLR", "signal": { "nativeLib": "libcoreclr.so" } },
+            { "value": "Mono", "signal": { "nativeLib": "libmonosgen-2.0.so" } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "python-for-android",
+      "comment": "Packages Python apps; its classes keep the org.kivy.android package for historical reasons.",
+      "signals": [{ "classPackage": "org.kivy.android" }, { "manifestContains": "PythonActivity" }]
+    },
+    {
+      "name": "Titanium",
+      "match": "all",
+      "signals": [{ "className": "TitaniumModule" }, { "className": "TiActivity" }]
+    },
+    {
+      "name": "NativeScript",
+      "signals": [{ "nativeLib": "libNativeScript.so" }, { "classPackage": "com.tns" }]
+    },
+    {
+      "name": "Tauri",
+      "signals": [{ "classPackage": "app.tauri" }, { "file": "assets/tauri.conf.json" }]
+    },
+    {
+      "name": "Lynx",
+      "signals": [{ "nativeLib": "liblynx.so" }, { "classPackage": "com.lynx.tasm" }, { "file": "assets/lynx_core.js" }]
+    },
+    {
+      "name": "Kony",
+      "signals": [{ "nativeLibRegex": "libkony.*\\.so" }, { "classPackage": "com.konylabs" }]
+    },
+    {
+      "name": "Flutter",
+      "signals": [{ "nativeLib": "libflutter.so" }, { "classPackage": "io.flutter" }],
+      "details": [
+        {
+          "key": "build",
+          "comment": "Release builds ship the Dart code compiled ahead of time, debug builds a kernel for the JIT.",
+          "options": [
+            { "value": "release", "signal": { "nativeLib": "libapp.so" } },
+            { "value": "debug", "signal": { "file": "assets/flutter_assets/kernel_blob.bin" } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Qt",
+      "signals": [
+        { "nativeLibRegex": "libQt[56]Core.*\\.so" },
+        { "classPackage": "org.qtproject.qt", "comment": "Qt 6" },
+        { "classPackage": "org.qtproject.qt5" }
+      ],
+      "runsOn": ["python-for-android"],
+      "comment": "PySide/PyQt apps run on python-for-android."
+    },
+    {
+      "name": "Unity",
+      "signals": [{ "nativeLib": "libunity.so" }, { "classPackage": "com.unity3d.player" }],
+      "details": [
+        {
+          "key": "scripting backend",
+          "options": [
+            { "value": "IL2CPP", "signal": { "nativeLib": "libil2cpp.so" } },
+            {
+              "value": "Mono",
+              "signal": {
+                "anyOf": [{ "nativeLib": "libmonobdwgc-2.0.so" }, { "nativeLib": "libmono.so" }, { "fileUnder": "assets/bin/Data/Managed/" }]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Unreal Engine",
+      "signals": [
+        { "nativeLib": "libUE4.so" },
+        { "nativeLib": "libUnreal.so" },
+        { "classPackage": "com.epicgames.ue4" },
+        { "classPackage": "com.epicgames.unreal" }
+      ]
+    },
+    {
+      "name": "Godot",
+      "signals": [{ "nativeLib": "libgodot_android.so" }, { "classPackage": "org.godotengine.godot" }]
+    },
+    {
+      "name": "Cocos",
+      "signals": [
+        { "nativeLib": "libcocos2dcpp.so", "comment": "Cocos2d-x" },
+        { "nativeLib": "libcocos.so", "comment": "Cocos Creator 3" },
+        { "classPackage": "org.cocos2dx.lib" },
+        { "classPackage": "com.cocos.lib" }
+      ]
+    },
+    {
+      "name": "libGDX",
+      "signals": [{ "nativeLib": "libgdx.so" }, { "classPackage": "com.badlogic.gdx" }]
+    },
+    {
+      "name": "Defold",
+      "signals": [{ "nativeLib": "libdmengine.so" }, { "classPackage": "com.dynamo.android" }]
+    },
+    {
+      "name": "Solar2D",
+      "signals": [{ "nativeLib": "libcorona.so" }, { "classPackage": "com.ansca.corona" }]
+    },
+    {
+      "name": "GameMaker",
+      "signals": [{ "nativeLib": "libyoyo.so" }, { "classPackage": "com.yoyogames.runner" }, { "file": "assets/game.droid" }]
+    },
+    {
+      "name": "Compose Multiplatform",
+      "signals": [
+        { "classPackage": "org.jetbrains.compose.resources" },
+        { "fileUnder": "assets/composeResources/" },
+        { "fileUnder": "composeResources/" }
+      ]
+    },
+    {
+      "name": "Kivy",
+      "match": "all",
+      "signals": [
+        { "classPackage": "org.kivy.android" },
+        {
+          "anyOf": [{ "nativeLib": "libSDL2.so" }, { "nativeLib": "libSDL3.so" }],
+          "comment": "Kivy's bootstraps; Qt apps use the qt one"
+        }
+      ],
+      "runsOn": ["python-for-android"]
+    },
+    {
+      "name": "Sencha",
+      "match": "all",
+      "signals": [
+        { "webAssetContains": "Ext.create", "extension": ".js" },
+        { "webAssetContains": "Ext.application", "extension": ".js" }
+      ],
+      "runsOn": ["Capacitor", "Apache Cordova"]
+    },
+    {
+      "name": "Ionic",
+      "signals": [{ "webAssetContains": "ion-app", "extension": ".js" }],
+      "runsOn": ["Capacitor", "Apache Cordova"]
+    },
+    {
+      "name": "Expo",
+      "signals": [{ "nativeLib": "libexpo-modules-core.so" }, { "file": "assets/app.config" }, { "classPackage": "expo.modules" }],
+      "runsOn": ["React Native"]
+    },
+    {
+      "name": "Xamarin.Forms",
+      "signals": [{ "className": "FormsAppCompatActivity" }, { "className": "FormsApplicationActivity" }],
+      "runsOn": [".NET for Android"]
+    },
+    {
+      "name": "Avalonia",
+      "signals": [{ "className": "AvaloniaMainActivity" }, { "className": "AvaloniaView" }],
+      "runsOn": [".NET for Android"]
+    },
+    {
+      "name": ".NET MAUI",
+      "signals": [{ "className": "MauiAppCompatActivity" }, { "classPackage": "com.microsoft.maui" }],
+      "runsOn": [".NET for Android"]
+    }
+  ],
+  "nativeDetails": [
+    {
+      "key": "ui",
+      "comment": "Compose may also come with a library, and the UI may still mix in Views: this means Compose is included.",
+      "options": [
+        {
+          "value": "Jetpack Compose",
+          "signal": { "anyOf": [{ "file": "META-INF/androidx.compose.ui_ui.version" }, { "classPackage": "androidx.compose.ui" }] }
+        }
+      ]
+    }
+  ]
+}

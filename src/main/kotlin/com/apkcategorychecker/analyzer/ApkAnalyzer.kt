@@ -5,14 +5,19 @@ import com.apkcategorychecker.apk.ApkInput
 import com.apkcategorychecker.framework.ApkInspection
 import com.apkcategorychecker.framework.Framework
 import com.apkcategorychecker.framework.Frameworks
+import com.apkcategorychecker.framework.Rules
 import java.nio.file.Path
 import java.time.Instant
 import kotlin.io.path.name
 
 /** Analyzes an app (an APK, split APKs or a container), reading it without decoding it to disk. Thread-safe. */
 class ApkAnalyzer(
-    private val frameworks: List<Framework> = Frameworks.all(),
+    private val rules: Rules = Rules.builtIn,
+    /** See [Frameworks.undefinedWebApp]. */
+    webAppThreshold: Int = 0,
 ) {
+    private val frameworks: List<Framework> = listOf(Frameworks.undefinedWebApp(webAppThreshold)) + rules.frameworks
+
     fun analyze(path: Path): ApkReport = analyze(ApkInput.of(path))
 
     fun analyze(input: ApkInput): ApkReport {
@@ -60,7 +65,7 @@ class ApkAnalyzer(
             fileSize = input.size(),
             packageName = manifest.packageName,
             mainFramework = main?.name ?: ApkReport.NATIVE,
-            baseFramework = main?.runsOn?.firstOrNull { it in matched }?.name,
+            baseFramework = main?.runsOn?.firstOrNull { name -> matched.keys.any { it.name == name } },
             evidence = matched.mapKeys { it.key.name },
             details = details(main, matched.keys, inspection),
             htmlFiles = inspection.countFiles(".html"),
@@ -86,7 +91,7 @@ class ApkAnalyzer(
         inspection: ApkInspection,
     ): Map<String, Map<String, String>> {
         if (main == null) {
-            val native = Frameworks.NATIVE_DETAILS.mapNotNull { d -> d.find(inspection)?.let { d.key to it } }.toMap()
+            val native = rules.nativeDetails.mapNotNull { d -> d.find(inspection)?.let { d.key to it } }.toMap()
             return if (native.isEmpty()) emptyMap() else mapOf(ApkReport.NATIVE to native)
         }
         return matched.associate { it.name to it.details(inspection) }.filterValues { it.isNotEmpty() }

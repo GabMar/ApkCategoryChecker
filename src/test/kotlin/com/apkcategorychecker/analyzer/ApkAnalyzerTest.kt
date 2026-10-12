@@ -2,7 +2,6 @@
 package com.apkcategorychecker.analyzer
 
 import com.apkcategorychecker.apk.syntheticApk
-import com.apkcategorychecker.framework.Frameworks
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
@@ -26,7 +25,7 @@ class ApkAnalyzerTest {
         webAppThreshold: Int = 0,
     ): ApkReport {
         val apk = syntheticApk(dir.resolve("test.apk"), files, classes, activities = activities)
-        return ApkAnalyzer(Frameworks.all(webAppThreshold)).analyze(apk)
+        return ApkAnalyzer(webAppThreshold = webAppThreshold).analyze(apk)
     }
 
     private fun analyzeWith(
