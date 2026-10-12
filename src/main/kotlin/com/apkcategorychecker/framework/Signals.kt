@@ -59,3 +59,13 @@ fun webAssetContains(
 fun either(vararg signals: Signal) = Signal { apk -> signals.firstNotNullOfOrNull { it.find(apk) } }
 
 private val WEB_ROOTS = listOf("assets/www/", "assets/public/")
+
+/** A JavaScript bundle compiled to Hermes bytecode (recognized by its magic number). */
+fun hermesBytecode(path: String) =
+    Signal { apk ->
+        val header = apk.apk.read(path)?.copyOf(HERMES_MAGIC.size)
+        if (header != null && header.contentEquals(HERMES_MAGIC)) "$path is Hermes bytecode" else null
+    }
+
+/** 0x1F1903C103BC1FC6, little-endian. */
+private val HERMES_MAGIC = intArrayOf(0xC6, 0x1F, 0xBC, 0x03, 0xC1, 0x03, 0x19, 0x1F).map { it.toByte() }.toByteArray()

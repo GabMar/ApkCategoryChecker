@@ -62,6 +62,7 @@ class ApkAnalyzer(
             mainFramework = main?.name ?: ApkReport.NATIVE,
             baseFramework = main?.runsOn?.firstOrNull { it in matched }?.name,
             evidence = matched.mapKeys { it.key.name },
+            details = details(main, matched.keys, inspection),
             htmlFiles = inspection.countFiles(".html"),
             jsFiles = inspection.countFiles(".js"),
             cssFiles = inspection.countFiles(".css"),
@@ -77,5 +78,17 @@ class ApkAnalyzer(
             analysisStart = start.toString(),
             analysisDurationMs = elapsedMs(),
         )
+    }
+
+    private fun details(
+        main: Framework?,
+        matched: Collection<Framework>,
+        inspection: ApkInspection,
+    ): Map<String, Map<String, String>> {
+        if (main == null) {
+            val native = Frameworks.NATIVE_DETAILS.mapNotNull { d -> d.find(inspection)?.let { d.key to it } }.toMap()
+            return if (native.isEmpty()) emptyMap() else mapOf(ApkReport.NATIVE to native)
+        }
+        return matched.associate { it.name to it.details(inspection) }.filterValues { it.isNotEmpty() }
     }
 }

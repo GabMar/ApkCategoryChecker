@@ -26,6 +26,23 @@ class ApkInspection(
 
     val manifestXml: String by lazy { apk.manifest.root.toXml() }
 
+    /** The value of a `<meta-data>` of the manifest, with resource references (`@0x7f...`) resolved. */
+    fun manifestMetaData(name: String): String? {
+        val value =
+            apk.manifest.root
+                .findAll("meta-data")
+                .firstOrNull { it.attributes["android:name"] == name }
+                ?.attributes
+                ?.get("android:value") ?: return null
+        val reference =
+            value
+                .removePrefix("@0x")
+                .takeIf { it != value }
+                ?.toLongOrNull(16)
+                ?.toInt() ?: return value
+        return apk.resourceValue(reference) ?: value
+    }
+
     /** Sorted, so that the evidence reported for a package is stable. */
     private val sortedClassNames: List<String> by lazy { apk.classNames.sorted() }
 

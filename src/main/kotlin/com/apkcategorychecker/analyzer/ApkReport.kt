@@ -19,6 +19,11 @@ data class ApkReport(
     val baseFramework: String?,
     /** For each detected framework, what was found in the APK. */
     val evidence: Map<String, List<String>> = emptyMap(),
+    /**
+     * Facts about the detected frameworks, e.g. `{"React Native": {"engine": "Hermes"}}`; for apps
+     * without a cross-platform framework, under [NATIVE] (e.g. whether Jetpack Compose is included).
+     */
+    val details: Map<String, Map<String, String>> = emptyMap(),
     val htmlFiles: Int = 0,
     val jsFiles: Int = 0,
     val cssFiles: Int = 0,

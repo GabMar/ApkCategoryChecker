@@ -26,6 +26,9 @@ interface ApkContents : Closeable {
         name: String,
     ): String?
 
+    /** The value of a resource as text (e.g. a string), for a reference like `@0x7f0e0001`; null if unknown. */
+    fun resourceValue(id: Int): String?
+
     /** Fully qualified names of all the classes in the DEX files. */
     val classNames: Set<String>
 
@@ -58,6 +61,8 @@ class SplitApk(
         type: String,
         name: String,
     ): String? = base.resourceFile(type, name)
+
+    override fun resourceValue(id: Int): String? = base.resourceValue(id)
 
     override val classNames: Set<String> by lazy { parts.flatMapTo(HashSet()) { it.classNames } }
 

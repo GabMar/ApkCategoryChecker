@@ -57,6 +57,17 @@ class ApkFile(
             }.getOrNull() // the resource table is a best-effort hint: a broken one must not fail the analysis
         }
 
+    override fun resourceValue(id: Int): String? =
+        synchronized(stringPoolLock) {
+            runCatching {
+                if (!module.hasTableBlock()) return null
+                module.tableBlock
+                    .getResource(id)
+                    ?.get()
+                    ?.valueAsString
+            }.getOrNull()
+        }
+
     /**
      * Fully qualified names of all the classes in the APK's DEX files (multidex included).
      * Read with [DexReader] rather than ARSCLib, which builds a full model of every DEX:

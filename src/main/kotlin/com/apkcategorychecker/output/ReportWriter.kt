@@ -59,6 +59,9 @@ class CsvReportWriter(
                 mainFramework,
                 baseFramework,
                 evidence.entries.joinToString(" | ") { (framework, found) -> "$framework: ${found.joinToString(", ")}" },
+                details.entries.joinToString(" | ") { (framework, facts) ->
+                    "$framework: ${facts.entries.joinToString(", ") { (key, value) -> "$key=$value" }}"
+                },
                 htmlFiles,
                 jsFiles,
                 cssFiles,
@@ -89,6 +92,7 @@ class CsvReportWriter(
                 "main_framework",
                 "base_framework",
                 "evidence",
+                "details",
                 "html_files",
                 "js_files",
                 "css_files",

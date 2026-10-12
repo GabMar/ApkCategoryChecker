@@ -29,6 +29,17 @@ class ApkAnalyzerTest {
         return ApkAnalyzer(Frameworks.all(webAppThreshold)).analyze(apk)
     }
 
+    private fun analyzeWith(
+        metaData: Map<String, String> = emptyMap(),
+        resources: Map<String, String> = emptyMap(),
+        binaryFiles: Map<String, ByteArray> = emptyMap(),
+    ): ApkReport {
+        val apk = syntheticApk(dir.resolve("test.apk"), metaData = metaData, resources = resources, binaryFiles = binaryFiles)
+        return ApkAnalyzer().analyze(apk)
+    }
+
+    private fun lib(name: String) = mapOf("lib/arm64-v8a/$name" to "")
+
     private fun ApkReport.evidenceText() =
         evidence.entries.joinToString(" | ") { (framework, found) -> "$framework: ${found.joinToString(", ")}" }
 
@@ -192,6 +203,56 @@ class ApkAnalyzerTest {
     }
 
     @Test
+    fun `react native details`() {
+        val hermesBundle = HERMES_MAGIC + ByteArray(8)
+        val bytecodeOnly = analyzeWith(binaryFiles = mapOf("assets/index.android.bundle" to hermesBundle))
+        assertEquals(mapOf("engine" to "Hermes"), bytecodeOnly.details["React Native"])
+
+        val newArchitecture =
+            analyze(lib("libreactnative.so") + lib("libhermes.so") + lib("libappmodules.so")).details["React Native"]
+        assertEquals(mapOf("engine" to "Hermes", "architecture" to "New"), newArchitecture)
+
+        val legacyJsc = analyze(lib("libreactnativejni.so") + lib("libjsc.so")).details["React Native"]
+        assertEquals(mapOf("engine" to "JavaScriptCore", "architecture" to "Legacy"), legacyJsc)
+    }
+
+    @Test
+    fun `engine and runtime details`() {
+        assertEquals(mapOf("build" to "release"), analyze(lib("libflutter.so") + lib("libapp.so")).details["Flutter"])
+        assertEquals(
+            mapOf("build" to "debug"),
+            analyze(lib("libflutter.so") + ("assets/flutter_assets/kernel_blob.bin" to "")).details["Flutter"],
+        )
+        assertEquals(mapOf("scripting backend" to "IL2CPP"), analyze(lib("libunity.so") + lib("libil2cpp.so")).details["Unity"])
+        assertEquals(
+            mapOf("scripting backend" to "Mono"),
+            analyze(lib("libunity.so") + ("assets/bin/Data/Managed/Assembly-CSharp.dll" to "")).details["Unity"],
+        )
+        assertEquals(mapOf("runtime" to "CoreCLR"), analyze(lib("libmonodroid.so") + lib("libcoreclr.so")).details[".NET for Android"])
+        assertEquals(mapOf("runtime" to "Mono"), analyze(lib("libmonodroid.so") + lib("libmonosgen-2.0.so")).details[".NET for Android"])
+        assertEquals(emptyMap<String, Map<String, String>>(), analyze(lib("libgdx.so")).details)
+    }
+
+    @Test
+    fun `trusted web activities report their url, resolving string resources`() {
+        val literal = analyzeWith(metaData = mapOf(TWA_URL to "https://example.com/"))
+        assertEquals("Trusted Web Activity", literal.mainFramework)
+        assertEquals(mapOf("url" to "https://example.com/"), literal.details["Trusted Web Activity"])
+
+        val reference =
+            analyzeWith(metaData = mapOf(TWA_URL to "@string/launchUrl"), resources = mapOf("string/launchUrl" to "https://pwa.example/"))
+        assertEquals(mapOf("url" to "https://pwa.example/"), reference.details["Trusted Web Activity"])
+    }
+
+    @Test
+    fun `native apps report whether jetpack compose is included`() {
+        val compose = analyze(mapOf("META-INF/androidx.compose.ui_ui.version" to "1.9.0"))
+        assertEquals("Native", compose.mainFramework)
+        assertEquals(mapOf("Native" to mapOf("ui" to "Jetpack Compose")), compose.details)
+        assertEquals(emptyMap<String, Map<String, String>>(), analyze().details)
+    }
+
+    @Test
     fun `a broken apk yields minimal results instead of failing`() {
         val broken = dir.resolve("broken.apk").apply { writeText("not a zip") }
         val result = ApkAnalyzer().analyze(broken)
@@ -202,6 +263,9 @@ class ApkAnalyzerTest {
     }
 
     companion object {
+        private const val TWA_URL = "android.support.customtabs.trusted.DEFAULT_URL"
+        private val HERMES_MAGIC = intArrayOf(0xC6, 0x1F, 0xBC, 0x03, 0xC1, 0x03, 0x19, 0x1F).map { it.toByte() }.toByteArray()
+
         private fun app(
             name: String,
             file: String,
@@ -236,6 +300,22 @@ class ApkAnalyzerTest {
                 app("Qt", "lib/arm64-v8a/libQt6Core_arm64-v8a.so"),
                 appWithClass("Qt", "org.qtproject.qt5.android.bindings.QtActivity"),
                 app("Compose Multiplatform", "assets/composeResources/app.generated.resources/values/strings.commonMain.cvr"),
+                app("Expo", "lib/arm64-v8a/libexpo-modules-core.so"),
+                app("Expo", "assets/app.config"),
+                app("Tauri", "assets/tauri.conf.json"),
+                appWithClass("Tauri", "app.tauri.AppPlugin"),
+                app("Lynx", "lib/arm64-v8a/liblynx.so"),
+                appWithClass("Lynx", "com.lynx.tasm.LynxView"),
+                app("Kony", "lib/armeabi-v7a/libkonyjsvm.so"),
+                app("libGDX", "lib/arm64-v8a/libgdx.so"),
+                appWithClass("libGDX", "com.badlogic.gdx.backends.android.AndroidApplication"),
+                app("Defold", "lib/arm64-v8a/libdmengine.so"),
+                app("Solar2D", "lib/arm64-v8a/libcorona.so"),
+                appWithClass("Solar2D", "com.ansca.corona.CoronaActivity"),
+                app("GameMaker", "lib/arm64-v8a/libyoyo.so"),
+                app("GameMaker", "assets/game.droid"),
+                appWithClass("Avalonia", "crc6431345fe65afe8d98.AvaloniaMainActivity"),
+                appWithClass("Trusted Web Activity", "com.google.androidbrowserhelper.trusted.LauncherActivity"),
             )
     }
 }
