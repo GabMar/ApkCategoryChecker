@@ -96,22 +96,22 @@ java -jar ApkCategoryChecker.jar ~/apks --rules my-rules.json
 
 Framework | Signals | Details
 ----------|---------|--------
-[Apache Cordova](https://cordova.apache.org/) | class `CordovaActivity` **and** either "org.apache.cordova" in `config.xml` or `assets/www/cordova.js` |
+[Apache Cordova](https://cordova.apache.org/) | class `CordovaActivity` **and** either "org.apache.cordova" in `config.xml` or `assets/www/cordova.js` | `cordova-android` and `cordova.js`: versions, from `cordova.js`
 [Capacitor](https://capacitorjs.com/) | classes in `com.getcapacitor`, `assets/capacitor.config.json` |
 [Trusted Web Activity](https://developer.chrome.com/docs/android/trusted-web-activity) (PWAs packaged with Bubblewrap or PWABuilder) | `android.support.customtabs.trusted.DEFAULT_URL` meta-data or `com.google.androidbrowserhelper.trusted` components in the manifest, classes in that package | `url`: the website
 [React Native](https://reactnative.dev/) | `libreactnativejni.so` (up to 0.75), `libreactnative.so` (0.76+), `assets/index.android.bundle`, classes in `com.facebook.react` | `engine`: `Hermes` (Hermes bytecode bundle or `libhermes*.so`) or `JavaScriptCore` (`libjsc.so`); `architecture`: `New` (`libappmodules.so`) or `Legacy`
 [.NET for Android](https://learn.microsoft.com/dotnet/android/) (formerly Xamarin.Android) | `libmonodroid.so`, classes in `mono.android` | `runtime`: `Mono` or `CoreCLR`
-[python-for-android](https://python-for-android.readthedocs.io/) | classes in `org.kivy.android`, "PythonActivity" in `AndroidManifest.xml` |
+[python-for-android](https://python-for-android.readthedocs.io/) | classes in `org.kivy.android`, "PythonActivity" in `AndroidManifest.xml` | `python`: version, from `libpython3.x.so`
 [Titanium](https://titaniumsdk.com/) | classes `TitaniumModule` **and** `TiActivity` |
 [NativeScript](https://nativescript.org/) | `libNativeScript.so`, classes in `com.tns` |
-[Tauri](https://tauri.app/) | classes in `app.tauri`, `assets/tauri.conf.json` |
+[Tauri](https://tauri.app/) | classes in `app.tauri`, `assets/tauri.conf.json` | `version`, from the app's Rust library
 [Lynx](https://lynxjs.org/) | `liblynx.so`, classes in `com.lynx.tasm`, `assets/lynx_core.js` |
 Kony / Temenos Quantum | `libkony*.so`, classes in `com.konylabs` |
-[Flutter](https://flutter.dev/) | `libflutter.so`, classes in `io.flutter` | `build`: `release` (`libapp.so`, ahead-of-time compiled) or `debug`
-[Qt](https://www.qt.io/) | `libQt5Core*.so` / `libQt6Core*.so`, classes in `org.qtproject.qt` / `org.qtproject.qt5`; base framework: python-for-android, for PySide/PyQt apps |
-[Unity](https://unity.com/) | `libunity.so`, classes in `com.unity3d.player` | `scripting backend`: `IL2CPP` or `Mono`
+[Flutter](https://flutter.dev/) | `libflutter.so`, classes in `io.flutter` | `build`: `release` (`libapp.so`, ahead-of-time compiled) or `debug`; `dart`: Dart SDK version of the engine (each Flutter release ships a known Dart version)
+[Qt](https://www.qt.io/) | `libQt5Core*.so` / `libQt6Core*.so`, classes in `org.qtproject.qt` / `org.qtproject.qt5`; base framework: python-for-android, for PySide/PyQt apps | `version`
+[Unity](https://unity.com/) | `libunity.so`, classes in `com.unity3d.player` | `scripting backend`: `IL2CPP` or `Mono`; `version` (e.g. `2022.3.20f1`)
 [Unreal Engine](https://www.unrealengine.com/) | `libUE4.so`, `libUnreal.so`, classes in `com.epicgames.ue4` / `com.epicgames.unreal` |
-[Godot](https://godotengine.org/) | `libgodot_android.so`, classes in `org.godotengine.godot` |
+[Godot](https://godotengine.org/) | `libgodot_android.so`, classes in `org.godotengine.godot` | `version`
 [Cocos](https://www.cocos.com/) (Cocos2d-x, Cocos Creator) | `libcocos2dcpp.so`, `libcocos.so`, classes in `org.cocos2dx.lib` / `com.cocos.lib` |
 [libGDX](https://libgdx.com/) | `libgdx.so`, classes in `com.badlogic.gdx` |
 [Defold](https://defold.com/) | `libdmengine.so`, classes in `com.dynamo.android` |
@@ -121,15 +121,15 @@ Kony / Temenos Quantum | `libkony*.so`, classes in `com.konylabs` |
 
 ### Frameworks built on a runtime
 
-Framework | Signals | Base framework
-----------|---------|---------------
-[Kivy](https://kivy.org/) | classes in `org.kivy.android` **and** `libSDL2.so` or `libSDL3.so` | python-for-android
-[Sencha](https://www.sencha.com/) | "Ext.create" **and** "Ext.application" in a `.js` web asset | Capacitor, Apache Cordova
-[Ionic](https://ionicframework.com/) | "ion-app" in a `.js` web asset | Capacitor, Apache Cordova
-[Expo](https://expo.dev/) | `libexpo-modules-core.so`, `assets/app.config`, classes in `expo.modules` | React Native
-[Xamarin.Forms](https://dotnet.microsoft.com/apps/xamarin/xamarin-forms) | classes `FormsAppCompatActivity`, `FormsApplicationActivity` | .NET for Android
-[Avalonia](https://avaloniaui.net/) | classes `AvaloniaMainActivity`, `AvaloniaView` | .NET for Android
-[.NET MAUI](https://dotnet.microsoft.com/apps/maui) | class `MauiAppCompatActivity`, classes in `com.microsoft.maui` | .NET for Android
+Framework | Signals | Base framework | Details
+----------|---------|----------------|--------
+[Kivy](https://kivy.org/) | classes in `org.kivy.android` **and** `libSDL2.so` or `libSDL3.so` | python-for-android |
+[Sencha](https://www.sencha.com/) | "Ext.create" **and** "Ext.application" in a `.js` web asset | Capacitor, Apache Cordova |
+[Ionic](https://ionicframework.com/) | "ion-app" in a `.js` web asset | Capacitor, Apache Cordova |
+[Expo](https://expo.dev/) | `libexpo-modules-core.so`, `assets/app.config`, classes in `expo.modules` | React Native | `sdk`: Expo SDK version, from `assets/app.config`
+[Xamarin.Forms](https://dotnet.microsoft.com/apps/xamarin/xamarin-forms) | classes `FormsAppCompatActivity`, `FormsApplicationActivity` | .NET for Android |
+[Avalonia](https://avaloniaui.net/) | classes `AvaloniaMainActivity`, `AvaloniaView` | .NET for Android |
+[.NET MAUI](https://dotnet.microsoft.com/apps/maui) | class `MauiAppCompatActivity`, classes in `com.microsoft.maui` | .NET for Android |
 
 `config.xml` is located through the resource table (`resources.arsc`), as release builds may rename it (e.g. to `res/ZW.xml`). Web assets are the files under `assets/www/` (Cordova) and `assets/public/` (Capacitor). With `--web-app-threshold N`, an app with at least N `.html`, `.js` and `.css` files and no other match is reported as `Undefined_Web_App`.
 
@@ -141,6 +141,7 @@ Besides the synthetic test cases, detection is checked on open source apps publi
 
 * **Compose Multiplatform** is only recognized through its resources library: on Android it otherwise uses the same Jetpack Compose libraries as a native app, so an app without Compose resources (or with them renamed by R8) is reported as `Native` with `ui` `Jetpack Compose`.
 * **Unity, Unreal Engine, Cocos, Defold and Kony** are recognized by well-known native libraries and classes but have not been checked on real apps, as open source builds are hard to find.
+* **Versions** are only reported where the APK states them reliably. React Native, .NET, NativeScript and the others don't: for NativeScript, for instance, the only version-like string in its library is the compiler's.
 
 ## Building from source
 

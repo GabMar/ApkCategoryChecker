@@ -75,6 +75,7 @@ class SampleApksTest {
                 minSdkVersion = "10",
                 targetSdkVersion = "19",
                 fileSize = 1915225,
+                details = mapOf("Apache Cordova" to mapOf("cordova.js" to "3.5.0")),
             ),
             report,
         )
@@ -108,6 +109,7 @@ class SampleApksTest {
                 minSdkVersion = "10",
                 targetSdkVersion = "17",
                 fileSize = 716499,
+                details = mapOf("Apache Cordova" to mapOf("cordova.js" to "3.2.0-rc1")),
             ),
             report,
         )
@@ -179,6 +181,7 @@ class SampleApksTest {
         minSdkVersion: String,
         targetSdkVersion: String,
         fileSize: Long,
+        details: Map<String, Map<String, String>> = emptyMap(),
     ) = ApkReport(
         file = actual.file,
         path = actual.path,
@@ -187,6 +190,7 @@ class SampleApksTest {
         mainFramework = mainFramework,
         baseFramework = baseFramework,
         evidence = evidence,
+        details = details,
         htmlFiles = htmlFiles,
         jsFiles = jsFiles,
         cssFiles = cssFiles,

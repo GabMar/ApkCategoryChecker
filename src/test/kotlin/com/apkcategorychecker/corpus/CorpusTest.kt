@@ -12,6 +12,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.abort
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.DynamicContainer.dynamicContainer
@@ -118,7 +119,14 @@ class CorpusTest {
         if ("baseFramework" in expect) assertEquals(expect.string("baseFramework"), report.baseFramework, context)
         expect["details"]?.jsonObject?.forEach { (framework, facts) ->
             facts.jsonObject.forEach { (key, value) ->
-                assertEquals(value.jsonPrimitive.content, report.details[framework]?.get(key), "$framework $key; $context")
+                val expected = value.jsonPrimitive.content
+                val actual = report.details[framework]?.get(key)
+                if (expected.startsWith("~")) {
+                    // A pattern, for values that change with the latest release (e.g. versions).
+                    assertTrue(actual != null && Regex(expected.drop(1)).matches(actual), "$framework $key: $actual !~ $expected; $context")
+                } else {
+                    assertEquals(expected, actual, "$framework $key; $context")
+                }
             }
         }
     }

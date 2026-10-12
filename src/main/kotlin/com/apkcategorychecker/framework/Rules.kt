@@ -132,13 +132,15 @@ private class RulesParser(
         path: String,
     ): Detail {
         val obj = element.obj(path)
-        obj.only(path, "key", "options", "manifestMetaData", "comment")
+        obj.only(path, "key", "options", "manifestMetaData", "extract", "comment")
         val key = obj.string("key", path)
+        val kinds = obj.keys.intersect(setOf("options", "manifestMetaData", "extract"))
+        if (kinds.size != 1) fail(path, "expected exactly one of options, manifestMetaData, extract")
         obj["manifestMetaData"]?.let { name ->
-            if ("options" in obj) fail(path, "expected either options or manifestMetaData")
             val metaData = name.string("$path.manifestMetaData")
             return Detail(key) { it.manifestMetaData(metaData) }
         }
+        obj["extract"]?.let { return Detail(key, extraction(it, "$path.extract")) }
         val options =
             obj["options"].array("$path.options").mapIndexed { i, option ->
                 val optionPath = "$path.options[$i]"
@@ -148,6 +150,51 @@ private class RulesParser(
             }
         if (options.isEmpty()) fail("$path.options", "no options")
         return detail(key, *options.toTypedArray())
+    }
+
+    /**
+     * A value read from a file of the APK: the first group of `pattern` in its content, or, without
+     * `pattern`, the first group of `nativeLibRegex` in the library's file name.
+     */
+    private fun extraction(
+        element: JsonElement,
+        path: String,
+    ): (ApkInspection) -> String? {
+        val obj = element.obj(path)
+        obj.only(path, "nativeLib", "nativeLibRegex", "file", "pattern", "comment")
+        val sources = obj.keys.intersect(setOf("nativeLib", "nativeLibRegex", "file"))
+        val kind = sources.singleOrNull() ?: fail(path, "expected exactly one of nativeLib, nativeLibRegex, file")
+        val value = obj.string(kind, path)
+        val pattern = obj["pattern"]?.let { regexWithGroup(it.string("$path.pattern"), "$path.pattern") }
+        val nameRegex = if (kind == "nativeLibRegex") regex(value, "$path.nativeLibRegex") else null
+        if (pattern == null) {
+            if (nameRegex == null) fail(path, "missing \"pattern\"")
+            regexWithGroup(value, "$path.nativeLibRegex")
+        }
+        return { apk ->
+            val entry =
+                when (kind) {
+                    "file" -> value.takeIf { it in apk.entries }
+                    else -> apk.firstNativeLib { name -> nameRegex?.matches(name) ?: (name == value) }
+                }
+            when {
+                entry == null -> null
+
+                pattern == null -> nameRegex!!.matchEntire(entry.substringAfterLast('/'))?.groupValues?.get(1)
+
+                // Binary files: ISO-8859-1 maps every byte to a char, so ASCII text is found as is.
+                else -> apk.apk.read(entry)?.let { pattern.find(String(it, Charsets.ISO_8859_1))?.groupValues?.get(1) }
+            }
+        }
+    }
+
+    private fun regexWithGroup(
+        pattern: String,
+        path: String,
+    ): Regex {
+        val regex = regex(pattern, path)
+        if (regex.toPattern().matcher("").groupCount() < 1) fail(path, "the regular expression needs a group (...) for the value")
+        return regex
     }
 
     private fun regex(

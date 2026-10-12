@@ -243,6 +243,26 @@ class ApkAnalyzerTest {
         assertEquals(mapOf("url" to "https://pwa.example/"), reference.details["Trusted Web Activity"])
     }
 
+    @ParameterizedTest(name = "{0} {1}")
+    @MethodSource("versionedApps")
+    fun `reads framework versions`(
+        framework: String,
+        key: String,
+        files: Map<String, String>,
+        classes: List<String>,
+        expected: String,
+    ) {
+        assertEquals(expected, analyze(files, classes).details[framework]?.get(key))
+    }
+
+    @Test
+    fun `versions are not made up`() {
+        // A Dart-like version without its channel, a Qt library without a version banner.
+        assertNull(analyze(lib("libflutter.so", "version 3.5.4 built")).details["Flutter"]?.get("dart"))
+        assertNull(analyze(lib("libQt6Core_x86.so", "6.8.1")).details["Qt"])
+        assertNull(analyze(mapOf("assets/www/cordova.js" to "var x = 1;"), CORDOVA).details["Apache Cordova"])
+    }
+
     @Test
     fun `native apps report whether jetpack compose is included`() {
         val compose = analyze(mapOf("META-INF/androidx.compose.ui_ui.version" to "1.9.0"))
@@ -275,6 +295,60 @@ class ApkAnalyzerTest {
             name: String,
             className: String,
         ) = Arguments.of(name, emptyMap<String, String>(), listOf(className), "class $className")
+
+        private fun lib(
+            name: String,
+            content: String,
+        ) = mapOf("lib/arm64-v8a/$name" to content)
+
+        /** [classes] make the framework detected: details are only read for detected frameworks. */
+        private fun version(
+            framework: String,
+            key: String,
+            files: Map<String, String>,
+            expected: String,
+            classes: List<String> = emptyList(),
+        ) = Arguments.of(framework, key, files, classes, expected)
+
+        private val PYTHON_FOR_ANDROID = listOf("org.kivy.android.PythonActivity")
+        private val CORDOVA = listOf("org.apache.cordova.CordovaActivity")
+
+        @JvmStatic
+        fun versionedApps() =
+            listOf(
+                version("Flutter", "dart", lib("libflutter.so", "\u0000 3.5.4 (stable) (Tue Oct 1 2024) on \"android_arm64\""), "3.5.4"),
+                version("Flutter", "dart", lib("libflutter.so", "3.6.0-216.1.beta (beta) (Wed)"), "3.6.0-216.1.beta"),
+                version("Godot", "version", lib("libgodot_android.so", "Godot Engine v3.5.2.stable.official"), "3.5.2"),
+                version("Godot", "version", lib("libgodot_android.so", "Godot Engine v4.3.stable.official"), "4.3"),
+                version("Qt", "version", lib("libQt5Core_armeabi-v7a.so", "Qt 5.15.2 (arm-little_endian-ilp32)"), "5.15.2"),
+                version("Qt", "version", lib("libQt6Core_x86_64.so", "Qt 6.8.1 (x86_64-little_endian-lp64)"), "6.8.1"),
+                version("Unity", "version", lib("libunity.so", "\u00002022.3.20f1\u0000"), "2022.3.20f1"),
+                version("Unity", "version", lib("libunity.so", "\u00006000.0.23f1\u0000"), "6000.0.23f1"),
+                version("python-for-android", "python", lib("libpython3.12.so", ""), "3.12", PYTHON_FOR_ANDROID),
+                version("python-for-android", "python", lib("libpython3.7m.so", ""), "3.7", PYTHON_FOR_ANDROID),
+                version(
+                    "Tauri",
+                    "version",
+                    lib("libapp_lib.so", "/cargo/registry/src/index.crates.io-1/tauri-2.1.0/src/app.rs") +
+                        ("assets/tauri.conf.json" to "{}"),
+                    "2.1.0",
+                ),
+                version("Expo", "sdk", mapOf("assets/app.config" to """{"name":"x","sdkVersion":"52.0.0"}"""), "52.0.0"),
+                version(
+                    "Apache Cordova",
+                    "cordova-android",
+                    mapOf("assets/www/cordova.js" to "var PLATFORM_VERSION_BUILD_LABEL = '13.0.0';"),
+                    "13.0.0",
+                    CORDOVA,
+                ),
+                version(
+                    "Apache Cordova",
+                    "cordova.js",
+                    mapOf("assets/www/cordova.js" to "var CORDOVA_JS_BUILD_LABEL = '3.5.0';"),
+                    "3.5.0",
+                    CORDOVA,
+                ),
+            )
 
         @JvmStatic
         fun singleSignalApps() =

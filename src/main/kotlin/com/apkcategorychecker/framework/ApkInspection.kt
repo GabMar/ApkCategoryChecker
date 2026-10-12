@@ -71,6 +71,10 @@ class ApkInspection(
                     text in content
             }?.key
 
+    /** The first native library (e.g. `lib/arm64-v8a/libflutter.so`) whose file name matches, in any ABI. */
+    fun firstNativeLib(nameMatches: (String) -> Boolean): String? =
+        apk.entryNames.filter { it.startsWith("lib/") && nameMatches(it.substringAfterLast('/')) }.minOrNull()
+
     fun countFiles(extension: String): Int = apk.entryNames.count { it.endsWith(extension, ignoreCase = true) }
 
     private companion object {

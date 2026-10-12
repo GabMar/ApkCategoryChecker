@@ -12,6 +12,8 @@
     "  hermesBytecode: a file compiled to Hermes bytecode; anyOf: the first of several signals that is found",
     "runsOn lists the frameworks it may be built on: the first one detected is the base framework.",
     "details: facts reported for a detected framework; options are tried in order, the first whose signal is found gives the value.",
+    "  manifestMetaData: the value of a <meta-data> of the manifest; extract: the first group (...) of \"pattern\" in a file",
+    "  (nativeLib, nativeLibRegex or file), or without \"pattern\" the first group of nativeLibRegex in the library's name.",
     "nativeDetails: details of apps without a cross-platform framework."
   ],
   "frameworks": [
@@ -21,6 +23,16 @@
       "signals": [
         { "className": "CordovaActivity" },
         { "anyOf": [{ "configXmlContains": "org.apache.cordova" }, { "file": "assets/www/cordova.js" }] }
+      ],
+      "details": [
+        {
+          "key": "cordova-android",
+          "extract": { "file": "assets/www/cordova.js", "pattern": "PLATFORM_VERSION_BUILD_LABEL\\s*=\\s*'([^']+)'" }
+        },
+        {
+          "key": "cordova.js",
+          "extract": { "file": "assets/www/cordova.js", "pattern": "CORDOVA_JS_BUILD_LABEL\\s*=\\s*'([^']+)'" }
+        }
       ]
     },
     {
@@ -87,7 +99,8 @@
     {
       "name": "python-for-android",
       "comment": "Packages Python apps; its classes keep the org.kivy.android package for historical reasons.",
-      "signals": [{ "classPackage": "org.kivy.android" }, { "manifestContains": "PythonActivity" }]
+      "signals": [{ "classPackage": "org.kivy.android" }, { "manifestContains": "PythonActivity" }],
+      "details": [{ "key": "python", "extract": { "nativeLibRegex": "libpython(\\d+\\.\\d+)m?\\.so" } }]
     },
     {
       "name": "Titanium",
@@ -100,7 +113,14 @@
     },
     {
       "name": "Tauri",
-      "signals": [{ "classPackage": "app.tauri" }, { "file": "assets/tauri.conf.json" }]
+      "signals": [{ "classPackage": "app.tauri" }, { "file": "assets/tauri.conf.json" }],
+      "details": [
+        {
+          "key": "version",
+          "comment": "From the path of the tauri crate in the app's Rust library, named <app>_lib by the Tauri template.",
+          "extract": { "nativeLibRegex": ".*_lib\\.so", "pattern": "tauri-(\\d+\\.\\d+\\.\\d+(?:-[\\w.]+)?)/" }
+        }
+      ]
     },
     {
       "name": "Lynx",
@@ -121,6 +141,11 @@
             { "value": "release", "signal": { "nativeLib": "libapp.so" } },
             { "value": "debug", "signal": { "file": "assets/flutter_assets/kernel_blob.bin" } }
           ]
+        },
+        {
+          "key": "dart",
+          "comment": "The Dart SDK version of the engine: each Flutter release ships a known Dart version.",
+          "extract": { "nativeLib": "libflutter.so", "pattern": "(\\d+\\.\\d+\\.\\d+(?:-[\\w.]+)?) \\((?:stable|beta|dev|main)\\)" }
         }
       ]
     },
@@ -132,7 +157,10 @@
         { "classPackage": "org.qtproject.qt5" }
       ],
       "runsOn": ["python-for-android"],
-      "comment": "PySide/PyQt apps run on python-for-android."
+      "comment": "PySide/PyQt apps run on python-for-android.",
+      "details": [
+        { "key": "version", "extract": { "nativeLibRegex": "libQt[56]Core.*\\.so", "pattern": "Qt (\\d+\\.\\d+\\.\\d+) \\(" } }
+      ]
     },
     {
       "name": "Unity",
@@ -149,6 +177,11 @@
               }
             }
           ]
+        },
+        {
+          "key": "version",
+          "comment": "Not checked on real apps.",
+          "extract": { "nativeLib": "libunity.so", "pattern": "\\b((?:20\\d\\d|6\\d\\d\\d)\\.\\d+\\.\\d+[abfp]\\d+)\\b" }
         }
       ]
     },
@@ -163,7 +196,10 @@
     },
     {
       "name": "Godot",
-      "signals": [{ "nativeLib": "libgodot_android.so" }, { "classPackage": "org.godotengine.godot" }]
+      "signals": [{ "nativeLib": "libgodot_android.so" }, { "classPackage": "org.godotengine.godot" }],
+      "details": [
+        { "key": "version", "extract": { "nativeLib": "libgodot_android.so", "pattern": "Godot Engine v(\\d+\\.\\d+(?:\\.\\d+)?)\\." } }
+      ]
     },
     {
       "name": "Cocos",
@@ -227,7 +263,8 @@
     {
       "name": "Expo",
       "signals": [{ "nativeLib": "libexpo-modules-core.so" }, { "file": "assets/app.config" }, { "classPackage": "expo.modules" }],
-      "runsOn": ["React Native"]
+      "runsOn": ["React Native"],
+      "details": [{ "key": "sdk", "extract": { "file": "assets/app.config", "pattern": "\"sdkVersion\"\\s*:\\s*\"([^\"]+)\"" } }]
     },
     {
       "name": "Xamarin.Forms",

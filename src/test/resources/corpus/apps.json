@@ -1,25 +1,33 @@
 {
-  "description": "Real apps checked by ./gradlew corpusTest. Sources: an F-Droid package (latest version), a GitHub release asset (latest release, or a fixed tag), or a fixed URL with its SHA-256. Expectations: mainFramework always; baseFramework when given (null = none); details as a subset.",
+  "description": "Real apps checked by ./gradlew corpusTest. Sources: an F-Droid package (latest version), a GitHub release asset (latest release, or a fixed tag), or a fixed URL with its SHA-256. Expectations: mainFramework always; baseFramework when given (null = none); details as a subset, where a value starting with ~ is a regular expression (for versions of the latest releases).",
   "apps": [
     {
       "name": "LocalSend",
       "source": { "fdroid": "org.localsend.localsend_app" },
-      "expect": { "mainFramework": "Flutter", "baseFramework": null, "details": { "Flutter": { "build": "release" } } }
+      "expect": { "mainFramework": "Flutter", "baseFramework": null, "details": { "Flutter": { "build": "release", "dart": "~\\d+\\.\\d+\\.\\d+" } } }
     },
     {
       "name": "Joplin",
       "source": { "fdroid": "net.cozic.joplin" },
-      "expect": { "mainFramework": "Expo", "baseFramework": "React Native", "details": { "React Native": { "engine": "Hermes" } } }
+      "expect": {
+        "mainFramework": "Expo",
+        "baseFramework": "React Native",
+        "details": { "React Native": { "engine": "Hermes" }, "Expo": { "sdk": "~\\d+\\.0\\.0" } }
+      }
     },
     {
       "name": "Godot editor",
       "source": { "fdroid": "org.godotengine.editor.v4" },
-      "expect": { "mainFramework": "Godot" }
+      "expect": { "mainFramework": "Godot", "details": { "Godot": { "version": "~4\\.\\d+(\\.\\d+)?" } } }
     },
     {
       "name": "Electrum (Qt)",
       "source": { "fdroid": "org.electrum.electrum" },
-      "expect": { "mainFramework": "Qt", "baseFramework": "python-for-android" }
+      "expect": {
+        "mainFramework": "Qt",
+        "baseFramework": "python-for-android",
+        "details": { "Qt": { "version": "~6\\.\\d+\\.\\d+" }, "python-for-android": { "python": "~3\\.\\d+" } }
+      }
     },
     {
       "name": "Electrum 4.3 (Kivy)",
@@ -27,7 +35,7 @@
         "url": "https://download.electrum.org/4.3.4/Electrum-4.3.4.0-arm64-v8a-release.apk",
         "sha256": "0cbb92241dd7d5638ae9e2cd7815a5305bb909112be4ad226782a86d6867a911"
       },
-      "expect": { "mainFramework": "Kivy", "baseFramework": "python-for-android" }
+      "expect": { "mainFramework": "Kivy", "baseFramework": "python-for-android", "details": { "python-for-android": { "python": "3.8" } } }
     },
     {
       "name": "Kvaesitso",
@@ -52,7 +60,11 @@
     {
       "name": "Bangumi",
       "source": { "github": "czy0729/Bangumi", "asset": "^bangumi_.*_arm64-v8a\\.apk$" },
-      "expect": { "mainFramework": "Expo", "baseFramework": "React Native", "details": { "React Native": { "engine": "Hermes" } } }
+      "expect": {
+        "mainFramework": "Expo",
+        "baseFramework": "React Native",
+        "details": { "React Native": { "engine": "Hermes" }, "Expo": { "sdk": "~\\d+\\.0\\.0" } }
+      }
     },
     {
       "name": "OSS Weather",
@@ -72,7 +84,7 @@
     {
       "name": "Acode",
       "source": { "github": "Acode-Foundation/Acode", "asset": "^app-fdroid\\.apk$" },
-      "expect": { "mainFramework": "Apache Cordova" }
+      "expect": { "mainFramework": "Apache Cordova", "details": { "Apache Cordova": { "cordova-android": "~\\d+\\.\\d+\\.\\d+" } } }
     },
     {
       "name": "Revolt",
@@ -82,7 +94,7 @@
     {
       "name": "EasyPocketMD",
       "source": { "github": "sunhouy/EasyPocketMD", "asset": "^easypocketmd-.*-android\\.apk$" },
-      "expect": { "mainFramework": "Tauri" }
+      "expect": { "mainFramework": "Tauri", "details": { "Tauri": { "version": "~2\\.\\d+\\.\\d+" } } }
     },
     {
       "name": "Lynx Explorer",
