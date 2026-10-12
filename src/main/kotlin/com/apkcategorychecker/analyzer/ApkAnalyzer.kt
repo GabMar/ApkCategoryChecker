@@ -24,7 +24,6 @@ class ApkAnalyzer(
     fun analyze(path: Path): ApkReport = analyze(ApkInput.of(path))
 
     fun analyze(input: ApkInput): ApkReport {
-        val path = input.path
         val start = Instant.now()
         val startNanos = System.nanoTime()
 
@@ -38,8 +37,8 @@ class ApkAnalyzer(
             // (e.g. a missing class) are bugs and must surface.
             if (e !is Exception && e !is OutOfMemoryError && e !is StackOverflowError) throw e
             ApkReport(
-                file = path.name,
-                path = path.toString(),
+                file = input.displayName,
+                path = input.displayPath,
                 fileSize = runCatching { input.size() }.getOrNull(),
                 packageName = null,
                 mainFramework = null,
@@ -62,8 +61,8 @@ class ApkAnalyzer(
         val main = matched.keys.lastOrNull()
 
         return ApkReport(
-            file = input.path.name,
-            path = input.path.toString(),
+            file = input.displayName,
+            path = input.displayPath,
             splits = inspection.apk.splitNames,
             fileSize = input.size(),
             packageName = manifest.packageName,

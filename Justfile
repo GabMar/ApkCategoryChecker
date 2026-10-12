@@ -39,6 +39,10 @@ jar:
 run *args: jar
     java -jar {{jar}} {{args}}
 
+# Analyze all the third-party apps on the connected device, e.g. `just device -s emulator-5554 -f json`
+device *args: jar
+    java -jar {{jar}} --adb-all {{args}}
+
 # Build the Docker image
 docker-build:
     docker build -t {{image}} .

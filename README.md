@@ -38,6 +38,10 @@ Option | Description
 `--rules FILE` | Use the framework rules in `FILE` instead of the built-in ones
 `--print-rules` | Print the built-in framework rules, a starting point for `--rules`
 `--no-sdks` | Skip the detection of SDKs and libraries (faster)
+`--adb` | Analyze apps installed on a device: `PATH` arguments are package names (see [below](#apps-on-a-device))
+`--adb-all` | Analyze all the third-party apps installed on a device
+`-s`, `--serial SERIAL` | The device to use with `--adb`, if several are connected
+`--adb-path FILE` | The adb executable. Default: `$ADB`, the Android SDK's (`$ANDROID_HOME`), or `adb` on the `PATH`
 `-h`, `--help` | Show the help
 `-V`, `--version` | Show the version
 
@@ -55,6 +59,20 @@ java -jar ApkCategoryChecker.jar ~/apks -f jsonl | jq -r 'select(.mainFramework 
 ```
 
 The exit code is 0 even when some APKs cannot be analyzed: they are reported with an `error`. It is 2 for invalid arguments (e.g. a missing path).
+
+### Apps on a device
+
+With [adb](https://developer.android.com/tools/adb) and a device connected (USB debugging enabled) or an emulator running, installed apps can be analyzed directly: their APKs, splits included, are pulled to a temporary directory and deleted right after.
+
+```sh
+# Specific apps
+java -jar ApkCategoryChecker.jar --adb com.example.app org.example.other
+
+# All the apps installed by the user, on a given device
+java -jar ApkCategoryChecker.jar --adb-all -s emulator-5554 -o device.json
+```
+
+Reports then have the package name as `file` and `adb:<serial>/<package>` as `path`. The Docker image has no adb: use the jar for this. This mode was checked on an Android 15 emulator: for 12 installed apps, two of them installed as split APKs, the reports match the analysis of the same APK files.
 
 ## Result format
 
@@ -168,6 +186,7 @@ just jar                    # runnable jar in build/libs/ApkCategoryChecker.jar
 just run path/to/app.apk    # build and analyze
 just docker-build           # build the Docker image
 just docker-run app.apk     # analyze APKs in the current directory with the image
+just device                 # analyze all the apps on the connected device (needs adb)
 just corpus                 # check the detection on real apps (downloads ~1 GB)
 just update-sdk-rules       # regenerate the SDK rules from LibChecker-Rules
 ```

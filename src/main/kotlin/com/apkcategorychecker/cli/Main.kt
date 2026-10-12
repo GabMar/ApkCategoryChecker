@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 package com.apkcategorychecker.cli
 
+import com.apkcategorychecker.adb.Adb
+import com.apkcategorychecker.adb.AdbException
 import com.apkcategorychecker.analyzer.ApkAnalyzer
 import com.apkcategorychecker.analyzer.BatchAnalyzer
 import com.apkcategorychecker.apk.ApkInput
@@ -37,9 +39,10 @@ class ApkCategoryChecker : Callable<Int> {
         description = [
             "APK files, APK containers (.xapk, .apks, .apkm) or directories searched recursively for them.",
             "Split APKs of the same app in one directory are analyzed together.",
+            "With --adb: package names of apps installed on the device.",
         ],
     )
-    var paths: List<Path> = emptyList()
+    var paths: List<String> = emptyList()
 
     @Option(names = ["-o", "--output"], paramLabel = "FILE", description = ["Write the results to FILE instead of standard output."])
     var output: Path? = null
@@ -72,6 +75,22 @@ class ApkCategoryChecker : Callable<Int> {
     )
     var rules: Path? = null
 
+    @Option(names = ["--adb"], description = ["Analyze the apps installed on a device: PATH arguments are package names."])
+    var adb: Boolean = false
+
+    @Option(names = ["--adb-all"], description = ["Analyze all the third-party apps installed on a device."])
+    var adbAll: Boolean = false
+
+    @Option(names = ["-s", "--serial"], paramLabel = "SERIAL", description = ["The device to use with --adb, if several are connected."])
+    var serial: String? = null
+
+    @Option(
+        names = ["--adb-path"],
+        paramLabel = "FILE",
+        description = ["The adb executable. Default: \$ADB, the Android SDK's, or adb on the PATH."],
+    )
+    var adbPath: String? = null
+
     @Option(names = ["--no-sdks"], description = ["Skip the detection of SDKs and libraries (faster)."])
     var noSdks: Boolean = false
 
@@ -81,16 +100,35 @@ class ApkCategoryChecker : Callable<Int> {
     @CommandLine.Spec
     lateinit var spec: CommandLine.Model.CommandSpec
 
+    private fun fail(message: String): Nothing = throw CommandLine.ParameterException(spec.commandLine(), message)
+
+    private fun fileApps(): List<ApkInput> {
+        if (serial != null || adbPath != null) fail("--serial and --adb-path need --adb or --adb-all")
+        if (paths.isEmpty()) fail("Missing required parameter: 'PATH'")
+        val files = paths.map { Path.of(it) }
+        files.filterNot { it.exists() }.takeIf { it.isNotEmpty() }?.let { fail("Path not found: ${it.joinToString()}") }
+        return ApkInput.find(files)
+    }
+
+    private fun deviceApps(): List<ApkInput> {
+        if (adbAll && paths.isNotEmpty()) fail("--adb-all analyzes all the apps: it takes no package names")
+        if (!adbAll && paths.isEmpty()) fail("Missing package names to analyze with --adb (or use --adb-all)")
+        val device = Adb(adbPath ?: Adb.defaultExecutable(), serial)
+        return try {
+            device.checkDevice()
+            val packages = if (adbAll) device.thirdPartyPackages() else paths.distinct()
+            packages.map { ApkInput.Device(it, device) }
+        } catch (e: AdbException) {
+            fail(e.message!!)
+        }
+    }
+
     override fun call(): Int {
         val err = spec.commandLine().err
         if (printRules) {
             spec.commandLine().out.print(Rules.builtInText)
             spec.commandLine().out.flush()
             return 0
-        }
-        if (paths.isEmpty()) throw CommandLine.ParameterException(spec.commandLine(), "Missing required parameter: 'PATH'")
-        paths.filterNot { it.exists() }.takeIf { it.isNotEmpty() }?.let { missing ->
-            throw CommandLine.ParameterException(spec.commandLine(), "Path not found: ${missing.joinToString()}")
         }
         if (threads < 1) throw CommandLine.ParameterException(spec.commandLine(), "--threads must be at least 1")
         val rules =
@@ -102,7 +140,7 @@ class ApkCategoryChecker : Callable<Int> {
                 throw CommandLine.ParameterException(spec.commandLine(), "Cannot read rules: ${e.message}")
             }
 
-        val apps = ApkInput.find(paths)
+        val apps = if (adb || adbAll) deviceApps() else fileApps()
         val outputFormat = format ?: output?.let { OutputFormat.fromExtension(it.fileName.toString()) } ?: OutputFormat.CSV
         val out = output?.bufferedWriter() ?: NonClosingWriter(spec.commandLine().out)
 

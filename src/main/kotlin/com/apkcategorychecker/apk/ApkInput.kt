@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 package com.apkcategorychecker.apk
 
+import com.apkcategorychecker.adb.Adb
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.zip.ZipException
@@ -17,6 +18,11 @@ import kotlin.io.path.walk
 sealed interface ApkInput {
     /** The file the app is reported under: the APK, the base APK or the container. */
     val path: Path
+
+    /** How the app is named in reports: the file name, or the package name for an app on a device. */
+    val displayName: String get() = path.name
+
+    val displayPath: String get() = path.toString()
 
     /** Total size of the app's files in bytes. */
     fun size(): Long
@@ -64,20 +70,9 @@ sealed interface ApkInput {
         @OptIn(kotlin.io.path.ExperimentalPathApi::class)
         override fun open(): ApkContents {
             val tempDir = Files.createTempDirectory("apk-category-checker-")
-            val opened = mutableListOf<Pair<String, ApkFile>>()
             try {
-                extractApks(tempDir).forEach { (name, file) -> opened += name to ApkFile(file) }
-                if (opened.isEmpty()) throw ApkFormatException("no APK inside $path")
-                val (bases, splits) = opened.partition { it.second.manifest.split == null }
-                // Prefer the conventional base names when a container also holds standalone APKs.
-                val base =
-                    bases.firstOrNull { it.first.substringAfterLast('/') in BASE_NAMES }
-                        ?: bases.firstOrNull()
-                        ?: throw ApkFormatException("no base APK inside $path")
-                (bases - base).forEach { it.second.close() }
-                return SplitApk(base.second, splits) { tempDir.deleteRecursively() }
+                return openApkSet(extractApks(tempDir), "inside $path") { tempDir.deleteRecursively() }
             } catch (e: Exception) {
-                opened.forEach { runCatching { it.second.close() } }
                 tempDir.deleteRecursively()
                 throw e
             }
@@ -99,13 +94,74 @@ sealed interface ApkInput {
             } catch (e: ZipException) {
                 throw ApkFormatException("not a valid zip archive: $path", e)
             }
+    }
 
-        private companion object {
-            val BASE_NAMES = setOf("base.apk", "base-master.apk")
+    /**
+     * An app installed on a device, read through adb: its APKs (base and splits) are pulled to a
+     * temporary directory, deleted when the returned contents are closed.
+     */
+    data class Device(
+        val packageName: String,
+        private val adb: Adb,
+    ) : ApkInput {
+        override val path: Path get() = Path.of(packageName)
+        override val displayName get() = packageName
+        override val displayPath get() = "adb:${adb.serial ?: "device"}/$packageName"
+
+        @Volatile private var pulledSize: Long? = null
+
+        override fun size() = pulledSize ?: throw IllegalStateException("$packageName not pulled yet")
+
+        @OptIn(kotlin.io.path.ExperimentalPathApi::class)
+        override fun open(): ApkContents {
+            val tempDir = Files.createTempDirectory("apk-category-checker-")
+            try {
+                val pulled =
+                    adb.apkPaths(packageName).mapIndexed { i, remote ->
+                        // Named by index: remote names are not trusted as local paths.
+                        val local = tempDir.resolve("$i.apk")
+                        adb.pull(remote, local)
+                        remote.substringAfterLast('/') to local
+                    }
+                pulledSize = pulled.sumOf { it.second.fileSize() }
+                return openApkSet(pulled, "of $packageName") { tempDir.deleteRecursively() }
+            } catch (e: Exception) {
+                tempDir.deleteRecursively()
+                throw e
+            }
         }
     }
 
     companion object {
+        private val BASE_NAMES = setOf("base.apk", "base-master.apk")
+
+        /**
+         * Opens the APKs of one app ([files] as (name, path)) as a [SplitApk]: the base APK is the one
+         * without a `split` attribute; [onClose] runs when the contents are closed.
+         */
+        private fun openApkSet(
+            files: List<Pair<String, Path>>,
+            source: String,
+            onClose: () -> Unit,
+        ): ApkContents {
+            val opened = mutableListOf<Pair<String, ApkFile>>()
+            try {
+                files.forEach { (name, file) -> opened += name to ApkFile(file) }
+                if (opened.isEmpty()) throw ApkFormatException("no APK $source")
+                val (bases, splits) = opened.partition { it.second.manifest.split == null }
+                // Prefer the conventional base names when a container also holds standalone APKs.
+                val base =
+                    bases.firstOrNull { it.first.substringAfterLast('/') in BASE_NAMES }
+                        ?: bases.firstOrNull()
+                        ?: throw ApkFormatException("no base APK $source")
+                (bases - base).forEach { it.second.close() }
+                return SplitApk(base.second, splits, onClose)
+            } catch (e: Exception) {
+                opened.forEach { runCatching { it.second.close() } }
+                throw e
+            }
+        }
+
         val CONTAINER_EXTENSIONS = setOf("xapk", "apks", "apkm")
 
         fun of(path: Path): ApkInput = if (path.extension.lowercase() in CONTAINER_EXTENSIONS) Container(path) else Single(path)
