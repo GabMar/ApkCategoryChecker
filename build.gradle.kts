@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.shadow)
+    alias(libs.plugins.ktlint)
     application
 }
 
@@ -25,6 +26,11 @@ dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+// Style rules are configured in .editorconfig; `./gradlew check` fails on violations.
+ktlint {
+    version = libs.versions.ktlint
 }
 
 application {

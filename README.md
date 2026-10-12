@@ -10,6 +10,12 @@ APKs are read directly as zip archives (DEX class names, binary XML manifest and
 
 Download `ApkCategoryChecker.jar` from the [latest release](https://github.com/GabMar/ApkCategoryChecker/releases/latest). It requires Java 21 or later.
 
+Or use the Docker image (amd64 and arm64), mounting the directory with the APKs on `/data`:
+
+```sh
+docker run --rm -v "$PWD:/data" --user "$(id -u):$(id -g)" ghcr.io/gabmar/apkcategorychecker app.apk
+```
+
 ## Usage
 
 ```sh
@@ -103,19 +109,20 @@ Besides the synthetic test cases, detection was checked on open source apps publ
 
 ## Building from source
 
-Requires JDK 21; Gradle downloads one automatically if missing.
+Requires JDK 21; Gradle downloads one automatically if missing. The common tasks are in the [Justfile](Justfile) (run `just` to list them):
 
 ```sh
-./gradlew build                     # compile and run the tests
-./gradlew shadowJar                 # runnable jar in build/libs/ApkCategoryChecker.jar
-./gradlew run --args="path/to/app.apk -f json"
+just build                  # compile, check the code style and run the tests
+just format                 # fix the code style (ktlint, rules in .editorconfig)
+just jar                    # runnable jar in build/libs/ApkCategoryChecker.jar
+just run path/to/app.apk    # build and analyze
+just docker-build           # build the Docker image
+just docker-run app.apk     # analyze APKs in the current directory with the image
 ```
 
-To publish a release, push a tag: the [release workflow](.github/workflows/release.yml) builds the jar with the tag's version and attaches it to a GitHub release.
+Without `just`, use Gradle directly: `./gradlew build`, `./gradlew shadowJar`.
 
-```sh
-git tag v2.0.0 && git push origin v2.0.0
-```
+To publish a release, run `just release 2.1.0` from an up-to-date `master`: it tags `v2.1.0` and pushes the tag, and the [release workflow](.github/workflows/release.yml) attaches the jar to a GitHub release and publishes the Docker image to `ghcr.io/gabmar/apkcategorychecker`.
 
 ## License
 

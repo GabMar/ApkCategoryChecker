@@ -27,7 +27,6 @@ import kotlin.system.exitProcess
     usageHelpAutoWidth = true,
 )
 class ApkCategoryChecker : Callable<Int> {
-
     @Parameters(arity = "1..*", paramLabel = "PATH", description = ["APK files, or directories searched recursively for .apk files."])
     lateinit var paths: List<Path>
 
@@ -41,7 +40,11 @@ class ApkCategoryChecker : Callable<Int> {
     )
     var format: OutputFormat? = null
 
-    @Option(names = ["-j", "--threads"], paramLabel = "N", description = ["APKs analyzed in parallel. Default: number of CPUs (\${DEFAULT-VALUE})."])
+    @Option(
+        names = ["-j", "--threads"],
+        paramLabel = "N",
+        description = ["APKs analyzed in parallel. Default: number of CPUs (\${DEFAULT-VALUE})."],
+    )
     var threads: Int = Runtime.getRuntime().availableProcessors()
 
     @Option(
@@ -81,7 +84,9 @@ class ApkCategoryChecker : Callable<Int> {
 }
 
 /** Lets the report writer close its output without closing standard output. */
-private class NonClosingWriter(out: Writer) : FilterWriter(out) {
+private class NonClosingWriter(
+    out: Writer,
+) : FilterWriter(out) {
     override fun close() = flush()
 }
 
@@ -90,7 +95,11 @@ class ManifestVersionProvider : CommandLine.IVersionProvider {
         arrayOf("apk-category-checker " + (javaClass.`package`.implementationVersion ?: "development build"))
 }
 
-fun run(args: Array<String>, out: PrintWriter? = null, err: PrintWriter? = null): Int {
+fun run(
+    args: Array<String>,
+    out: PrintWriter? = null,
+    err: PrintWriter? = null,
+): Int {
     val commandLine = CommandLine(ApkCategoryChecker()).setCaseInsensitiveEnumValuesAllowed(true)
     out?.let(commandLine::setOut)
     err?.let(commandLine::setErr)

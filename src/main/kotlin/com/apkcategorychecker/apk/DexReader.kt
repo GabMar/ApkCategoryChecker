@@ -12,7 +12,6 @@ import java.nio.ByteOrder
  * See https://source.android.com/docs/core/runtime/dex-format
  */
 object DexReader {
-
     /** Returns the fully qualified names (e.g. `org.apache.cordova.CordovaActivity`) of the defined classes. */
     fun classNames(dex: ByteArray): List<String> {
         if (dex.size < HEADER_SIZE || !dex.copyOfRange(0, 4).contentEquals(MAGIC)) {
@@ -39,11 +38,13 @@ object DexReader {
     }
 
     /** `Lorg/apache/cordova/CordovaActivity;` -> `org.apache.cordova.CordovaActivity` */
-    private fun descriptorToClassName(descriptor: String): String =
-        descriptor.removePrefix("L").removeSuffix(";").replace('/', '.')
+    private fun descriptorToClassName(descriptor: String): String = descriptor.removePrefix("L").removeSuffix(";").replace('/', '.')
 
     /** Reads a string_data_item: a ULEB128 length in UTF-16 units followed by NUL-terminated MUTF-8. */
-    private fun readMutf8(dex: ByteArray, offset: Int): String {
+    private fun readMutf8(
+        dex: ByteArray,
+        offset: Int,
+    ): String {
         var pos = offset
         while (dex[pos].toInt() and 0x80 != 0) pos++ // skip the ULEB128 utf16_size
         pos++
@@ -52,18 +53,28 @@ object DexReader {
         while (true) {
             val a = dex[pos++].toInt() and 0xFF
             when {
-                a == 0 -> return out.toString()
-                a < 0x80 -> out.append(a.toChar())
+                a == 0 -> {
+                    return out.toString()
+                }
+
+                a < 0x80 -> {
+                    out.append(a.toChar())
+                }
+
                 a and 0xE0 == 0xC0 -> {
                     val b = dex[pos++].toInt() and 0x3F
                     out.append((((a and 0x1F) shl 6) or b).toChar())
                 }
+
                 a and 0xF0 == 0xE0 -> {
                     val b = dex[pos++].toInt() and 0x3F
                     val c = dex[pos++].toInt() and 0x3F
                     out.append((((a and 0x0F) shl 12) or (b shl 6) or c).toChar())
                 }
-                else -> throw ApkFormatException("invalid MUTF-8 byte 0x%02x at offset %d".format(a, pos - 1))
+
+                else -> {
+                    throw ApkFormatException("invalid MUTF-8 byte 0x%02x at offset %d".format(a, pos - 1))
+                }
             }
         }
     }

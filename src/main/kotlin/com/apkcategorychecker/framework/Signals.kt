@@ -7,13 +7,19 @@ fun interface Signal {
 }
 
 /** A native library in any ABI directory, e.g. `lib/arm64-v8a/libflutter.so`. */
-fun nativeLib(fileName: String) = Signal { apk ->
-    apk.apk.entryNames.filter { it.startsWith("lib/") && it.substringAfterLast('/') == fileName }.minOrNull()
-}
+fun nativeLib(fileName: String) =
+    Signal { apk ->
+        apk.apk.entryNames
+            .filter { it.startsWith("lib/") && it.substringAfterLast('/') == fileName }
+            .minOrNull()
+    }
 
-fun nativeLib(fileName: Regex) = Signal { apk ->
-    apk.apk.entryNames.filter { it.startsWith("lib/") && fileName.matches(it.substringAfterLast('/')) }.minOrNull()
-}
+fun nativeLib(fileName: Regex) =
+    Signal { apk ->
+        apk.apk.entryNames
+            .filter { it.startsWith("lib/") && fileName.matches(it.substringAfterLast('/')) }
+            .minOrNull()
+    }
 
 /** Any class in the package or its subpackages. */
 fun classInPackage(packageName: String) = Signal { apk -> apk.firstClassInPackage(packageName)?.let { "class $it" } }
@@ -24,18 +30,28 @@ fun classNamed(simpleName: String) = Signal { apk -> apk.firstClassNamed(simpleN
 fun file(path: String) = Signal { apk -> path.takeIf { it in apk.entries } }
 
 /** Any file under the directory, e.g. `assets/composeResources/`. */
-fun fileUnder(dir: String) = Signal { apk -> apk.apk.entryNames.filter { it.startsWith(dir) }.minOrNull() }
+fun fileUnder(dir: String) =
+    Signal { apk ->
+        apk.apk.entryNames
+            .filter { it.startsWith(dir) }
+            .minOrNull()
+    }
 
-fun configXmlContains(text: String) = Signal { apk ->
-    if (text in apk.configXml) "res/xml/config.xml contains \"$text\"" else null
-}
+fun configXmlContains(text: String) =
+    Signal { apk ->
+        if (text in apk.configXml) "res/xml/config.xml contains \"$text\"" else null
+    }
 
-fun manifestContains(text: String) = Signal { apk ->
-    if (text in apk.manifestXml) "AndroidManifest.xml contains \"$text\"" else null
-}
+fun manifestContains(text: String) =
+    Signal { apk ->
+        if (text in apk.manifestXml) "AndroidManifest.xml contains \"$text\"" else null
+    }
 
 /** A web asset of a Cordova (`assets/www/`) or Capacitor (`assets/public/`) app containing [text]. */
-fun webAssetContains(text: String, extension: String? = null) = Signal { apk ->
+fun webAssetContains(
+    text: String,
+    extension: String? = null,
+) = Signal { apk ->
     apk.findAssetContaining(text, WEB_ROOTS, extension)?.let { "$it contains \"$text\"" }
 }
 

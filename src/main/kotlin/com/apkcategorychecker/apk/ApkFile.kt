@@ -7,25 +7,35 @@ import java.nio.file.Path
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
-class ApkFormatException(message: String, cause: Throwable? = null) : IOException(message, cause)
+class ApkFormatException(
+    message: String,
+    cause: Throwable? = null,
+) : IOException(message, cause)
 
 /**
  * Read-only view of an APK, read directly from the zip archive: nothing is extracted to disk.
  * Everything is parsed lazily, on first access.
  */
-class ApkFile(val path: Path) : Closeable {
-
-    private val zip = try {
-        ZipFile(path.toFile())
-    } catch (e: ZipException) {
-        throw ApkFormatException("not a valid zip archive: $path", e)
-    }
+class ApkFile(
+    val path: Path,
+) : Closeable {
+    private val zip =
+        try {
+            ZipFile(path.toFile())
+        } catch (e: ZipException) {
+            throw ApkFormatException("not a valid zip archive: $path", e)
+        }
 
     /** Paths of all the files in the archive, e.g. `assets/www/index.html`. */
-    val entryNames: List<String> = zip.entries().asSequence().filterNot { it.isDirectory }.map { it.name }.toList()
+    val entryNames: List<String> =
+        zip
+            .entries()
+            .asSequence()
+            .filterNot { it.isDirectory }
+            .map { it.name }
+            .toList()
 
-    fun read(name: String): ByteArray? =
-        zip.getEntry(name)?.let { entry -> zip.getInputStream(entry).use { it.readAllBytes() } }
+    fun read(name: String): ByteArray? = zip.getEntry(name)?.let { entry -> zip.getInputStream(entry).use { it.readAllBytes() } }
 
     fun readText(name: String): String? = read(name)?.toString(Charsets.UTF_8)
 
@@ -55,8 +65,9 @@ class ApkFile(val path: Path) : Closeable {
 }
 
 /** The fields of `AndroidManifest.xml` used by the analysis. */
-class AndroidManifest(val root: XmlElement) {
-
+class AndroidManifest(
+    val root: XmlElement,
+) {
     val packageName: String? get() = root.attributes["package"]
 
     /** Raw value of `android:debuggable`, or null if not declared. */

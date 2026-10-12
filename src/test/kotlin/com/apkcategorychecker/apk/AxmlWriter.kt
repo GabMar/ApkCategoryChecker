@@ -15,17 +15,26 @@ internal class Attr(
 )
 
 /** Just enough of an AXML encoder to produce test inputs. */
-internal class AxmlWriter(private val utf8: Boolean, resourceAttributes: List<Pair<String, Int>> = emptyList()) {
+internal class AxmlWriter(
+    private val utf8: Boolean,
+    resourceAttributes: List<Pair<String, Int>> = emptyList(),
+) {
     // Attribute names with a resource id come first in the pool, aligned with the resource map.
     private val strings = resourceAttributes.map { it.first }.toMutableList()
     private val resourceIds = resourceAttributes.map { it.second }.toMutableList()
     private val chunks = mutableListOf<ByteArray>()
 
-    fun namespace(prefix: String, uri: String) {
+    fun namespace(
+        prefix: String,
+        uri: String,
+    ) {
         chunks += chunk(0x0100, 16, ints(1, -1, index(prefix), index(uri)))
     }
 
-    fun start(name: String, vararg attrs: Attr) {
+    fun start(
+        name: String,
+        vararg attrs: Attr,
+    ) {
         val body = ByteArrayOutputStream()
         body.write(ints(1, -1, -1, index(name)))
         body.write(shorts(20, 20, attrs.size, 0, 0, 0))
@@ -53,8 +62,11 @@ internal class AxmlWriter(private val utf8: Boolean, resourceAttributes: List<Pa
     }
 
     private fun attrIndex(a: Attr): Int =
-        if (a.resourceId == null) index(a.name)
-        else resourceIds.indexOf(a.resourceId).also { check(it >= 0) { "unregistered resource id" } }
+        if (a.resourceId == null) {
+            index(a.name)
+        } else {
+            resourceIds.indexOf(a.resourceId).also { check(it >= 0) { "unregistered resource id" } }
+        }
 
     private fun index(s: String): Int {
         val existing = strings.withIndex().drop(resourceIds.size).firstOrNull { it.value == s }
@@ -63,9 +75,10 @@ internal class AxmlWriter(private val utf8: Boolean, resourceAttributes: List<Pa
 
     private fun stringPool(): ByteArray {
         val data = ByteArrayOutputStream()
-        val offsets = strings.map { s ->
-            data.size().also { data.write(encode(s)) }
-        }
+        val offsets =
+            strings.map { s ->
+                data.size().also { data.write(encode(s)) }
+            }
         while (data.size() % 4 != 0) data.write(0)
         val header = 28
         val payload = ByteArrayOutputStream()
@@ -79,23 +92,38 @@ internal class AxmlWriter(private val utf8: Boolean, resourceAttributes: List<Pa
         val out = ByteArrayOutputStream()
         if (utf8) {
             val bytes = s.toByteArray(Charsets.UTF_8)
-            out.write(len8(s.length)); out.write(len8(bytes.size)); out.write(bytes); out.write(0)
+            out.write(len8(s.length))
+            out.write(len8(bytes.size))
+            out.write(bytes)
+            out.write(0)
         } else {
             require(s.length < 0x8000)
-            out.write(shorts(s.length)); out.write(s.toByteArray(Charsets.UTF_16LE)); out.write(shorts(0))
+            out.write(shorts(s.length))
+            out.write(s.toByteArray(Charsets.UTF_16LE))
+            out.write(shorts(0))
         }
         return out.toByteArray()
     }
 
-    private fun len8(n: Int) =
-        if (n < 0x80) byteArrayOf(n.toByte()) else byteArrayOf((0x80 or (n shr 8)).toByte(), n.toByte())
+    private fun len8(n: Int) = if (n < 0x80) byteArrayOf(n.toByte()) else byteArrayOf((0x80 or (n shr 8)).toByte(), n.toByte())
 
-    private fun chunk(type: Int, headerSize: Int, payload: ByteArray): ByteArray =
-        shorts(type, headerSize) + ints(8 + payload.size) + payload
+    private fun chunk(
+        type: Int,
+        headerSize: Int,
+        payload: ByteArray,
+    ): ByteArray = shorts(type, headerSize) + ints(8 + payload.size) + payload
 
     private fun ints(vararg v: Int) =
-        ByteBuffer.allocate(4 * v.size).order(ByteOrder.LITTLE_ENDIAN).apply { v.forEach(::putInt) }.array()
+        ByteBuffer
+            .allocate(4 * v.size)
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .apply { v.forEach(::putInt) }
+            .array()
 
     private fun shorts(vararg v: Int) =
-        ByteBuffer.allocate(2 * v.size).order(ByteOrder.LITTLE_ENDIAN).apply { v.forEach { putShort(it.toShort()) } }.array()
+        ByteBuffer
+            .allocate(2 * v.size)
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .apply { v.forEach { putShort(it.toShort()) } }
+            .array()
 }

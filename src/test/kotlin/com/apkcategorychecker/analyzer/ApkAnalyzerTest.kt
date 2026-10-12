@@ -16,7 +16,6 @@ import java.nio.file.Path
 import kotlin.io.path.writeText
 
 class ApkAnalyzerTest {
-
     @TempDir
     lateinit var dir: Path
 
@@ -77,10 +76,11 @@ class ApkAnalyzerTest {
 
     @Test
     fun `capacitor wins over the cordova runtime it bundles`() {
-        val result = analyze(
-            cordovaConfig + ("assets/capacitor.config.json" to "{}"),
-            cordovaClasses + "com.getcapacitor.BridgeActivity",
-        )
+        val result =
+            analyze(
+                cordovaConfig + ("assets/capacitor.config.json" to "{}"),
+                cordovaClasses + "com.getcapacitor.BridgeActivity",
+            )
         assertEquals("Capacitor", result.mainFramework)
         assertNull(result.baseFramework)
     }
@@ -103,10 +103,11 @@ class ApkAnalyzerTest {
         assertEquals("Sencha", onCordova.mainFramework)
         assertEquals("Apache Cordova", onCordova.baseFramework)
 
-        val ionic = analyze(
-            mapOf("assets/public/main.js" to "customElements.define('ion-app', IonApp)"),
-            listOf("com.getcapacitor.BridgeActivity"),
-        )
+        val ionic =
+            analyze(
+                mapOf("assets/public/main.js" to "customElements.define('ion-app', IonApp)"),
+                listOf("com.getcapacitor.BridgeActivity"),
+            )
         assertEquals("Ionic", ionic.mainFramework)
         assertEquals("Capacitor", ionic.baseFramework)
         assertEquals(
@@ -117,10 +118,11 @@ class ApkAnalyzerTest {
 
     @Test
     fun `expo runs on react native`() {
-        val result = analyze(
-            mapOf("lib/arm64-v8a/libreactnative.so" to ""),
-            listOf("com.facebook.react.ReactActivity", "expo.modules.ExpoModulesPackage"),
-        )
+        val result =
+            analyze(
+                mapOf("lib/arm64-v8a/libreactnative.so" to ""),
+                listOf("com.facebook.react.ReactActivity", "expo.modules.ExpoModulesPackage"),
+            )
         assertEquals("Expo", result.mainFramework)
         assertEquals("React Native", result.baseFramework)
     }
@@ -164,15 +166,16 @@ class ApkAnalyzerTest {
 
     @Test
     fun `counts web resources by extension`() {
-        val result = analyze(
-            mapOf(
-                "assets/www/index.html" to "",
-                "assets/www/app.js" to "",
-                "assets/www/app.json" to "{}",
-                "assets/www/style.css" to "",
-                "assets/www/data.jsonp" to "",
+        val result =
+            analyze(
+                mapOf(
+                    "assets/www/index.html" to "",
+                    "assets/www/app.js" to "",
+                    "assets/www/app.json" to "{}",
+                    "assets/www/style.css" to "",
+                    "assets/www/data.jsonp" to "",
+                ),
             )
-        )
         assertEquals(1, result.htmlFiles)
         assertEquals(1, result.jsFiles)
         assertEquals(1, result.cssFiles)
@@ -199,34 +202,40 @@ class ApkAnalyzerTest {
     }
 
     companion object {
-        private fun app(name: String, file: String, evidence: String = file) =
-            Arguments.of(name, mapOf(file to ""), emptyList<String>(), evidence)
+        private fun app(
+            name: String,
+            file: String,
+            evidence: String = file,
+        ) = Arguments.of(name, mapOf(file to ""), emptyList<String>(), evidence)
 
-        private fun appWithClass(name: String, className: String) =
-            Arguments.of(name, emptyMap<String, String>(), listOf(className), "class $className")
+        private fun appWithClass(
+            name: String,
+            className: String,
+        ) = Arguments.of(name, emptyMap<String, String>(), listOf(className), "class $className")
 
         @JvmStatic
-        fun singleSignalApps() = listOf(
-            app("Flutter", "lib/arm64-v8a/libflutter.so"),
-            appWithClass("Flutter", "io.flutter.embedding.engine.FlutterEngine"),
-            app("React Native", "lib/armeabi-v7a/libreactnativejni.so"),
-            app("React Native", "assets/index.android.bundle"),
-            appWithClass("React Native", "com.facebook.react.ReactActivity"),
-            app(".NET for Android", "lib/x86_64/libmonodroid.so"),
-            appWithClass(".NET for Android", "mono.android.Runtime"),
-            app("Unity", "lib/arm64-v8a/libunity.so"),
-            appWithClass("Unity", "com.unity3d.player.UnityPlayer"),
-            app("Unreal Engine", "lib/arm64-v8a/libUnreal.so"),
-            appWithClass("Unreal Engine", "com.epicgames.ue4.GameActivity"),
-            app("Godot", "lib/arm64-v8a/libgodot_android.so"),
-            app("Cocos", "lib/armeabi-v7a/libcocos2dcpp.so"),
-            appWithClass("Cocos", "com.cocos.lib.CocosActivity"),
-            app("Capacitor", "assets/capacitor.config.json"),
-            app("NativeScript", "lib/arm64-v8a/libNativeScript.so"),
-            appWithClass("NativeScript", "com.tns.Runtime"),
-            app("Qt", "lib/arm64-v8a/libQt6Core_arm64-v8a.so"),
-            appWithClass("Qt", "org.qtproject.qt5.android.bindings.QtActivity"),
-            app("Compose Multiplatform", "assets/composeResources/app.generated.resources/values/strings.commonMain.cvr"),
-        )
+        fun singleSignalApps() =
+            listOf(
+                app("Flutter", "lib/arm64-v8a/libflutter.so"),
+                appWithClass("Flutter", "io.flutter.embedding.engine.FlutterEngine"),
+                app("React Native", "lib/armeabi-v7a/libreactnativejni.so"),
+                app("React Native", "assets/index.android.bundle"),
+                appWithClass("React Native", "com.facebook.react.ReactActivity"),
+                app(".NET for Android", "lib/x86_64/libmonodroid.so"),
+                appWithClass(".NET for Android", "mono.android.Runtime"),
+                app("Unity", "lib/arm64-v8a/libunity.so"),
+                appWithClass("Unity", "com.unity3d.player.UnityPlayer"),
+                app("Unreal Engine", "lib/arm64-v8a/libUnreal.so"),
+                appWithClass("Unreal Engine", "com.epicgames.ue4.GameActivity"),
+                app("Godot", "lib/arm64-v8a/libgodot_android.so"),
+                app("Cocos", "lib/armeabi-v7a/libcocos2dcpp.so"),
+                appWithClass("Cocos", "com.cocos.lib.CocosActivity"),
+                app("Capacitor", "assets/capacitor.config.json"),
+                app("NativeScript", "lib/arm64-v8a/libNativeScript.so"),
+                appWithClass("NativeScript", "com.tns.Runtime"),
+                app("Qt", "lib/arm64-v8a/libQt6Core_arm64-v8a.so"),
+                appWithClass("Qt", "org.qtproject.qt5.android.bindings.QtActivity"),
+                app("Compose Multiplatform", "assets/composeResources/app.generated.resources/values/strings.commonMain.cvr"),
+            )
     }
 }

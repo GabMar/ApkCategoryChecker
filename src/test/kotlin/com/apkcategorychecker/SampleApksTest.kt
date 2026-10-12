@@ -23,12 +23,13 @@ import kotlin.io.path.reader
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SampleApksTest {
-
     private lateinit var csvRows: List<CSVRecord>
     private lateinit var reports: Map<String, ApkReport>
 
     @BeforeAll
-    fun analyzeSampleApks(@TempDir outDir: Path) {
+    fun analyzeSampleApks(
+        @TempDir outDir: Path,
+    ) {
         val apks = File(javaClass.getResource("/apks")!!.toURI()).path
         val csv = outDir.resolve("results.csv")
         val json = outDir.resolve("results.json")
@@ -37,7 +38,15 @@ class SampleApksTest {
         assertEquals(0, run(arrayOf(apks, "-o", csv.toString()), err = PrintWriter(err)))
         assertEquals(0, run(arrayOf(apks, "--output", json.toString(), "--threads", "2"), err = PrintWriter(err)))
 
-        csvRows = csv.reader().use { CSVFormat.RFC4180.builder().setHeader().get().parse(it).records }
+        csvRows =
+            csv.reader().use {
+                CSVFormat.RFC4180
+                    .builder()
+                    .setHeader()
+                    .get()
+                    .parse(it)
+                    .records
+            }
         reports = Json.decodeFromString<List<ApkReport>>(json.readText()).associateBy { it.file }
     }
 
@@ -57,11 +66,14 @@ class SampleApksTest {
                 mainFramework = "Apache Cordova",
                 baseFramework = null,
                 evidence = mapOf("Apache Cordova" to CORDOVA_EVIDENCE),
-                htmlFiles = 1, jsFiles = 3, cssFiles = 1,
+                htmlFiles = 1,
+                jsFiles = 3,
+                cssFiles = 1,
                 jsFileNames = listOf("index.js", "cordova.js", "cordova_plugins.js"),
                 debuggable = "true",
                 permissions = listOf("android.permission.INTERNET"),
-                minSdkVersion = "10", targetSdkVersion = "19",
+                minSdkVersion = "10",
+                targetSdkVersion = "19",
                 fileSize = 1915225,
             ),
             report,
@@ -78,18 +90,23 @@ class SampleApksTest {
                 packageName = "com.mydomain.sentoco",
                 mainFramework = "Sencha",
                 baseFramework = "Apache Cordova",
-                evidence = mapOf(
-                    "Apache Cordova" to CORDOVA_EVIDENCE,
-                    "Sencha" to listOf(
-                        "assets/www/app.js contains \"Ext.create\"",
-                        "assets/www/app.js contains \"Ext.application\"",
+                evidence =
+                    mapOf(
+                        "Apache Cordova" to CORDOVA_EVIDENCE,
+                        "Sencha" to
+                            listOf(
+                                "assets/www/app.js contains \"Ext.create\"",
+                                "assets/www/app.js contains \"Ext.application\"",
+                            ),
                     ),
-                ),
-                htmlFiles = 1, jsFiles = 4, cssFiles = 2,
+                htmlFiles = 1,
+                jsFiles = 4,
+                cssFiles = 2,
                 jsFileNames = listOf("index.js", "app.js", "cordova.js", "cordova_plugins.js"),
                 debuggable = "true",
                 permissions = listOf("android.permission.INTERNET"),
-                minSdkVersion = "10", targetSdkVersion = "17",
+                minSdkVersion = "10",
+                targetSdkVersion = "17",
                 fileSize = 716499,
             ),
             report,
@@ -106,20 +123,39 @@ class SampleApksTest {
                 packageName = "com.appcelerator.sample.todo",
                 mainFramework = "Titanium",
                 baseFramework = null,
-                evidence = mapOf(
-                    "Titanium" to listOf("class ti.modules.titanium.TitaniumModule", "class org.appcelerator.titanium.TiActivity"),
-                ),
-                htmlFiles = 0, jsFiles = 10, cssFiles = 0,
-                jsFileNames = listOf(
-                    "AddWindow.js", "AppTabGroup.js", "ListWindow.js", "app.js", "db.js",
-                    "binding.js", "binding.min.js", "json2.js", "polling.js", "polling.min.js",
-                ),
+                evidence =
+                    mapOf(
+                        "Titanium" to listOf("class ti.modules.titanium.TitaniumModule", "class org.appcelerator.titanium.TiActivity"),
+                    ),
+                htmlFiles = 0,
+                jsFiles = 10,
+                cssFiles = 0,
+                jsFileNames =
+                    listOf(
+                        "AddWindow.js",
+                        "AppTabGroup.js",
+                        "ListWindow.js",
+                        "app.js",
+                        "db.js",
+                        "binding.js",
+                        "binding.min.js",
+                        "json2.js",
+                        "polling.js",
+                        "polling.min.js",
+                    ),
                 debuggable = "false",
-                permissions = listOf(
-                    "INTERNET", "ACCESS_WIFI_STATE", "ACCESS_NETWORK_STATE", "WRITE_EXTERNAL_STORAGE",
-                    "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "ACCESS_MOCK_LOCATION",
-                ).map { "android.permission.$it" },
-                minSdkVersion = "10", targetSdkVersion = "19",
+                permissions =
+                    listOf(
+                        "INTERNET",
+                        "ACCESS_WIFI_STATE",
+                        "ACCESS_NETWORK_STATE",
+                        "WRITE_EXTERNAL_STORAGE",
+                        "ACCESS_COARSE_LOCATION",
+                        "ACCESS_FINE_LOCATION",
+                        "ACCESS_MOCK_LOCATION",
+                    ).map { "android.permission.$it" },
+                minSdkVersion = "10",
+                targetSdkVersion = "19",
                 fileSize = 8202108,
             ),
             report,
@@ -184,9 +220,10 @@ class SampleApksTest {
     }
 
     private companion object {
-        val CORDOVA_EVIDENCE = listOf(
-            "class org.apache.cordova.CordovaActivity",
-            "res/xml/config.xml contains \"org.apache.cordova\"",
-        )
+        val CORDOVA_EVIDENCE =
+            listOf(
+                "class org.apache.cordova.CordovaActivity",
+                "res/xml/config.xml contains \"org.apache.cordova\"",
+            )
     }
 }

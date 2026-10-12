@@ -1,0 +1,7 @@
+# Only the build files and src/main are needed to build the image.
+*
+!gradlew
+!gradle/
+!settings.gradle.kts
+!build.gradle.kts
+!src/main/

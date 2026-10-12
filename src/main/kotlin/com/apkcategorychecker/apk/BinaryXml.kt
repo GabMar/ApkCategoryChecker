@@ -15,10 +15,11 @@ class XmlElement(
     val namespaces: Map<String, String> = emptyMap(),
 ) {
     /** This element and all its descendants with the given name, in document order. */
-    fun findAll(name: String): Sequence<XmlElement> = sequence {
-        if (this@XmlElement.name == name) yield(this@XmlElement)
-        for (child in children) yieldAll(child.findAll(name))
-    }
+    fun findAll(name: String): Sequence<XmlElement> =
+        sequence {
+            if (this@XmlElement.name == name) yield(this@XmlElement)
+            for (child in children) yieldAll(child.findAll(name))
+        }
 
     fun findFirst(name: String): XmlElement? = findAll(name).firstOrNull()
 
@@ -27,8 +28,22 @@ class XmlElement(
 
     private fun render(out: StringBuilder) {
         out.append('<').append(name)
-        for ((prefix, uri) in namespaces) out.append(" xmlns:").append(prefix).append("=\"").append(escape(uri)).append('"')
-        for ((key, value) in attributes) out.append(' ').append(key).append("=\"").append(escape(value)).append('"')
+        for ((prefix, uri) in namespaces) {
+            out
+                .append(" xmlns:")
+                .append(prefix)
+                .append("=\"")
+                .append(escape(uri))
+                .append('"')
+        }
+        for ((key, value) in attributes) {
+            out
+                .append(' ')
+                .append(key)
+                .append("=\"")
+                .append(escape(value))
+                .append('"')
+        }
         if (children.isEmpty() && text.isEmpty()) {
             out.append("/>")
             return
@@ -39,7 +54,11 @@ class XmlElement(
     }
 
     private fun escape(s: String) =
-        s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
+        s
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
 }
 
 /**
@@ -49,7 +68,6 @@ class XmlElement(
  * See frameworks/base/libs/androidfw/include/androidfw/ResourceTypes.h in AOSP.
  */
 object BinaryXml {
-
     const val ANDROID_NS = "http://schemas.android.com/apk/res/android"
 
     fun parse(data: ByteArray): XmlElement {
@@ -63,13 +81,20 @@ object BinaryXml {
         }
     }
 
-    private class ElementBuilder(val name: String, val attributes: Map<String, String>, val namespaces: Map<String, String>) {
+    private class ElementBuilder(
+        val name: String,
+        val attributes: Map<String, String>,
+        val namespaces: Map<String, String>,
+    ) {
         val children = mutableListOf<XmlElement>()
         val text = StringBuilder()
+
         fun build() = XmlElement(name, attributes, children, text.toString(), namespaces)
     }
 
-    private class Parser(private val buf: ByteBuffer) {
+    private class Parser(
+        private val buf: ByteBuffer,
+    ) {
         private var strings: List<String> = emptyList()
         private var resourceIds = IntArray(0)
         private val prefixByUri = mutableMapOf<String, String>()
@@ -88,21 +113,33 @@ object BinaryXml {
                     throw ApkFormatException("invalid chunk size $size at offset $pos")
                 }
                 when (type) {
-                    RES_STRING_POOL_TYPE -> strings = readStringPool(pos)
-                    RES_XML_RESOURCE_MAP_TYPE ->
+                    RES_STRING_POOL_TYPE -> {
+                        strings = readStringPool(pos)
+                    }
+
+                    RES_XML_RESOURCE_MAP_TYPE -> {
                         resourceIds = IntArray((size - headerSize) / 4) { buf.getInt(pos + headerSize + it * 4) }
+                    }
+
                     RES_XML_START_NAMESPACE_TYPE -> {
                         val prefix = string(buf.getInt(pos + headerSize))
                         val uri = string(buf.getInt(pos + headerSize + 4))
                         prefixByUri[uri] = prefix
                         pendingNamespaces[prefix] = uri
                     }
-                    RES_XML_START_ELEMENT_TYPE -> startElement(pos + headerSize)
+
+                    RES_XML_START_ELEMENT_TYPE -> {
+                        startElement(pos + headerSize)
+                    }
+
                     RES_XML_END_ELEMENT_TYPE -> {
                         val element = stack.removeLast().build()
                         if (stack.isEmpty()) root = element else stack.last().children += element
                     }
-                    RES_XML_CDATA_TYPE -> stack.lastOrNull()?.text?.append(string(buf.getInt(pos + headerSize)))
+
+                    RES_XML_CDATA_TYPE -> {
+                        stack.lastOrNull()?.text?.append(string(buf.getInt(pos + headerSize)))
+                    }
                 }
                 pos += size
             }
@@ -125,7 +162,10 @@ object BinaryXml {
             pendingNamespaces.clear()
         }
 
-        private fun attributeName(nsIndex: Int, nameIndex: Int): String {
+        private fun attributeName(
+            nsIndex: Int,
+            nameIndex: Int,
+        ): String {
             // Android resolves framework attributes by resource id, not by name: obfuscators exploit
             // this by blanking or faking the name string, so trust the id when we know it.
             val name = resourceIds.getOrNull(nameIndex)?.let(KNOWN_ATTRIBUTES::get) ?: string(nameIndex)
@@ -135,18 +175,23 @@ object BinaryXml {
             return "$prefix:$name"
         }
 
-        private fun attributeValue(rawIndex: Int, dataType: Int, data: Int): String = when {
-            rawIndex != NO_INDEX -> string(rawIndex)
-            dataType == TYPE_STRING -> string(data)
-            dataType == TYPE_REFERENCE -> "@0x%08x".format(data)
-            dataType == TYPE_ATTRIBUTE -> "?0x%08x".format(data)
-            dataType == TYPE_FLOAT -> Float.fromBits(data).toString()
-            dataType == TYPE_INT_DEC -> data.toString()
-            dataType == TYPE_INT_HEX -> "0x%x".format(data)
-            dataType == TYPE_INT_BOOLEAN -> (data != 0).toString()
-            dataType in TYPE_FIRST_COLOR..TYPE_LAST_COLOR -> "#%08x".format(data)
-            else -> "0x%08x".format(data)
-        }
+        private fun attributeValue(
+            rawIndex: Int,
+            dataType: Int,
+            data: Int,
+        ): String =
+            when {
+                rawIndex != NO_INDEX -> string(rawIndex)
+                dataType == TYPE_STRING -> string(data)
+                dataType == TYPE_REFERENCE -> "@0x%08x".format(data)
+                dataType == TYPE_ATTRIBUTE -> "?0x%08x".format(data)
+                dataType == TYPE_FLOAT -> Float.fromBits(data).toString()
+                dataType == TYPE_INT_DEC -> data.toString()
+                dataType == TYPE_INT_HEX -> "0x%x".format(data)
+                dataType == TYPE_INT_BOOLEAN -> (data != 0).toString()
+                dataType in TYPE_FIRST_COLOR..TYPE_LAST_COLOR -> "#%08x".format(data)
+                else -> "0x%08x".format(data)
+            }
 
         private fun readStringPool(start: Int): List<String> {
             val headerSize = u16(start + 2)
@@ -208,11 +253,12 @@ object BinaryXml {
     private const val TYPE_LAST_COLOR = 0x1F
 
     /** Framework attribute ids (android.R.attr) of the attributes the analysis relies on. */
-    private val KNOWN_ATTRIBUTES = mapOf(
-        0x01010003 to "name",
-        0x0101000f to "debuggable",
-        0x0101020c to "minSdkVersion",
-        0x01010270 to "targetSdkVersion",
-        0x01010271 to "maxSdkVersion",
-    )
+    private val KNOWN_ATTRIBUTES =
+        mapOf(
+            0x01010003 to "name",
+            0x0101000f to "debuggable",
+            0x0101020c to "minSdkVersion",
+            0x01010270 to "targetSdkVersion",
+            0x01010271 to "maxSdkVersion",
+        )
 }

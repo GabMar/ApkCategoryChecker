@@ -13,28 +13,29 @@ import kotlin.io.path.toPath
 import kotlin.io.path.writeText
 
 class ApkFileTest {
-
     private fun sample(name: String) = ApkFile(javaClass.getResource("/apks/$name")!!.toURI().toPath())
 
     @Test
-    fun `reads the manifest of a cordova app`() = sample("cordova/HelloWorld.apk").use { apk ->
-        val manifest = apk.manifest
-        assertEquals("com.example.hello", manifest.packageName)
-        assertEquals("true", manifest.debuggable)
-        assertEquals(listOf("android.permission.INTERNET"), manifest.permissions)
-        assertEquals("10", manifest.minSdkVersion)
-        assertEquals("19", manifest.targetSdkVersion)
-        assertNull(manifest.maxSdkVersion)
-    }
+    fun `reads the manifest of a cordova app`() =
+        sample("cordova/HelloWorld.apk").use { apk ->
+            val manifest = apk.manifest
+            assertEquals("com.example.hello", manifest.packageName)
+            assertEquals("true", manifest.debuggable)
+            assertEquals(listOf("android.permission.INTERNET"), manifest.permissions)
+            assertEquals("10", manifest.minSdkVersion)
+            assertEquals("19", manifest.targetSdkVersion)
+            assertNull(manifest.maxSdkVersion)
+        }
 
     @Test
-    fun `reads the manifest of a titanium app`() = sample("titanium/TodoList.apk").use { apk ->
-        val manifest = apk.manifest
-        assertEquals("com.appcelerator.sample.todo", manifest.packageName)
-        assertEquals("false", manifest.debuggable)
-        assertEquals(7, manifest.permissions.size)
-        assertEquals("android.permission.ACCESS_MOCK_LOCATION", manifest.permissions.last())
-    }
+    fun `reads the manifest of a titanium app`() =
+        sample("titanium/TodoList.apk").use { apk ->
+            val manifest = apk.manifest
+            assertEquals("com.appcelerator.sample.todo", manifest.packageName)
+            assertEquals("false", manifest.debuggable)
+            assertEquals(7, manifest.permissions.size)
+            assertEquals("android.permission.ACCESS_MOCK_LOCATION", manifest.permissions.last())
+        }
 
     @Test
     fun `lists the classes defined in the dex files`() {
@@ -54,22 +55,26 @@ class ApkFileTest {
     }
 
     @Test
-    fun `decodes compiled resource xml files`() = sample("cordova/HelloWorld.apk").use { apk ->
-        val config = apk.readBinaryXml("res/xml/config.xml")!!
-        assertEquals("widget", config.name)
-        assertTrue("org.apache.cordova" in config.toXml())
-        assertNull(apk.readBinaryXml("res/xml/missing.xml"))
-    }
+    fun `decodes compiled resource xml files`() =
+        sample("cordova/HelloWorld.apk").use { apk ->
+            val config = apk.readBinaryXml("res/xml/config.xml")!!
+            assertEquals("widget", config.name)
+            assertTrue("org.apache.cordova" in config.toXml())
+            assertNull(apk.readBinaryXml("res/xml/missing.xml"))
+        }
 
     @Test
-    fun `lists the archive entries`() = sample("cordova/HelloWorld.apk").use { apk ->
-        assertEquals(27, apk.entryNames.size)
-        assertTrue("assets/www/index.html" in apk.entryNames)
-        assertTrue(apk.entryNames.none { it.endsWith("/") })
-    }
+    fun `lists the archive entries`() =
+        sample("cordova/HelloWorld.apk").use { apk ->
+            assertEquals(27, apk.entryNames.size)
+            assertTrue("assets/www/index.html" in apk.entryNames)
+            assertTrue(apk.entryNames.none { it.endsWith("/") })
+        }
 
     @Test
-    fun `rejects files that are not zip archives`(@TempDir dir: Path) {
+    fun `rejects files that are not zip archives`(
+        @TempDir dir: Path,
+    ) {
         val notAnApk = dir.resolve("fake.apk").apply { writeText("hello") }
         assertThrows<ApkFormatException> { ApkFile(notAnApk) }
     }

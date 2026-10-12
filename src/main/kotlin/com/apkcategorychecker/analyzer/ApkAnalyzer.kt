@@ -11,11 +11,13 @@ import kotlin.io.path.fileSize
 import kotlin.io.path.name
 
 /** Analyzes a single APK, reading it directly without decoding it to disk. Thread-safe. */
-class ApkAnalyzer(private val frameworks: List<Framework> = Frameworks.all()) {
-
+class ApkAnalyzer(
+    private val frameworks: List<Framework> = Frameworks.all(),
+) {
     fun analyze(path: Path): ApkReport {
         val start = Instant.now()
         val startNanos = System.nanoTime()
+
         fun elapsedMs() = (System.nanoTime() - startNanos) / 1_000_000
 
         return try {
@@ -36,7 +38,12 @@ class ApkAnalyzer(private val frameworks: List<Framework> = Frameworks.all()) {
         }
     }
 
-    private fun analyze(path: Path, inspection: ApkInspection, start: Instant, elapsedMs: () -> Long): ApkReport {
+    private fun analyze(
+        path: Path,
+        inspection: ApkInspection,
+        start: Instant,
+        elapsedMs: () -> Long,
+    ): ApkReport {
         val manifest = inspection.apk.manifest
         val matched = frameworks.mapNotNull { framework -> framework.detect(inspection)?.let { framework to it } }.toMap()
         val main = matched.keys.lastOrNull()
@@ -52,9 +59,10 @@ class ApkAnalyzer(private val frameworks: List<Framework> = Frameworks.all()) {
             htmlFiles = inspection.countFiles(".html"),
             jsFiles = inspection.countFiles(".js"),
             cssFiles = inspection.countFiles(".css"),
-            jsFileNames = inspection.apk.entryNames
-                .filter { it.endsWith(".js", ignoreCase = true) }
-                .map { it.substringAfterLast('/') },
+            jsFileNames =
+                inspection.apk.entryNames
+                    .filter { it.endsWith(".js", ignoreCase = true) }
+                    .map { it.substringAfterLast('/') },
             debuggable = manifest.debuggable,
             permissions = manifest.permissions,
             minSdkVersion = manifest.minSdkVersion,

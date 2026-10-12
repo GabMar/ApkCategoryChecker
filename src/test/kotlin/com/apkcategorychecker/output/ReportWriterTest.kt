@@ -10,22 +10,25 @@ import org.junit.jupiter.api.Test
 import java.io.StringWriter
 
 class ReportWriterTest {
-
-    private val report = ApkReport(
-        file = "a, \"quoted\".apk",
-        path = "/tmp/a, \"quoted\".apk",
-        fileSize = 42,
-        packageName = "com.example",
-        mainFramework = "Ionic",
-        baseFramework = "Capacitor",
-        evidence = mapOf("Capacitor" to listOf("class com.getcapacitor.Bridge"), "Ionic" to listOf("a", "b")),
-        permissions = listOf("android.permission.INTERNET", "android.permission.CAMERA"),
-        analysisStart = "2026-10-12T10:00:00Z",
-        analysisDurationMs = 5,
-    )
+    private val report =
+        ApkReport(
+            file = "a, \"quoted\".apk",
+            path = "/tmp/a, \"quoted\".apk",
+            fileSize = 42,
+            packageName = "com.example",
+            mainFramework = "Ionic",
+            baseFramework = "Capacitor",
+            evidence = mapOf("Capacitor" to listOf("class com.getcapacitor.Bridge"), "Ionic" to listOf("a", "b")),
+            permissions = listOf("android.permission.INTERNET", "android.permission.CAMERA"),
+            analysisStart = "2026-10-12T10:00:00Z",
+            analysisDurationMs = 5,
+        )
     private val failed = report.copy(file = "b.apk", mainFramework = null, baseFramework = null, error = "not a zip")
 
-    private fun write(format: OutputFormat, vararg reports: ApkReport): String {
+    private fun write(
+        format: OutputFormat,
+        vararg reports: ApkReport,
+    ): String {
         val out = StringWriter()
         format.writer(out).use { writer -> reports.forEach(writer::write) }
         return out.toString()
@@ -34,7 +37,13 @@ class ReportWriterTest {
     @Test
     fun `csv is quoted per RFC 4180 and lists are joined`() {
         val csv = write(OutputFormat.CSV, report, failed)
-        val rows = CSVFormat.RFC4180.builder().setHeader().get().parse(csv.reader()).records
+        val rows =
+            CSVFormat.RFC4180
+                .builder()
+                .setHeader()
+                .get()
+                .parse(csv.reader())
+                .records
         assertEquals(2, rows.size)
         assertEquals(report.file, rows[0]["file"])
         assertEquals("android.permission.INTERNET; android.permission.CAMERA", rows[0]["permissions"])

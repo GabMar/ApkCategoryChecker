@@ -14,16 +14,20 @@ interface ReportWriter : Closeable {
     fun write(report: ApkReport)
 }
 
-enum class OutputFormat(val extension: String) {
+enum class OutputFormat(
+    val extension: String,
+) {
     CSV("csv"),
     JSON("json"),
-    JSONL("jsonl");
+    JSONL("jsonl"),
+    ;
 
-    fun writer(out: Writer): ReportWriter = when (this) {
-        CSV -> CsvReportWriter(out)
-        JSON -> JsonReportWriter(out)
-        JSONL -> JsonLinesReportWriter(out)
-    }
+    fun writer(out: Writer): ReportWriter =
+        when (this) {
+            CSV -> CsvReportWriter(out)
+            JSON -> JsonReportWriter(out)
+            JSONL -> JsonLinesReportWriter(out)
+        }
 
     companion object {
         fun fromExtension(fileName: String): OutputFormat? =
@@ -32,31 +36,71 @@ enum class OutputFormat(val extension: String) {
 }
 
 /** RFC 4180 CSV with a header row; list values are separated by "; ". */
-class CsvReportWriter(out: Writer) : ReportWriter {
-
-    private val printer = CSVPrinter(out, CSVFormat.RFC4180.builder().setHeader(*HEADER).get())
-
-    override fun write(report: ApkReport) = with(report) {
-        printer.printRecord(
-            file, path, fileSize, packageName, mainFramework, baseFramework,
-            evidence.entries.joinToString(" | ") { (framework, found) -> "$framework: ${found.joinToString(", ")}" },
-            htmlFiles, jsFiles, cssFiles, jsFileNames.joinToString(LIST_SEPARATOR),
-            debuggable, permissions.joinToString(LIST_SEPARATOR),
-            minSdkVersion, targetSdkVersion, maxSdkVersion,
-            analysisStart, analysisDurationMs, success, error,
+class CsvReportWriter(
+    out: Writer,
+) : ReportWriter {
+    private val printer =
+        CSVPrinter(
+            out,
+            CSVFormat.RFC4180
+                .builder()
+                .setHeader(*HEADER)
+                .get(),
         )
-    }
+
+    override fun write(report: ApkReport) =
+        with(report) {
+            printer.printRecord(
+                file,
+                path,
+                fileSize,
+                packageName,
+                mainFramework,
+                baseFramework,
+                evidence.entries.joinToString(" | ") { (framework, found) -> "$framework: ${found.joinToString(", ")}" },
+                htmlFiles,
+                jsFiles,
+                cssFiles,
+                jsFileNames.joinToString(LIST_SEPARATOR),
+                debuggable,
+                permissions.joinToString(LIST_SEPARATOR),
+                minSdkVersion,
+                targetSdkVersion,
+                maxSdkVersion,
+                analysisStart,
+                analysisDurationMs,
+                success,
+                error,
+            )
+        }
 
     override fun close() = printer.close()
 
     private companion object {
         const val LIST_SEPARATOR = "; "
-        val HEADER = arrayOf(
-            "file", "path", "file_size", "package", "main_framework", "base_framework", "evidence",
-            "html_files", "js_files", "css_files", "js_file_names",
-            "debuggable", "permissions", "min_sdk_version", "target_sdk_version", "max_sdk_version",
-            "analysis_start", "analysis_duration_ms", "success", "error",
-        )
+        val HEADER =
+            arrayOf(
+                "file",
+                "path",
+                "file_size",
+                "package",
+                "main_framework",
+                "base_framework",
+                "evidence",
+                "html_files",
+                "js_files",
+                "css_files",
+                "js_file_names",
+                "debuggable",
+                "permissions",
+                "min_sdk_version",
+                "target_sdk_version",
+                "max_sdk_version",
+                "analysis_start",
+                "analysis_duration_ms",
+                "success",
+                "error",
+            )
     }
 }
 
@@ -64,10 +108,16 @@ class CsvReportWriter(out: Writer) : ReportWriter {
 private val compactJson = Json { encodeDefaults = true }
 
 @OptIn(ExperimentalSerializationApi::class)
-private val prettyJson = Json(compactJson) { prettyPrint = true; prettyPrintIndent = "  " }
+private val prettyJson =
+    Json(compactJson) {
+        prettyPrint = true
+        prettyPrintIndent = "  "
+    }
 
 /** A JSON array of reports. */
-class JsonReportWriter(private val out: Writer) : ReportWriter {
+class JsonReportWriter(
+    private val out: Writer,
+) : ReportWriter {
     private var first = true
 
     override fun write(report: ApkReport) {
@@ -83,7 +133,9 @@ class JsonReportWriter(private val out: Writer) : ReportWriter {
 }
 
 /** One JSON object per line (https://jsonlines.org), convenient for large batches. */
-class JsonLinesReportWriter(private val out: Writer) : ReportWriter {
+class JsonLinesReportWriter(
+    private val out: Writer,
+) : ReportWriter {
     override fun write(report: ApkReport) {
         out.write(compactJson.encodeToString(report))
         out.write("\n")

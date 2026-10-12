@@ -14,11 +14,14 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 class MainTest {
-
     @TempDir
     lateinit var dir: Path
 
-    private class Result(val exitCode: Int, val out: String, val err: String)
+    private class Result(
+        val exitCode: Int,
+        val out: String,
+        val err: String,
+    )
 
     private fun cli(vararg args: String): Result {
         val out = StringWriter()
@@ -27,8 +30,7 @@ class MainTest {
         return Result(exitCode, out.toString(), err.toString())
     }
 
-    private fun flutterApk(name: String = "app.apk") =
-        syntheticApk(dir.resolve(name), mapOf("lib/arm64-v8a/libflutter.so" to ""))
+    private fun flutterApk(name: String = "app.apk") = syntheticApk(dir.resolve(name), mapOf("lib/arm64-v8a/libflutter.so" to ""))
 
     @Test
     fun `writes csv to standard output by default`() {

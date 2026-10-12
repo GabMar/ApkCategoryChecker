@@ -19,20 +19,25 @@ internal fun syntheticApk(
     packageName: String = "com.example.app",
     activities: List<String> = emptyList(),
 ): Path {
-    val manifest = AxmlWriter(utf8 = true).apply {
-        namespace("android", BinaryXml.ANDROID_NS)
-        start("manifest", Attr(null, "package", string = packageName))
-        start("application")
-        for (activity in activities) {
-            start("activity", Attr(BinaryXml.ANDROID_NS, "name", string = activity))
-            end("activity")
-        }
-        end("application")
-        end("manifest")
-    }.toByteArray()
+    val manifest =
+        AxmlWriter(utf8 = true)
+            .apply {
+                namespace("android", BinaryXml.ANDROID_NS)
+                start("manifest", Attr(null, "package", string = packageName))
+                start("application")
+                for (activity in activities) {
+                    start("activity", Attr(BinaryXml.ANDROID_NS, "name", string = activity))
+                    end("activity")
+                }
+                end("application")
+                end("manifest")
+            }.toByteArray()
 
     ZipOutputStream(file.outputStream()).use { zip ->
-        fun add(name: String, bytes: ByteArray) {
+        fun add(
+            name: String,
+            bytes: ByteArray,
+        ) {
             zip.putNextEntry(ZipEntry(name))
             zip.write(bytes)
             zip.closeEntry()
