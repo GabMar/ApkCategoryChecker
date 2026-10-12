@@ -3,6 +3,7 @@ package com.apkcategorychecker.corpus
 
 import com.apkcategorychecker.analyzer.ApkAnalyzer
 import com.apkcategorychecker.analyzer.ApkReport
+import com.apkcategorychecker.apk.ApkInput
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -12,7 +13,9 @@ import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assumptions.abort
-import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.DynamicContainer.dynamicContainer
+import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.TestFactory
@@ -25,7 +28,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
+import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.listDirectoryEntries
@@ -43,17 +48,65 @@ class CorpusTest {
     private val analyzer = ApkAnalyzer()
 
     @TestFactory
-    fun `real apps`(): List<DynamicTest> {
+    fun `real apps`(): List<DynamicNode> {
         val apps = Json.parseToJsonElement(javaClass.getResource("/corpus/apps.json")!!.readText()).jsonObject["apps"]!!.jsonArray
         val used = mutableSetOf<String>()
         return apps.map { it.jsonObject }.map { app ->
-            dynamicTest(app.string("name")!!) {
-                val apk = download(app["source"]!!.jsonObject)
-                used += apk.name
-                check(analyzer.analyze(apk), app["expect"]!!.jsonObject)
-            }
+            var apk: Path? = null
+            var report: ApkReport? = null
+            dynamicContainer(
+                app.string("name")!!,
+                listOf(
+                    dynamicTest("APK") {
+                        val downloaded = download(app["source"]!!.jsonObject).also { used += it.name }
+                        apk = downloaded
+                        report = analyzer.analyze(downloaded).also { check(it, app["expect"]!!.jsonObject) }
+                    },
+                    // The same app as Google Play installs it, and in the containers people share it in.
+                    dynamicTest("as split APKs, XAPK and APKS") {
+                        assumeTrue(report != null, "the APK test did not pass")
+                        checkRepackaged(apk!!, report!!)
+                    },
+                ),
+            )
         } + dynamicTest("remove APKs no longer in the corpus") { pruneCache(used) }
     }
+
+    @OptIn(ExperimentalPathApi::class)
+    private fun checkRepackaged(
+        apk: Path,
+        universal: ApkReport,
+    ) {
+        val dir = Files.createTempDirectory("corpus-")
+        try {
+            val parts = splitLikePlay(apk, dir.resolve("installed").createDirectories())
+            val forms =
+                mapOf(
+                    "split APKs" to ApkInput.find(listOf(dir.resolve("installed"))).single(),
+                    "XAPK" to ApkInput.of(xapk(parts, dir.resolve("app.xapk"))),
+                    "APKS" to ApkInput.of(bundletoolApks(parts, apk, dir.resolve("app.apks"))),
+                )
+            for ((form, input) in forms) {
+                val report = analyzer.analyze(input)
+                assertEquals(parts.drop(1).size, report.splits.size, "$form: splits ${report.splits}")
+                assertEquals(comparable(universal), comparable(report), "$form differs from the universal APK")
+            }
+        } finally {
+            dir.deleteRecursively()
+        }
+    }
+
+    /** What must not depend on how the app is packaged (not its file name, size or file order). */
+    private fun comparable(report: ApkReport) =
+        report.copy(
+            file = "",
+            path = "",
+            splits = emptyList(),
+            fileSize = null,
+            jsFileNames = report.jsFileNames.sorted(),
+            analysisStart = "",
+            analysisDurationMs = 0,
+        )
 
     private fun check(
         report: ApkReport,
