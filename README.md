@@ -6,65 +6,54 @@ Author: [Gabriele Martini](https://github.com/GabMar)
 
 A Command-Line Program written in [Kotlin](https://kotlinlang.org/) to check what Framework has been used to build an APK file, or each APK in a directory. APKs are read directly as zip archives (DEX class names, binary XML manifest and resources): nothing is decompiled or extracted to disk.
 
-## COMMAND LINE PARAMETERS ##
+## USAGE ##
 
-Parameter | Description
-----------|------------
--p | The Path of an APK or the Path of a directory containing APKs
--csv | Export the results in a [CSV](http://it.wikipedia.org/wiki/Comma-separated_values) file with specified path
--k | Deprecated and ignored: APKs are no longer decoded to disk
--deep | Number of threshold to detect if defined APK is hybrid
+	java -jar ApkCategoryChecker.jar [OPTIONS] PATH...
 
-## USAGE EXAMPLE ##
+Each `PATH` is an APK file or a directory, searched recursively for `.apk` files. Results go to standard output (or to `--output`), progress and errors to standard error.
 
-* To analyze the directory containing the `ApkCategoryChecker.jar` and put the CSV result file in the same directory, open a terminal, navigate in the directory and type:
+Option | Description
+-------|------------
+`-o`, `--output FILE` | Write the results to `FILE` instead of standard output
+`-f`, `--format FORMAT` | `csv`, `json` or `jsonl` ([JSON Lines](https://jsonlines.org)). Default: from the output file extension, otherwise `csv`
+`-j`, `--threads N` | APKs analyzed in parallel. Default: number of CPUs
+`--web-app-threshold N` | Report apps with at least N `.html`/`.js`/`.css` files and no other match as `Undefined_Web_App`. Default: disabled
+`-h`, `--help` | Show the help
+`-V`, `--version` | Show the version
 
-	`java -jar ApkCategoryChecker.jar -p . -csv .`
+Examples:
 
-* To analyze a directory or an APK file and put the CSV result file in a different directory, open a terminal, navigate in the directory containing the 'ApkCategoryChecker.jar' file and type:
+	# Analyze a single APK, print CSV
+	java -jar ApkCategoryChecker.jar app.apk
 
-	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv /Destination/Path/for/Result/File`
+	# Analyze a directory tree, write JSON
+	java -jar ApkCategoryChecker.jar ~/apks -o results.json
 
-* To set the level of Analysis (number of web resource files to search) use the parameter -deep:
+	# Stream one JSON object per APK into jq
+	java -jar ApkCategoryChecker.jar ~/apks -f jsonl | jq -r 'select(.mainFramework == "Flutter") | .packageName'
 
-	(example with choosed level 4)
-	
-	`java -jar ApkCategoryChecker.jar -p /Path/of/The/Directory/or/APK/To/Analyze -csv . -deep 4`
+The exit code is 0 even when some APKs cannot be analyzed: they are reported with an `error`. It is 2 for invalid arguments (e.g. a missing path).
 
-## FILE RESULT FORMAT ##
+## RESULT FORMAT ##
 
-For now the only supported output format is CSV with the following columns
+APKs are reported in path order. JSON fields are camelCase (`mainFramework`); CSV columns are snake_case (`main_framework`), with lists separated by `; ` and RFC 4180 quoting. Unknown values are `null` in JSON and empty in CSV.
 
-Column | Description
-----------|------------
-App_ID | The id of analyzed APK
-APK_File_Name | The APK name
-APK_File_Path | The path of analyzed APK
-APK_Package | The package of APK
-Main_Framework | The Main Framework used to build the APK
-Base_Framework | The Base Framework used to build the APK
-HTML | Number of ".html" files in the APK
-JS | Number of ".js" files in the APK
-CSS | Number of ".css" files in the APK
-Android_Debuggable | The value of Debuggable parameter in AndroidManifest.xml
-Android_Permissions | List of Android Permission
-Android_MinSdkVersion | Value of minSdkVersion
-Android_MaxSdkVersion | Value of maxSdkVersion
-Android_TargetSdkVersion | Value of targetSdkVersion
-File_Size(bytes) | File size (in bytes) of APK
-Start_Analysis_Time(milliseconds) | UNIX Time of start
-Duration_Analysis_Time(milliseconds) | UNIX Time of duration
-Decode_Success | Flag to indicate the success of the analysis (0 success, 1 fail)
-Evidence | What was found in the APK for each detected framework, e.g. `Flutter: lib/arm64-v8a/libflutter.so`
-
-## CSV CONTAINING THE COLLECTION OF .JS FILES ##
-
-Regardless of the format result file chosen, the script generates a file with .csv extension containing the following values
-
-Column | Description
-----------|------------
-appID | The id of analyzed APK
-jsFiles | List of js files contained in the APK
+Field | Description
+------|------------
+`file`, `path` | Name and path of the APK
+`fileSize` | Size of the APK in bytes
+`packageName` | Package name from `AndroidManifest.xml`
+`mainFramework` | The most specific framework detected, or `Native`; null if the APK could not be analyzed
+`baseFramework` | The runtime the main framework is built on, if detected (e.g. `Capacitor` for `Ionic`)
+`evidence` | For each detected framework, what was found in the APK. In CSV: `Ionic: assets/public/main.js contains "ion-app" \| Capacitor: ...`
+`htmlFiles`, `jsFiles`, `cssFiles` | Number of `.html`, `.js` and `.css` files in the APK
+`jsFileNames` | Names of the `.js` files in the APK
+`debuggable` | Value of `android:debuggable`
+`permissions` | Permissions requested with `uses-permission`
+`minSdkVersion`, `targetSdkVersion`, `maxSdkVersion` | From `uses-sdk`
+`analysisStart` | When the analysis of the APK started (ISO-8601)
+`analysisDurationMs` | How long the analysis of the APK took
+`success` (CSV only), `error` | Whether the APK could be analyzed, and if not why
 
 ## RECOGNITION FRAMEWORKS METHODS ##
 
@@ -94,7 +83,7 @@ Framework | Signals | Base framework
 [Xamarin.Forms](https://dotnet.microsoft.com/apps/xamarin/xamarin-forms) | classes `FormsAppCompatActivity`, `FormsApplicationActivity` | .NET for Android
 [.NET MAUI](https://dotnet.microsoft.com/apps/maui) | class `MauiAppCompatActivity`, classes in `com.microsoft.maui` | .NET for Android
 
-Web assets are the files under `assets/www/` (Cordova) and `assets/public/` (Capacitor). With `-deep N`, an app with at least N `.html`, `.js` and `.css` files and no other match is reported as `Undefined_Web_App`. An app matching none of the above is reported as `Native`.
+Web assets are the files under `assets/www/` (Cordova) and `assets/public/` (Capacitor). With `--web-app-threshold N`, an app with at least N `.html`, `.js` and `.css` files and no other match is reported as `Undefined_Web_App`. An app matching none of the above is reported as `Native`.
 
 ## BUILD ##
 
@@ -110,6 +99,6 @@ This software requires Java 21 or higher
 
 ## THIRD-PARTY LIBRARIES ##
 
-Apache Commons CSV:   https://commons.apache.org/proper/commons-csv/
-
-Apache Commons CLI:   https://commons.apache.org/proper/commons-cli/
+* [picocli](https://picocli.info/)
+* [Apache Commons CSV](https://commons.apache.org/proper/commons-csv/)
+* [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)

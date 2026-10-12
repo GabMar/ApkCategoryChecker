@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.shadow)
     application
 }
@@ -16,8 +17,9 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.commons.cli)
+    implementation(libs.picocli)
     implementation(libs.commons.csv)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(platform(libs.junit.bom))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -25,7 +27,11 @@ dependencies {
 }
 
 application {
-    mainClass = "com.apkcategorychecker.Main"
+    mainClass = "com.apkcategorychecker.cli.MainKt"
+}
+
+tasks.jar {
+    manifest.attributes("Implementation-Version" to project.version)
 }
 
 tasks.shadowJar {

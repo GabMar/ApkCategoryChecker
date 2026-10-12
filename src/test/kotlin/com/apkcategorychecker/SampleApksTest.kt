@@ -1,7 +1,8 @@
 package com.apkcategorychecker
 
-import com.apkcategorychecker.analyzer.PathAnalyzer
-import com.apkcategorychecker.cli.CommandLineInterface
+import com.apkcategorychecker.analyzer.ApkReport
+import com.apkcategorychecker.cli.run
+import kotlinx.serialization.json.Json
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -10,137 +11,181 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.nio.file.Path
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.readLines
+import kotlin.io.path.readText
 import kotlin.io.path.reader
 
 /**
- * Characterization tests: run the whole pipeline on the sample APKs and pin the
- * results, so the refactoring in the next phases can't silently change them.
+ * End-to-end tests: run the command line on the sample APKs and pin the results.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SampleApksTest {
 
-    private lateinit var results: Map<String, CSVRecord>
-    private lateinit var jsFiles: Map<String, String>
-    private lateinit var resultLines: List<String>
+    private lateinit var csvRows: List<CSVRecord>
+    private lateinit var reports: Map<String, ApkReport>
 
     @BeforeAll
     fun analyzeSampleApks(@TempDir outDir: Path) {
-        val apks = File(javaClass.getResource("/apks")!!.toURI())
-        CommandLineInterface.getInstance().Initialize(arrayOf("-p", apks.path, "-csv", outDir.toString()))
-        PathAnalyzer().analyze()
+        val apks = File(javaClass.getResource("/apks")!!.toURI()).path
+        val csv = outDir.resolve("results.csv")
+        val json = outDir.resolve("results.json")
+        val err = StringWriter()
 
-        val resultsCsv = outDir.listDirectoryEntries("Results_*.csv").single()
-        resultLines = resultsCsv.readLines()
-        results = parse(resultsCsv).associateBy { it["APK_File_Name"] }
-        jsFiles = parse(outDir.listDirectoryEntries("Results-JS FILES_*.csv").single())
-            .associate { it["appID"] to it["jsFiles"] }
+        assertEquals(0, run(arrayOf(apks, "-o", csv.toString()), err = PrintWriter(err)))
+        assertEquals(0, run(arrayOf(apks, "--output", json.toString(), "--threads", "2"), err = PrintWriter(err)))
+
+        csvRows = csv.reader().use { CSVFormat.RFC4180.builder().setHeader().get().parse(it).records }
+        reports = Json.decodeFromString<List<ApkReport>>(json.readText()).associateBy { it.file }
     }
 
     @Test
-    fun `results file has a header and one line per APK`() {
-        assertEquals(4, resultLines.size)
-        assert(resultLines.first().startsWith("App_ID#APK_File_Name#"))
-        assertEquals(setOf("HelloWorld.apk", "SenToCo.apk", "TodoList.apk"), results.keys)
+    fun `csv and json have one entry per APK, in path order`() {
+        assertEquals(listOf("HelloWorld.apk", "SenToCo.apk", "TodoList.apk"), csvRows.map { it["file"] })
+        assertEquals(listOf("HelloWorld.apk", "SenToCo.apk", "TodoList.apk"), reports.keys.toList())
     }
 
     @Test
     fun `cordova app`() {
-        assertResult(
-            results.getValue("HelloWorld.apk"),
-            pkg = "com.example.hello",
-            mainFramework = "Apache Cordova",
-            baseFramework = "",
-            html = 1, js = 3, css = 1,
-            debuggable = "true",
-            permissions = "android.permission.INTERNET",
-            minSdk = "10", targetSdk = "19",
-            fileSize = 1915225,
-            evidence = CORDOVA_EVIDENCE,
+        val report = reports.getValue("HelloWorld.apk")
+        assertEquals(
+            expected(
+                report,
+                packageName = "com.example.hello",
+                mainFramework = "Apache Cordova",
+                baseFramework = null,
+                evidence = mapOf("Apache Cordova" to CORDOVA_EVIDENCE),
+                htmlFiles = 1, jsFiles = 3, cssFiles = 1,
+                jsFileNames = listOf("index.js", "cordova.js", "cordova_plugins.js"),
+                debuggable = "true",
+                permissions = listOf("android.permission.INTERNET"),
+                minSdkVersion = "10", targetSdkVersion = "19",
+                fileSize = 1915225,
+            ),
+            report,
         )
-        assertEquals("index.js, cordova.js, cordova_plugins.js", jsFiles["com.example.hello"])
+        assertCsvMatches(report)
     }
 
     @Test
     fun `sencha app on top of cordova`() {
-        assertResult(
-            results.getValue("SenToCo.apk"),
-            pkg = "com.mydomain.sentoco",
-            mainFramework = "Sencha",
-            baseFramework = "Apache Cordova",
-            html = 1, js = 4, css = 2,
-            debuggable = "true",
-            permissions = "android.permission.INTERNET",
-            minSdk = "10", targetSdk = "17",
-            fileSize = 716499,
-            evidence = "$CORDOVA_EVIDENCE | Sencha: assets/www/app.js contains \"Ext.create\", " +
-                "assets/www/app.js contains \"Ext.application\"",
+        val report = reports.getValue("SenToCo.apk")
+        assertEquals(
+            expected(
+                report,
+                packageName = "com.mydomain.sentoco",
+                mainFramework = "Sencha",
+                baseFramework = "Apache Cordova",
+                evidence = mapOf(
+                    "Apache Cordova" to CORDOVA_EVIDENCE,
+                    "Sencha" to listOf(
+                        "assets/www/app.js contains \"Ext.create\"",
+                        "assets/www/app.js contains \"Ext.application\"",
+                    ),
+                ),
+                htmlFiles = 1, jsFiles = 4, cssFiles = 2,
+                jsFileNames = listOf("index.js", "app.js", "cordova.js", "cordova_plugins.js"),
+                debuggable = "true",
+                permissions = listOf("android.permission.INTERNET"),
+                minSdkVersion = "10", targetSdkVersion = "17",
+                fileSize = 716499,
+            ),
+            report,
         )
-        assertEquals("index.js, app.js, cordova.js, cordova_plugins.js", jsFiles["com.mydomain.sentoco"])
+        assertCsvMatches(report)
     }
 
     @Test
     fun `titanium app`() {
-        assertResult(
-            results.getValue("TodoList.apk"),
-            pkg = "com.appcelerator.sample.todo",
-            mainFramework = "Titanium",
-            baseFramework = "",
-            html = 0, js = 10, css = 0,
-            debuggable = "false",
-            permissions = listOf(
-                "INTERNET", "ACCESS_WIFI_STATE", "ACCESS_NETWORK_STATE", "WRITE_EXTERNAL_STORAGE",
-                "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "ACCESS_MOCK_LOCATION",
-            ).joinToString(", ") { "android.permission.$it" },
-            minSdk = "10", targetSdk = "19",
-            fileSize = 8202108,
-            evidence = "Titanium: class ti.modules.titanium.TitaniumModule, class org.appcelerator.titanium.TiActivity",
-        )
+        val report = reports.getValue("TodoList.apk")
         assertEquals(
-            "AddWindow.js, AppTabGroup.js, ListWindow.js, app.js, db.js, binding.js, binding.min.js, " +
-                "json2.js, polling.js, polling.min.js",
-            jsFiles["com.appcelerator.sample.todo"],
+            expected(
+                report,
+                packageName = "com.appcelerator.sample.todo",
+                mainFramework = "Titanium",
+                baseFramework = null,
+                evidence = mapOf(
+                    "Titanium" to listOf("class ti.modules.titanium.TitaniumModule", "class org.appcelerator.titanium.TiActivity"),
+                ),
+                htmlFiles = 0, jsFiles = 10, cssFiles = 0,
+                jsFileNames = listOf(
+                    "AddWindow.js", "AppTabGroup.js", "ListWindow.js", "app.js", "db.js",
+                    "binding.js", "binding.min.js", "json2.js", "polling.js", "polling.min.js",
+                ),
+                debuggable = "false",
+                permissions = listOf(
+                    "INTERNET", "ACCESS_WIFI_STATE", "ACCESS_NETWORK_STATE", "WRITE_EXTERNAL_STORAGE",
+                    "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "ACCESS_MOCK_LOCATION",
+                ).map { "android.permission.$it" },
+                minSdkVersion = "10", targetSdkVersion = "19",
+                fileSize = 8202108,
+            ),
+            report,
         )
+        assertCsvMatches(report)
     }
 
-    private fun assertResult(
-        row: CSVRecord,
-        pkg: String,
+    /** The expected report, taking the fields that change at every run (path, timing) from [actual]. */
+    private fun expected(
+        actual: ApkReport,
+        packageName: String,
         mainFramework: String,
-        baseFramework: String,
-        html: Int,
-        js: Int,
-        css: Int,
+        baseFramework: String?,
+        evidence: Map<String, List<String>>,
+        htmlFiles: Int,
+        jsFiles: Int,
+        cssFiles: Int,
+        jsFileNames: List<String>,
         debuggable: String,
-        permissions: String,
-        minSdk: String,
-        targetSdk: String,
+        permissions: List<String>,
+        minSdkVersion: String,
+        targetSdkVersion: String,
         fileSize: Long,
-        evidence: String,
-    ) {
-        assertEquals(pkg, row["APK_Package"])
-        assertEquals(mainFramework, row["Main_Framework"])
-        assertEquals(baseFramework, row["Base_Framework"])
-        assertEquals(html.toString(), row["HTML"])
-        assertEquals(js.toString(), row["JS"])
-        assertEquals(css.toString(), row["CSS"])
-        assertEquals(debuggable, row["Android_Debuggable"])
-        assertEquals(permissions, row["Android_Permissions"])
-        assertEquals(minSdk, row["Android_MinSdkVersion"])
-        assertEquals("UNDEFINED", row["Android_MaxSdkVersion"])
-        assertEquals(targetSdk, row["Android_TargetSdkVersion"])
-        assertEquals(fileSize.toString(), row["File_Size(Bytes)"])
-        assertEquals("0", row["Decode_Success"])
-        assertEquals(evidence, row["Evidence"])
+    ) = ApkReport(
+        file = actual.file,
+        path = actual.path,
+        fileSize = fileSize,
+        packageName = packageName,
+        mainFramework = mainFramework,
+        baseFramework = baseFramework,
+        evidence = evidence,
+        htmlFiles = htmlFiles,
+        jsFiles = jsFiles,
+        cssFiles = cssFiles,
+        jsFileNames = jsFileNames,
+        debuggable = debuggable,
+        permissions = permissions,
+        minSdkVersion = minSdkVersion,
+        targetSdkVersion = targetSdkVersion,
+        maxSdkVersion = null,
+        analysisStart = actual.analysisStart,
+        analysisDurationMs = actual.analysisDurationMs,
+    )
+
+    /** The CSV row carries the same values as the JSON report. */
+    private fun assertCsvMatches(report: ApkReport) {
+        val row = csvRows.single { it["file"] == report.file }
+        assertEquals(report.packageName, row["package"])
+        assertEquals(report.mainFramework, row["main_framework"])
+        assertEquals(report.baseFramework.orEmpty(), row["base_framework"])
+        assertEquals(report.jsFiles.toString(), row["js_files"])
+        assertEquals(report.jsFileNames.joinToString("; "), row["js_file_names"])
+        assertEquals(report.permissions.joinToString("; "), row["permissions"])
+        assertEquals(report.minSdkVersion, row["min_sdk_version"])
+        assertEquals("", row["max_sdk_version"])
+        assertEquals(report.fileSize.toString(), row["file_size"])
+        assertEquals("true", row["success"])
+        assertEquals(
+            report.evidence.entries.joinToString(" | ") { (framework, found) -> "$framework: ${found.joinToString(", ")}" },
+            row["evidence"],
+        )
     }
 
     private companion object {
-        const val CORDOVA_EVIDENCE =
-            "Apache Cordova: class org.apache.cordova.CordovaActivity, res/xml/config.xml contains \"org.apache.cordova\""
+        val CORDOVA_EVIDENCE = listOf(
+            "class org.apache.cordova.CordovaActivity",
+            "res/xml/config.xml contains \"org.apache.cordova\"",
+        )
     }
-
-    private fun parse(csv: Path): List<CSVRecord> =
-        csv.reader().use { CSVFormat.DEFAULT.withDelimiter('#').withHeader().parse(it).records }
 }
