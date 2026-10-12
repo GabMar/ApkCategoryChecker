@@ -43,11 +43,6 @@ public class CommandLineInterface {
 	private String _givenPath;
 	
 	/**
-	 * Boolean for keep decoded Apk
-	 */
-	private boolean _keep = false;
-
-	/**
 	 * Format of result file
 	 */
 	private String _choosedResultFormat;
@@ -56,11 +51,6 @@ public class CommandLineInterface {
 	 * Output directory
 	 */
 	private String _outDir;
-	
-	/**
-	 * Destination path of decoded APK
-	 */
-	private String _outDecoded;
 	
 	/**
 	 * How deep an hybrid app will be analyzed
@@ -98,15 +88,6 @@ public class CommandLineInterface {
 	}
 	
 	/**
-	 * Method to get the boolean Keep
-	 * 
-	 * @return
-	 */
-	public boolean getKeep(){
-		return this._keep;
-	}
-	
-	/**
 	 * Method to get the result file format
 	 * 
 	 * @return
@@ -122,15 +103,6 @@ public class CommandLineInterface {
 	 */
 	public String getOutDir() {
 		return this._outDir;
-	}
-	
-	/**
-	 * Method to set the decoded apk path
-	 * 
-	 * @return
-	 */
-	public String getDecodedPath() {
-		return this._outDecoded;
 	}
 	
 	/**
@@ -162,7 +134,7 @@ public class CommandLineInterface {
 		/*--Add options--*/
 		options.addOption("p", true, "Path of APK or Directory containing APKs");
 		options.addOption("csv", true, "To obtain a CSV file result");
-        options.addOption("k", true, "Keep the decoded APK on the filesystem");
+        options.addOption("k", true, "Deprecated and ignored: APKs are no longer decoded to disk");
         options.addOption("deep", true, "How deep you want to analyze an hybrid app");
 		
 		/*--CLI parser--*/
@@ -186,11 +158,8 @@ public class CommandLineInterface {
 		
 		}
 		
-		/*--If k parameter is passed, the directory of decoded APK will be maintained--*/
-        
         if(cmd.hasOption("k")){ 
-            this._keep = true;
-            this._outDecoded = cmd.getOptionValue("k");
+            System.err.println("Warning: -k is deprecated and ignored, APKs are no longer decoded to disk.");
         }
         
         if(cmd.hasOption("csv")){

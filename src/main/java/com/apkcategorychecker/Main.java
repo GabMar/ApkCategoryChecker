@@ -19,10 +19,6 @@
  */
 package com.apkcategorychecker;
 
-import java.io.IOException;
-
-import brut.androlib.AndrolibException;
-
 import com.apkcategorychecker.analyzer.PathAnalyzer;
 import com.apkcategorychecker.cli.CommandLineInterface;
 
@@ -39,10 +35,8 @@ public class Main {
      * Initialize CLI and PathAnalyzer
      * 
      * @param args Arguments
-     * @throws IOException Exception
-     * @throws AndrolibException 
      */
-	public static void main(String[] args) throws IOException, AndrolibException {
+	public static void main(String[] args) {
 		
 		/*--Initializing Command Line Interface--*/
 		CommandLineInterface.getInstance().Initialize(args);
@@ -54,7 +48,7 @@ public class Main {
         
         /*--Analyze given path--*/
         
-        analyzer.Analyze();
+        analyzer.analyze();
 
 	}
 	

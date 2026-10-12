@@ -29,12 +29,8 @@ class SampleApksTest {
     @BeforeAll
     fun analyzeSampleApks(@TempDir outDir: Path) {
         val apks = File(javaClass.getResource("/apks")!!.toURI())
-        val decodedDir = outDir.resolve("decoded")
-
-        CommandLineInterface.getInstance().Initialize(
-            arrayOf("-p", apks.path, "-csv", outDir.toString(), "-k", decodedDir.toString())
-        )
-        PathAnalyzer().Analyze()
+        CommandLineInterface.getInstance().Initialize(arrayOf("-p", apks.path, "-csv", outDir.toString()))
+        PathAnalyzer().analyze()
 
         val resultsCsv = outDir.listDirectoryEntries("Results_*.csv").single()
         resultLines = resultsCsv.readLines()
@@ -63,7 +59,7 @@ class SampleApksTest {
             minSdk = "10", targetSdk = "19",
             fileSize = 1915225,
         )
-        assertEquals("cordova.js, index.js, cordova_plugins.js", jsFiles["com.example.hello"])
+        assertEquals("index.js, cordova.js, cordova_plugins.js", jsFiles["com.example.hello"])
     }
 
     @Test
@@ -73,16 +69,13 @@ class SampleApksTest {
             pkg = "com.mydomain.sentoco",
             mainFramework = "Sencha",
             baseFramework = "Apache Cordova",
-            html = 1, js = 5, css = 2,
+            html = 1, js = 4, css = 2,
             debuggable = "true",
             permissions = "android.permission.INTERNET",
             minSdk = "10", targetSdk = "17",
             fileSize = 716499,
         )
-        assertEquals(
-            "cordova.js, index.js, app.json, app.js, cordova_plugins.js",
-            jsFiles["com.mydomain.sentoco"],
-        )
+        assertEquals("index.js, app.js, cordova.js, cordova_plugins.js", jsFiles["com.mydomain.sentoco"])
     }
 
     @Test
@@ -92,7 +85,7 @@ class SampleApksTest {
             pkg = "com.appcelerator.sample.todo",
             mainFramework = "Titanium",
             baseFramework = "",
-            html = 0, js = 13, css = 0,
+            html = 0, js = 10, css = 0,
             debuggable = "false",
             permissions = listOf(
                 "INTERNET", "ACCESS_WIFI_STATE", "ACCESS_NETWORK_STATE", "WRITE_EXTERNAL_STORAGE",
@@ -102,12 +95,9 @@ class SampleApksTest {
             fileSize = 8202108,
         )
         assertEquals(
-            listOf(
-                "json2.js", "polling.js", "binding.min.js", "binding.js", "polling.min.js",
-                "_app_props_.json", "db.js", "ListWindow.js", "AppTabGroup.js", "AddWindow.js",
-                "app.js", "index.json", "app.json",
-            ).sorted(),
-            jsFiles.getValue("com.appcelerator.sample.todo").split(", ").sorted(),
+            "AddWindow.js, AppTabGroup.js, ListWindow.js, app.js, db.js, binding.js, binding.min.js, " +
+                "json2.js, polling.js, polling.min.js",
+            jsFiles["com.appcelerator.sample.todo"],
         )
     }
 
