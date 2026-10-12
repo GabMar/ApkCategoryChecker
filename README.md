@@ -89,9 +89,17 @@ Framework | Recognition method | Reliability
 [Sencha](http://www.sencha.com/products/touch) | If is present the strings "Ext.create" AND "Ext.application" in a file javascript | Strong
 [Titanium](http://www.appcelerator.com/) | If is present the file "TitaniumModule.class", AND if is present the file "TiActivity.class"| Strong
 
+## BUILD ##
+
+Requires JDK 21 (Gradle will download one automatically if missing).
+
+	./gradlew shadowJar
+
+The runnable jar is written to `build/libs/ApkCategoryChecker.jar`.
+
 ## MINIMUM REQUIREMENTS ##
 
-This software requires Java 1.7 or higher
+This software requires Java 21 or higher
 
 ## THIRD-PARTY APPLICATIONS: ##
 
