@@ -87,6 +87,13 @@ class MainTest {
     }
 
     @Test
+    fun `finds sdks unless told not to`() {
+        val apk = flutterApk().toString()
+        assertTrue("\"sdks\":[{\"name\":\"Flutter\"" in cli(apk, "-f", "jsonl").out)
+        assertTrue("\"sdks\":[]" in cli(apk, "-f", "jsonl", "--no-sdks").out)
+    }
+
+    @Test
     fun `prints help and version`() {
         val help = cli("--help")
         assertEquals(0, help.exitCode)

@@ -17,7 +17,8 @@ import kotlin.io.path.readBytes
  * [metaData], a DEX defining [classes] (fully qualified names) and the given extra [files] and
  * [binaryFiles]. [resources] maps `type/name` to a value written to `resources.arsc` (e.g.
  * `xml/config` -> `res/ZW.xml`); a meta-data value like `@string/url` references one of them.
- * With [split], the APK is a split of the [packageName] app (e.g. `config.arm64_v8a`).
+ * With [split], the APK is a split of the [packageName] app (e.g. `config.arm64_v8a`). [components] are
+ * (tag, android:name) pairs such as `"service" to ".SyncService"`; [actions] go in a receiver's intent filter.
  */
 internal fun syntheticApk(
     file: Path,
@@ -31,6 +32,8 @@ internal fun syntheticApk(
     versionCode: Int = 1,
     metaData: Map<String, String> = emptyMap(),
     binaryFiles: Map<String, ByteArray> = emptyMap(),
+    components: List<Pair<String, String>> = emptyList(),
+    actions: List<String> = emptyList(),
 ): Path {
     val table = if (resources.isEmpty()) null else resourceTable(packageName, resources)
     val manifest =
@@ -40,6 +43,16 @@ internal fun syntheticApk(
             if (split != null) setSplit(split, true)
             val application = getOrCreateApplicationElement()
             activities.forEach { getOrCreateActivity(it, false) }
+            // Other components as (tag, android:name), e.g. "service" to ".sync.SyncService".
+            components.forEach { (tag, name) ->
+                application.newElement(tag).getOrCreateAndroidAttribute("name", ANDROID_NAME).setValueAsString(name)
+            }
+            if (actions.isNotEmpty()) {
+                val receiver = application.newElement("receiver")
+                receiver.getOrCreateAndroidAttribute("name", ANDROID_NAME).setValueAsString("$packageName.ActionReceiver")
+                val filter = receiver.newElement("intent-filter")
+                actions.forEach { filter.newElement("action").getOrCreateAndroidAttribute("name", ANDROID_NAME).setValueAsString(it) }
+            }
             metaData.forEach { (name, value) ->
                 val element = application.newElement("meta-data")
                 element.getOrCreateAndroidAttribute("name", ANDROID_NAME).setValueAsString(name)

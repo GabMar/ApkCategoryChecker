@@ -1,10 +1,10 @@
 {
-  "description": "Real apps checked by ./gradlew corpusTest. Sources: an F-Droid package (latest version), a GitHub release asset (latest release, or a fixed tag), or a fixed URL with its SHA-256. Expectations: mainFramework always; baseFramework when given (null = none); details as a subset, where a value starting with ~ is a regular expression (for versions of the latest releases).",
+  "description": "Real apps checked by ./gradlew corpusTest. Sources: an F-Droid package (latest version), a GitHub release asset (latest release, or a fixed tag), or a fixed URL with its SHA-256. Expectations: mainFramework always; baseFramework when given (null = none); details as a subset, where a value starting with ~ is a regular expression (for versions of the latest releases); sdks that must be found, notSdks that must not.",
   "apps": [
     {
       "name": "LocalSend",
       "source": { "fdroid": "org.localsend.localsend_app" },
-      "expect": { "mainFramework": "Flutter", "baseFramework": null, "details": { "Flutter": { "build": "release", "dart": "~\\d+\\.\\d+\\.\\d+" } } }
+      "expect": { "mainFramework": "Flutter", "baseFramework": null, "details": { "Flutter": { "build": "release", "dart": "~\\d+\\.\\d+\\.\\d+" } }, "sdks": ["Flutter"] }
     },
     {
       "name": "Joplin",
@@ -12,13 +12,15 @@
       "expect": {
         "mainFramework": "Expo",
         "baseFramework": "React Native",
-        "details": { "React Native": { "engine": "Hermes" }, "Expo": { "sdk": "~\\d+\\.0\\.0" } }
+        "details": { "React Native": { "engine": "Hermes" }, "Expo": { "sdk": "~\\d+\\.0\\.0" } },
+        "sdks": ["Expo", "Hermes JS Engine", "React Native"],
+        "notSdks": ["Facebook SDK"]
       }
     },
     {
       "name": "Godot editor",
       "source": { "fdroid": "org.godotengine.editor.v4" },
-      "expect": { "mainFramework": "Godot", "details": { "Godot": { "version": "~4\\.\\d+(\\.\\d+)?" } } }
+      "expect": { "mainFramework": "Godot", "details": { "Godot": { "version": "~4\\.\\d+(\\.\\d+)?" } }, "sdks": ["Godot Engine"] }
     },
     {
       "name": "Electrum (Qt)",
@@ -26,7 +28,9 @@
       "expect": {
         "mainFramework": "Qt",
         "baseFramework": "python-for-android",
-        "details": { "Qt": { "version": "~6\\.\\d+\\.\\d+" }, "python-for-android": { "python": "~3\\.\\d+" } }
+        "details": { "Qt": { "version": "~6\\.\\d+\\.\\d+" }, "python-for-android": { "python": "~3\\.\\d+" } },
+        "sdks": ["Qt", "python-for-android"],
+        "notSdks": ["Unity"]
       }
     },
     {
@@ -35,7 +39,13 @@
         "url": "https://download.electrum.org/4.3.4/Electrum-4.3.4.0-arm64-v8a-release.apk",
         "sha256": "0cbb92241dd7d5638ae9e2cd7815a5305bb909112be4ad226782a86d6867a911"
       },
-      "expect": { "mainFramework": "Kivy", "baseFramework": "python-for-android", "details": { "python-for-android": { "python": "3.8" } } }
+      "expect": {
+        "mainFramework": "Kivy",
+        "baseFramework": "python-for-android",
+        "details": { "python-for-android": { "python": "3.8" } },
+        "sdks": ["libSDL", "python-for-android"],
+        "notSdks": ["Unity"]
+      }
     },
     {
       "name": "Kvaesitso",
@@ -50,7 +60,7 @@
     {
       "name": "lichess",
       "source": { "github": "lichess-org/lichobile", "asset": "^app-release\\.apk$" },
-      "expect": { "mainFramework": "Capacitor", "baseFramework": null }
+      "expect": { "mainFramework": "Capacitor", "baseFramework": null, "sdks": ["Firebase Cloud Messaging"] }
     },
     {
       "name": "Voyager",
@@ -63,7 +73,9 @@
       "expect": {
         "mainFramework": "Expo",
         "baseFramework": "React Native",
-        "details": { "React Native": { "engine": "Hermes" }, "Expo": { "sdk": "~\\d+\\.0\\.0" } }
+        "details": { "React Native": { "engine": "Hermes" }, "Expo": { "sdk": "~\\d+\\.0\\.0" } },
+        "sdks": ["Expo", "Hermes JS Engine"],
+        "notSdks": ["Facebook SDK"]
       }
     },
     {
@@ -99,7 +111,7 @@
     {
       "name": "Lynx Explorer",
       "source": { "github": "lynx-family/lynx", "asset": "^LynxExplorer-noasan-release\\.apk$" },
-      "expect": { "mainFramework": "Lynx" }
+      "expect": { "mainFramework": "Lynx", "sdks": ["Lynx"] }
     },
     {
       "name": "Shattered Pixel Dungeon",
@@ -114,7 +126,7 @@
     {
       "name": "Ursa (Avalonia)",
       "source": { "github": "irihitech/Ursa.Avalonia", "asset": "^com\\.irihitech\\.Ursa-Signed\\.apk$" },
-      "expect": { "mainFramework": "Avalonia", "baseFramework": ".NET for Android" }
+      "expect": { "mainFramework": "Avalonia", "baseFramework": ".NET for Android", "sdks": ["CoreCLR"] }
     },
     {
       "name": "Bacteriomatics",
@@ -124,7 +136,7 @@
     {
       "name": "UTDR Textbox Generator",
       "source": { "github": "SoupTaels/UTDR-SoupGen", "tag": "Soupy", "asset": "^UTDR\\.Textbox\\.Gen\\.apk$" },
-      "expect": { "mainFramework": "GameMaker" }
+      "expect": { "mainFramework": "GameMaker", "sdks": ["GameMaker Studio"] }
     },
     {
       "name": "Bitwarden 2023.12 (Xamarin.Forms)",

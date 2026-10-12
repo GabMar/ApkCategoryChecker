@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 package com.apkcategorychecker.analyzer
 
+import com.apkcategorychecker.sdk.SdkFinding
 import kotlinx.serialization.Serializable
 
 /** The result of the analysis of one APK. Fields are null when unknown or not declared. */
@@ -24,6 +25,8 @@ data class ApkReport(
      * without a cross-platform framework, under [NATIVE] (e.g. whether Jetpack Compose is included).
      */
     val details: Map<String, Map<String, String>> = emptyMap(),
+    /** SDKs and libraries found in the app (rules from LibChecker-Rules), sorted by name. */
+    val sdks: List<SdkFinding> = emptyList(),
     val htmlFiles: Int = 0,
     val jsFiles: Int = 0,
     val cssFiles: Int = 0,

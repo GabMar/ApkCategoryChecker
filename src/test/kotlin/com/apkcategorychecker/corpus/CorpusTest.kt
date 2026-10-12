@@ -117,6 +117,14 @@ class CorpusTest {
         assertNull(report.error, "analysis failed")
         assertEquals(expect.string("mainFramework"), report.mainFramework, context)
         if ("baseFramework" in expect) assertEquals(expect.string("baseFramework"), report.baseFramework, context)
+        val sdks = report.sdks.map { it.name }
+        expect["sdks"]?.jsonArray?.map { it.jsonPrimitive.content }?.forEach { assertTrue(it in sdks, "SDK $it not found in $sdks") }
+        expect["notSdks"]?.jsonArray?.map { it.jsonPrimitive.content }?.forEach {
+            assertTrue(
+                it !in sdks,
+                "SDK $it wrongly found: ${report.sdks}",
+            )
+        }
         expect["details"]?.jsonObject?.forEach { (framework, facts) ->
             facts.jsonObject.forEach { (key, value) ->
                 val expected = value.jsonPrimitive.content

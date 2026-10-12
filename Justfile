@@ -27,6 +27,10 @@ format:
 corpus:
     GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null || true)}" ./gradlew corpusTest
 
+# Regenerate the SDK rules from LibChecker-Rules (e.g. `just update-sdk-rules` or `just update-sdk-rules <commit>`)
+update-sdk-rules ref="v4":
+    GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null || true)}" ./gradlew updateSdkRules -Pref={{ref}}
+
 # Build the runnable jar
 jar:
     ./gradlew shadowJar

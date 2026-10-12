@@ -83,3 +83,18 @@ val corpusTest =
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
     }
+
+// Regenerates src/main/resources/sdks/ from LibChecker-Rules: ./gradlew updateSdkRules [-Pref=<branch, tag or commit>]
+tasks.register<JavaExec>("updateSdkRules") {
+    description = "Regenerates the SDK rules from LibChecker-Rules."
+    group = "build setup"
+    classpath = sourceSets.test.get().runtimeClasspath
+    mainClass = "com.apkcategorychecker.tools.UpdateSdkRulesKt"
+    args(
+        providers.gradleProperty("ref").getOrElse("v4"),
+        layout.projectDirectory
+            .dir("src/main/resources/sdks")
+            .asFile.path,
+    )
+    providers.environmentVariable("GITHUB_TOKEN").orNull?.let { environment("GITHUB_TOKEN", it) }
+}

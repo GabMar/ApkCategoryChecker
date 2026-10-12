@@ -62,6 +62,7 @@ class CsvReportWriter(
                 details.entries.joinToString(" | ") { (framework, facts) ->
                     "$framework: ${facts.entries.joinToString(", ") { (key, value) -> "$key=$value" }}"
                 },
+                sdks.joinToString(LIST_SEPARATOR) { it.name },
                 htmlFiles,
                 jsFiles,
                 cssFiles,
@@ -93,6 +94,7 @@ class CsvReportWriter(
                 "base_framework",
                 "evidence",
                 "details",
+                "sdks",
                 "html_files",
                 "js_files",
                 "css_files",

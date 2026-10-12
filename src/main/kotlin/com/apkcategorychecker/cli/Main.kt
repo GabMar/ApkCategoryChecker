@@ -7,6 +7,7 @@ import com.apkcategorychecker.apk.ApkInput
 import com.apkcategorychecker.framework.Rules
 import com.apkcategorychecker.framework.RulesException
 import com.apkcategorychecker.output.OutputFormat
+import com.apkcategorychecker.sdk.SdkRules
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
@@ -71,6 +72,9 @@ class ApkCategoryChecker : Callable<Int> {
     )
     var rules: Path? = null
 
+    @Option(names = ["--no-sdks"], description = ["Skip the detection of SDKs and libraries (faster)."])
+    var noSdks: Boolean = false
+
     @Option(names = ["--print-rules"], description = ["Print the built-in framework rules, a starting point for --rules, and exit."])
     var printRules: Boolean = false
 
@@ -104,7 +108,7 @@ class ApkCategoryChecker : Callable<Int> {
 
         var failures = 0
         outputFormat.writer(out).use { writer ->
-            BatchAnalyzer(ApkAnalyzer(rules, webAppThreshold), threads).analyze(apps) { report ->
+            BatchAnalyzer(ApkAnalyzer(rules, webAppThreshold, if (noSdks) null else SdkRules.builtIn), threads).analyze(apps) { report ->
                 writer.write(report)
                 if (!report.success) {
                     failures++

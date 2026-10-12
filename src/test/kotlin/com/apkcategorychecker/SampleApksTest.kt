@@ -3,6 +3,7 @@ package com.apkcategorychecker
 
 import com.apkcategorychecker.analyzer.ApkReport
 import com.apkcategorychecker.cli.run
+import com.apkcategorychecker.sdk.SdkFinding
 import kotlinx.serialization.json.Json
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
@@ -159,6 +160,7 @@ class SampleApksTest {
                 minSdkVersion = "10",
                 targetSdkVersion = "19",
                 fileSize = 8202108,
+                sdks = listOf(SdkFinding("Support Library", null, listOf("package android.support.v4"))),
             ),
             report,
         )
@@ -182,6 +184,7 @@ class SampleApksTest {
         targetSdkVersion: String,
         fileSize: Long,
         details: Map<String, Map<String, String>> = emptyMap(),
+        sdks: List<SdkFinding> = emptyList(),
     ) = ApkReport(
         file = actual.file,
         path = actual.path,
@@ -191,6 +194,7 @@ class SampleApksTest {
         baseFramework = baseFramework,
         evidence = evidence,
         details = details,
+        sdks = sdks,
         htmlFiles = htmlFiles,
         jsFiles = jsFiles,
         cssFiles = cssFiles,

@@ -6,6 +6,7 @@ import com.apkcategorychecker.framework.ApkInspection
 import com.apkcategorychecker.framework.Framework
 import com.apkcategorychecker.framework.Frameworks
 import com.apkcategorychecker.framework.Rules
+import com.apkcategorychecker.sdk.SdkRules
 import java.nio.file.Path
 import java.time.Instant
 import kotlin.io.path.name
@@ -15,6 +16,8 @@ class ApkAnalyzer(
     private val rules: Rules = Rules.builtIn,
     /** See [Frameworks.undefinedWebApp]. */
     webAppThreshold: Int = 0,
+    /** Null to skip the detection of SDKs. */
+    private val sdkRules: SdkRules? = SdkRules.builtIn,
 ) {
     private val frameworks: List<Framework> = listOf(Frameworks.undefinedWebApp(webAppThreshold)) + rules.frameworks
 
@@ -68,6 +71,7 @@ class ApkAnalyzer(
             baseFramework = main?.runsOn?.firstOrNull { name -> matched.keys.any { it.name == name } },
             evidence = matched.mapKeys { it.key.name },
             details = details(main, matched.keys, inspection),
+            sdks = sdkRules?.detect(inspection).orEmpty(),
             htmlFiles = inspection.countFiles(".html"),
             jsFiles = inspection.countFiles(".js"),
             cssFiles = inspection.countFiles(".css"),

@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/GabMar/ApkCategoryChecker/actions/workflows/ci.yml/badge.svg)](https://github.com/GabMar/ApkCategoryChecker/actions/workflows/ci.yml)
 
-A command-line tool that detects which framework was used to build Android apps: Flutter, React Native, Cordova, Capacitor/Ionic, PWAs, .NET MAUI, Unity and [more](#how-frameworks-are-recognized), or plain native.
+A command-line tool that detects which framework was used to build Android apps: Flutter, React Native, Cordova, Capacitor/Ionic, PWAs, .NET MAUI, Unity and [more](#how-frameworks-are-recognized), or plain native. It also lists the [SDKs and libraries](#sdks-and-libraries) an app includes, such as Firebase, Sentry or FFmpeg.
 
 APKs are read directly as zip archives (DEX class names, binary XML manifest and resources): nothing is decompiled or extracted to disk, so even large batches are analyzed in seconds. For every detected framework the tool reports the evidence it found.
 
@@ -37,6 +37,7 @@ Option | Description
 `--web-app-threshold N` | Report apps with at least N `.html`/`.js`/`.css` files and no other match as `Undefined_Web_App`. Default: disabled
 `--rules FILE` | Use the framework rules in `FILE` instead of the built-in ones
 `--print-rules` | Print the built-in framework rules, a starting point for `--rules`
+`--no-sdks` | Skip the detection of SDKs and libraries (faster)
 `-h`, `--help` | Show the help
 `-V`, `--version` | Show the version
 
@@ -69,6 +70,7 @@ Field | Description
 `baseFramework` | The runtime the main framework is built on, if detected (e.g. `Capacitor` for `Ionic`)
 `evidence` | For each detected framework, what was found in the APK. In CSV: `Ionic: assets/public/main.js contains "ion-app" \| Capacitor: ...`
 `details` | Facts about the detected frameworks, e.g. `{"React Native": {"engine": "Hermes", "architecture": "New"}}` (see [below](#how-frameworks-are-recognized)). In CSV: `React Native: engine=Hermes, architecture=New`
+`sdks` | SDKs and libraries found in the app (see [below](#sdks-and-libraries)), each with `name`, `team` and up to 5 `evidence` items. In CSV: the names, separated by `; `
 `htmlFiles`, `jsFiles`, `cssFiles` | Number of `.html`, `.js` and `.css` files in the APK
 `jsFileNames` | Names of the `.js` files in the APK
 `debuggable` | Value of `android:debuggable`
@@ -143,6 +145,18 @@ Besides the synthetic test cases, detection is checked on open source apps publi
 * **Unity, Unreal Engine, Cocos, Defold and Kony** are recognized by well-known native libraries and classes but have not been checked on real apps, as open source builds are hard to find.
 * **Versions** are only reported where the APK states them reliably. React Native, .NET, NativeScript and the others don't: for NativeScript, for instance, the only version-like string in its library is the compiler's.
 
+## SDKs and libraries
+
+Besides the framework, each app's SDKs and libraries are listed in `sdks`, using the rules of [LibChecker-Rules](https://github.com/LibChecker/LibChecker-Rules), the database of the [LibChecker](https://github.com/LibChecker/LibChecker) app (about 3,000 rules for 940 libraries). Rules match:
+
+* native libraries (`lib/<abi>/*.so`);
+* activities, services, receivers and providers declared in the manifest, and intent actions;
+* packages of the classes in the DEX files (LibChecker itself does not evaluate these rules: here a rule matches when a class is in that package or a subpackage).
+
+As in LibChecker, exact names are looked up first, then regular expressions in priority order. A few upstream rules attribute generic files to a single SDK (e.g. `libmain.so` to Unity, while SDL and python-for-android apps ship it too): they are excluded or relabelled, with the reason listed under `corrections` in [`libchecker-rules.json`](src/main/resources/sdks/libchecker-rules.json).
+
+The rules are bundled with the tool, generated from a pinned commit of LibChecker-Rules (Apache License 2.0, see [`LICENSE-LibChecker-Rules`](src/main/resources/sdks/LICENSE-LibChecker-Rules)). To update them, run `just update-sdk-rules` (or `./gradlew updateSdkRules -Pref=<branch, tag or commit>`) and check the result with `just corpus`.
+
 ## Building from source
 
 Requires JDK 21; Gradle downloads one automatically if missing. The common tasks are in the [Justfile](Justfile) (run `just` to list them):
@@ -155,6 +169,7 @@ just run path/to/app.apk    # build and analyze
 just docker-build           # build the Docker image
 just docker-run app.apk     # analyze APKs in the current directory with the image
 just corpus                 # check the detection on real apps (downloads ~1 GB)
+just update-sdk-rules       # regenerate the SDK rules from LibChecker-Rules
 ```
 
 Without `just`, use Gradle directly: `./gradlew build`, `./gradlew shadowJar`.
@@ -165,4 +180,4 @@ To publish a release, run `just release 2.1.0` from an up-to-date `master`: it t
 
 [MIT](LICENSE) © [Gabriele Martini](https://github.com/GabMar)
 
-Built with [ARSCLib](https://github.com/REAndroid/ARSCLib) (binary XML and resources), [picocli](https://picocli.info/), [Apache Commons CSV](https://commons.apache.org/proper/commons-csv/) and [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
+SDK rules from [LibChecker-Rules](https://github.com/LibChecker/LibChecker-Rules) (Apache License 2.0). Built with [ARSCLib](https://github.com/REAndroid/ARSCLib) (binary XML and resources), [picocli](https://picocli.info/), [Apache Commons CSV](https://commons.apache.org/proper/commons-csv/) and [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
