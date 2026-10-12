@@ -1,1 +1,0 @@
-java -jar ApkCategoryChecker.jar -p . -csv .
