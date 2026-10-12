@@ -83,6 +83,7 @@ public class WriterCSV implements Writer {
                 resultData.add(String.valueOf(_resultElement.get_startAnalysis()));
                 resultData.add(String.valueOf(_resultElement.get_durationAnalysis()));
                 resultData.add(String.valueOf(_resultElement.get_decodeSuccess()));
+                resultData.add(_resultElement.get_evidence());
                 printer.printRecord(resultData);
             }
             
@@ -128,7 +129,8 @@ public class WriterCSV implements Writer {
             					"File_Size(Bytes)",
             					"Start_Analysis_Time(milliseconds)",
             					"Duration_Analysis_Time(milliseconds)",
-            					"Decode_Success");
+            					"Decode_Success",
+            					"Evidence");
         } catch (IOException ex) {
             Logger.getLogger(WriterCSV.class.getName()).log(Level.SEVERE, null, ex);
         }

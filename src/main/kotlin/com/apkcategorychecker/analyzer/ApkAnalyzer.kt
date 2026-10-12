@@ -27,8 +27,9 @@ class ApkAnalyzer(private val frameworks: List<Framework> = Frameworks.all()) {
 
     private fun analyze(path: Path, inspection: ApkInspection, startTime: Long): ApkAnalysis {
         val manifest = inspection.apk.manifest
-        val matched = frameworks.filter { it.matches(inspection) }
-        val main = matched.lastOrNull()
+        val matched = frameworks.mapNotNull { framework -> framework.detect(inspection)?.let { framework to it } }.toMap()
+        val main = matched.keys.lastOrNull()
+        val base = main?.runsOn?.firstOrNull { it in matched }
         val packageName = manifest.packageName.orEmpty()
 
         val result = AnalyzerResult().apply {
@@ -36,7 +37,7 @@ class ApkAnalyzer(private val frameworks: List<Framework> = Frameworks.all()) {
             set_APKPath(path.toString())
             set_APKName(path.name)
             set_APKMainFramework(main?.name ?: NATIVE)
-            set_APKBaseFramework(if (Frameworks.CORDOVA in matched && main != Frameworks.CORDOVA) Frameworks.CORDOVA.name else "")
+            set_APKBaseFramework(base?.name.orEmpty())
             set_html(inspection.countFiles(".html"))
             set_js(inspection.countFiles(".js"))
             set_css(inspection.countFiles(".css"))
@@ -49,6 +50,7 @@ class ApkAnalyzer(private val frameworks: List<Framework> = Frameworks.all()) {
             set_startAnalysis(startTime)
             set_durationAnalysis(System.currentTimeMillis() - startTime)
             set_decodeSuccess(0)
+            set_evidence(matched.entries.joinToString(" | ") { (framework, evidence) -> "${framework.name}: ${evidence.joinToString(", ")}" })
         }
         val jsFiles = inspection.apk.entryNames
             .filter { it.endsWith(".js", ignoreCase = true) }

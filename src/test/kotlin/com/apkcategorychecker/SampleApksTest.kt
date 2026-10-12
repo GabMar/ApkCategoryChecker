@@ -58,6 +58,7 @@ class SampleApksTest {
             permissions = "android.permission.INTERNET",
             minSdk = "10", targetSdk = "19",
             fileSize = 1915225,
+            evidence = CORDOVA_EVIDENCE,
         )
         assertEquals("index.js, cordova.js, cordova_plugins.js", jsFiles["com.example.hello"])
     }
@@ -74,6 +75,8 @@ class SampleApksTest {
             permissions = "android.permission.INTERNET",
             minSdk = "10", targetSdk = "17",
             fileSize = 716499,
+            evidence = "$CORDOVA_EVIDENCE | Sencha: assets/www/app.js contains \"Ext.create\", " +
+                "assets/www/app.js contains \"Ext.application\"",
         )
         assertEquals("index.js, app.js, cordova.js, cordova_plugins.js", jsFiles["com.mydomain.sentoco"])
     }
@@ -93,6 +96,7 @@ class SampleApksTest {
             ).joinToString(", ") { "android.permission.$it" },
             minSdk = "10", targetSdk = "19",
             fileSize = 8202108,
+            evidence = "Titanium: class ti.modules.titanium.TitaniumModule, class org.appcelerator.titanium.TiActivity",
         )
         assertEquals(
             "AddWindow.js, AppTabGroup.js, ListWindow.js, app.js, db.js, binding.js, binding.min.js, " +
@@ -114,6 +118,7 @@ class SampleApksTest {
         minSdk: String,
         targetSdk: String,
         fileSize: Long,
+        evidence: String,
     ) {
         assertEquals(pkg, row["APK_Package"])
         assertEquals(mainFramework, row["Main_Framework"])
@@ -128,6 +133,12 @@ class SampleApksTest {
         assertEquals(targetSdk, row["Android_TargetSdkVersion"])
         assertEquals(fileSize.toString(), row["File_Size(Bytes)"])
         assertEquals("0", row["Decode_Success"])
+        assertEquals(evidence, row["Evidence"])
+    }
+
+    private companion object {
+        const val CORDOVA_EVIDENCE =
+            "Apache Cordova: class org.apache.cordova.CordovaActivity, res/xml/config.xml contains \"org.apache.cordova\""
     }
 
     private fun parse(csv: Path): List<CSVRecord> =

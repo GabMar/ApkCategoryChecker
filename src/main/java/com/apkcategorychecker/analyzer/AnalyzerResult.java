@@ -118,6 +118,11 @@ public class AnalyzerResult {
 	 * Decode success flag
 	 */
 	private int _decodeSuccess;
+	
+	/**
+	 * What was found in the APK for each detected framework
+	 */
+	private String _evidence = "";
 
 
 	/*--Methods--*/
@@ -315,6 +320,10 @@ public class AnalyzerResult {
 	public int get_decodeSuccess(){
 		return this._decodeSuccess;
 	}
+	
+	public String get_evidence(){
+		return this._evidence;
+	}
 
 	/**
 	 *
@@ -462,5 +471,9 @@ public class AnalyzerResult {
 	 */
 	public void set_decodeSuccess(int _flag){
 		this._decodeSuccess = _flag;
+	}
+	
+	public void set_evidence(String evidence){
+		this._evidence = evidence;
 	}
 }
