@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 package com.apkcategorychecker.apk
 
+import com.reandroid.apk.ApkModule
 import java.io.Closeable
 import java.io.IOException
 import java.nio.file.Path
-import java.util.zip.ZipException
-import java.util.zip.ZipFile
 
 class ApkFormatException(
     message: String,
@@ -13,29 +12,32 @@ class ApkFormatException(
 ) : IOException(message, cause)
 
 /**
- * Read-only view of an APK, read directly from the zip archive: nothing is extracted to disk.
- * Everything is parsed lazily, on first access.
+ * Read-only view of an APK, read directly from the archive: nothing is extracted to disk.
+ * ARSCLib reads the archive, the binary XML and the resource table. Everything is parsed
+ * lazily, on first access.
  */
 class ApkFile(
     val path: Path,
 ) : Closeable {
-    private val zip =
+    private val module =
         try {
-            ZipFile(path.toFile())
-        } catch (e: ZipException) {
-            throw ApkFormatException("not a valid zip archive: $path", e)
+            ApkModule.loadApkFile(path.toFile())
+        } catch (e: IOException) {
+            throw ApkFormatException("not a valid APK: ${e.message}", e)
         }
 
-    /** Paths of all the files in the archive, e.g. `assets/www/index.html`. */
+    /** Paths of all the files in the archive, in archive order, e.g. `assets/www/index.html`. */
     val entryNames: List<String> =
-        zip
-            .entries()
-            .asSequence()
-            .filterNot { it.isDirectory }
-            .map { it.name }
-            .toList()
+        module.zipEntryMap
+            .listInputSources()
+            .map { it.alias }
+            .filterNot { it.endsWith("/") }
 
-    fun read(name: String): ByteArray? = zip.getEntry(name)?.let { entry -> zip.getInputStream(entry).use { it.readAllBytes() } }
+    fun read(name: String): ByteArray? =
+        module.zipEntryMap
+            .getInputSource(name)
+            ?.openStream()
+            ?.use { it.readAllBytes() }
 
     fun readText(name: String): String? = read(name)?.toString(Charsets.UTF_8)
 
@@ -46,7 +48,26 @@ class ApkFile(
         AndroidManifest(readBinaryXml(MANIFEST) ?: throw ApkFormatException("missing $MANIFEST"))
     }
 
-    /** Fully qualified names of all the classes in the APK's DEX files (multidex included). */
+    /**
+     * The file of a resource according to `resources.arsc`, e.g. `res/xml/config.xml` for
+     * `xml/config`. Release builds may shorten resource paths (to something like `res/ZW.xml`).
+     */
+    fun resourceFile(
+        type: String,
+        name: String,
+    ): String? =
+        synchronized(stringPoolLock) {
+            runCatching {
+                if (!module.hasTableBlock()) return null
+                module.tableBlock.listPackages().firstNotNullOfOrNull { it.getResource(type, name)?.get()?.valueAsString }
+            }.getOrNull() // the resource table is a best-effort hint: a broken one must not fail the analysis
+        }
+
+    /**
+     * Fully qualified names of all the classes in the APK's DEX files (multidex included).
+     * Read with [DexReader] rather than ARSCLib, which builds a full model of every DEX:
+     * several times slower and needing ~10x the memory.
+     */
     val classNames: Set<String> by lazy {
         entryNames.filter { DEX_FILE.matches(it) }.flatMapTo(HashSet()) { DexReader.classNames(read(it)!!) }
     }
@@ -56,7 +77,7 @@ class ApkFile(
     /** True if a class with this simple name (e.g. `CordovaActivity`) exists in any package. */
     fun hasClassNamed(simpleName: String): Boolean = simpleName in simpleClassNames
 
-    override fun close() = zip.close()
+    override fun close() = module.close()
 
     private companion object {
         const val MANIFEST = "AndroidManifest.xml"

@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.arsclib)
     implementation(libs.picocli)
     implementation(libs.commons.csv)
     implementation(libs.kotlinx.serialization.json)

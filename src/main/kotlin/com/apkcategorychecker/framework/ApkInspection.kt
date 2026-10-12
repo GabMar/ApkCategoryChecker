@@ -11,9 +11,12 @@ class ApkInspection(
 ) {
     val entries: Set<String> by lazy { apk.entryNames.toHashSet() }
 
-    /** Cordova's `res/xml/config.xml` as text, or "" if absent. */
+    /** Where Cordova's `config.xml` is: looked up in the resource table, as release builds may rename it. */
+    val configXmlPath: String by lazy { apk.resourceFile("xml", "config") ?: CONFIG_XML }
+
+    /** Cordova's `config.xml` as text, or "" if absent. */
     val configXml: String by lazy {
-        val bytes = apk.read(CONFIG_XML) ?: return@lazy ""
+        val bytes = apk.read(configXmlPath) ?: return@lazy ""
         try {
             BinaryXml.parse(bytes).toXml()
         } catch (e: ApkFormatException) {

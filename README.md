@@ -77,7 +77,7 @@ When more than one framework matches, the most specific one is reported as `Main
 
 Framework | Signals | Base framework
 ----------|---------|---------------
-[Apache Cordova](https://cordova.apache.org/) | class `CordovaActivity` **and** either "org.apache.cordova" in `res/xml/config.xml` or `assets/www/cordova.js` |
+[Apache Cordova](https://cordova.apache.org/) | class `CordovaActivity` **and** either "org.apache.cordova" in `config.xml` or `assets/www/cordova.js` |
 [Capacitor](https://capacitorjs.com/) | classes in `com.getcapacitor`, `assets/capacitor.config.json` |
 [React Native](https://reactnative.dev/) | `libreactnativejni.so` (up to 0.75), `libreactnative.so` (0.76+), `assets/index.android.bundle`, classes in `com.facebook.react` |
 [.NET for Android](https://learn.microsoft.com/dotnet/android/) (formerly Xamarin.Android) | `libmonodroid.so`, classes in `mono.android` |
@@ -98,7 +98,7 @@ Framework | Signals | Base framework
 [Xamarin.Forms](https://dotnet.microsoft.com/apps/xamarin/xamarin-forms) | classes `FormsAppCompatActivity`, `FormsApplicationActivity` | .NET for Android
 [.NET MAUI](https://dotnet.microsoft.com/apps/maui) | class `MauiAppCompatActivity`, classes in `com.microsoft.maui` | .NET for Android
 
-Web assets are the files under `assets/www/` (Cordova) and `assets/public/` (Capacitor). With `--web-app-threshold N`, an app with at least N `.html`, `.js` and `.css` files and no other match is reported as `Undefined_Web_App`. An app matching none of the above is reported as `Native`.
+`config.xml` is located through the resource table (`resources.arsc`), as release builds may rename it (e.g. to `res/ZW.xml`). Web assets are the files under `assets/www/` (Cordova) and `assets/public/` (Capacitor). With `--web-app-threshold N`, an app with at least N `.html`, `.js` and `.css` files and no other match is reported as `Undefined_Web_App`. An app matching none of the above is reported as `Native`.
 
 ### Accuracy
 
@@ -128,4 +128,4 @@ To publish a release, run `just release 2.1.0` from an up-to-date `master`: it t
 
 [MIT](LICENSE) © [Gabriele Martini](https://github.com/GabMar)
 
-Built with [picocli](https://picocli.info/), [Apache Commons CSV](https://commons.apache.org/proper/commons-csv/) and [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
+Built with [ARSCLib](https://github.com/REAndroid/ARSCLib) (binary XML and resources), [picocli](https://picocli.info/), [Apache Commons CSV](https://commons.apache.org/proper/commons-csv/) and [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).

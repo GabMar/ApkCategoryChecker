@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: MIT
 package com.apkcategorychecker.apk
 
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
+import com.reandroid.arsc.chunk.TableBlock
+import com.reandroid.arsc.chunk.xml.AndroidManifestBlock
+import com.reandroid.dex.key.TypeKey
+import com.reandroid.dex.model.DexFile
 import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.outputStream
 
 /**
- * Builds a minimal synthetic APK: a binary manifest, a DEX defining [classes] (fully
- * qualified names) and the given extra files.
+ * Builds a minimal synthetic APK with ARSCLib: a binary manifest declaring [activities], a DEX
+ * defining [classes] (fully qualified names) and the given extra [files]. [resources] maps
+ * `type/name` to a file path, written to `resources.arsc` (e.g. `xml/config` -> `res/ZW.xml`).
  */
 internal fun syntheticApk(
     file: Path,
@@ -18,20 +21,16 @@ internal fun syntheticApk(
     classes: List<String> = emptyList(),
     packageName: String = "com.example.app",
     activities: List<String> = emptyList(),
+    resources: Map<String, String> = emptyMap(),
+    dex: ByteArray = dex(classes),
 ): Path {
     val manifest =
-        AxmlWriter(utf8 = true)
-            .apply {
-                namespace("android", BinaryXml.ANDROID_NS)
-                start("manifest", Attr(null, "package", string = packageName))
-                start("application")
-                for (activity in activities) {
-                    start("activity", Attr(BinaryXml.ANDROID_NS, "name", string = activity))
-                    end("activity")
-                }
-                end("application")
-                end("manifest")
-            }.toByteArray()
+        AndroidManifestBlock().apply {
+            setPackageName(packageName)
+            getOrCreateApplicationElement()
+            activities.forEach { getOrCreateActivity(it, false) }
+            refresh()
+        }
 
     ZipOutputStream(file.outputStream()).use { zip ->
         fun add(
@@ -42,35 +41,32 @@ internal fun syntheticApk(
             zip.write(bytes)
             zip.closeEntry()
         }
-        add("AndroidManifest.xml", manifest)
-        add("classes.dex", dex(classes))
+        add("AndroidManifest.xml", manifest.bytes)
+        add("classes.dex", dex)
+        if (resources.isNotEmpty()) add("resources.arsc", resourceTable(packageName, resources))
         files.forEach { (name, content) -> add(name, content.toByteArray()) }
     }
     return file
 }
 
-/** Just enough of a DEX file for [DexReader]: string ids, type ids and class defs. */
 internal fun dex(classes: List<String>): ByteArray {
-    val n = classes.size
-    val stringIdsOff = 0x70
-    val typeIdsOff = stringIdsOff + 4 * n
-    val classDefsOff = typeIdsOff + 4 * n
-    var stringDataOff = classDefsOff + 32 * n
-    val descriptors = classes.map { "L" + it.replace('.', '/') + ";" }
+    val dex = DexFile.createDefault()
+    val layout = dex.iterator().next()
+    classes.forEach { layout.getOrCreateClass(TypeKey.create("L" + it.replace('.', '/') + ";")) }
+    dex.refresh()
+    return dex.bytes
+}
 
-    val buf = ByteBuffer.allocate(stringDataOff + descriptors.sumOf { it.length + 3 }).order(ByteOrder.LITTLE_ENDIAN)
-    buf.put("dex\n035\u0000".toByteArray())
-    buf.putInt(0x38, n).putInt(0x3C, stringIdsOff)
-    buf.putInt(0x40, n).putInt(0x44, typeIdsOff)
-    buf.putInt(0x60, n).putInt(0x64, classDefsOff)
-    descriptors.forEachIndexed { i, descriptor ->
-        buf.putInt(stringIdsOff + 4 * i, stringDataOff)
-        buf.putInt(typeIdsOff + 4 * i, i)
-        buf.putInt(classDefsOff + 32 * i, i)
-        buf.position(stringDataOff)
-        buf.put(descriptor.length.toByte()) // ULEB128, fine for names shorter than 128
-        buf.put(descriptor.toByteArray()).put(0)
-        stringDataOff = buf.position()
+private fun resourceTable(
+    packageName: String,
+    resources: Map<String, String>,
+): ByteArray {
+    val table = TableBlock()
+    val pkg = table.newPackage(0x7f, packageName)
+    resources.forEach { (resource, path) ->
+        val (type, name) = resource.split('/')
+        pkg.getOrCreate("", type, name).setValueAsString(path)
     }
-    return buf.array()
+    table.refresh()
+    return table.bytes
 }

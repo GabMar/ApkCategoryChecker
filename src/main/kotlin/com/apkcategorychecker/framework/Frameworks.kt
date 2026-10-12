@@ -10,14 +10,13 @@ class Framework(
     val runsOn: List<Framework> = emptyList(),
 ) {
     /** The evidence found in the APK, or null if the framework is not detected. */
-    fun detect(apk: ApkInspection): List<String>? {
-        val found = signals.map { it.find(apk) }
-        return if (requireAll) {
-            found.takeIf { results -> results.all { it != null } }?.filterNotNull()
+    fun detect(apk: ApkInspection): List<String>? =
+        if (requireAll) {
+            // Stop at the first missing signal: the next ones may be expensive (e.g. the resource table).
+            signals.map { it.find(apk) ?: return null }
         } else {
-            found.filterNotNull().ifEmpty { null }
+            signals.mapNotNull { it.find(apk) }.ifEmpty { null }
         }
-    }
 
     override fun toString() = name
 }

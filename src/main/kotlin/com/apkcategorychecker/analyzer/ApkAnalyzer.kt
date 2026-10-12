@@ -22,8 +22,11 @@ class ApkAnalyzer(
 
         return try {
             ApkFile(path).use { analyze(path, ApkInspection(it), start, ::elapsedMs) }
-        } catch (e: Exception) {
-            // One broken APK must not stop the analysis of a whole directory.
+        } catch (e: Throwable) {
+            // One broken APK must not stop the analysis of a whole directory: that includes a huge
+            // APK running out of memory, or deeply nested XML overflowing the stack. Other errors
+            // (e.g. a missing class) are bugs and must surface.
+            if (e !is Exception && e !is OutOfMemoryError && e !is StackOverflowError) throw e
             ApkReport(
                 file = path.name,
                 path = path.toString(),

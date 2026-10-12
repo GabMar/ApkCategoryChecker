@@ -79,10 +79,49 @@ class ApkFileTest {
         assertThrows<ApkFormatException> { ApkFile(notAnApk) }
     }
 
+    /** A DEX header declaring 127 classes, with nothing after it. */
+    private val truncatedDex = "dex\n035\u0000".toByteArray() + ByteArray(0x68).also { it[0x58] = 0x7F }
+
     @Test
-    fun `rejects corrupted dex files`() {
-        assertThrows<ApkFormatException> { DexReader.classNames(ByteArray(0x70)) }
-        val truncated = "dex\n035\u0000".toByteArray() + ByteArray(0x68).also { it[0x58] = 0x7F }
-        assertThrows<ApkFormatException> { DexReader.classNames(truncated) }
+    fun `rejects corrupted dex files`(
+        @TempDir dir: Path,
+    ) {
+        val apk = syntheticApk(dir.resolve("bad-dex.apk"), dex = truncatedDex)
+        ApkFile(apk).use { assertThrows<ApkFormatException> { it.classNames } }
+    }
+
+    @Test
+    fun `finds resource files through resources arsc`(
+        @TempDir dir: Path,
+    ) {
+        val apk = syntheticApk(dir.resolve("shortened.apk"), resources = mapOf("xml/config" to "res/ZW.xml"))
+        ApkFile(apk).use {
+            assertEquals("res/ZW.xml", it.resourceFile("xml", "config"))
+            assertNull(it.resourceFile("xml", "missing"))
+        }
+        sample("cordova/HelloWorld.apk").use { assertEquals("res/xml/config.xml", it.resourceFile("xml", "config")) }
+    }
+
+    @Test
+    fun `reads manifests and classes of synthetic apks`(
+        @TempDir dir: Path,
+    ) {
+        val apk =
+            syntheticApk(
+                dir.resolve("app.apk"),
+                classes = listOf("com.example.app.MainActivity", "io.flutter.embedding.engine.FlutterEngine"),
+                activities = listOf("com.example.app.MainActivity"),
+            )
+        ApkFile(apk).use {
+            assertEquals("com.example.app", it.manifest.packageName)
+            assertEquals(
+                listOf("com.example.app.MainActivity"),
+                it.manifest.root
+                    .findAll("activity")
+                    .map { a -> a.attributes["android:name"] }
+                    .toList(),
+            )
+            assertEquals(setOf("com.example.app.MainActivity", "io.flutter.embedding.engine.FlutterEngine"), it.classNames)
+        }
     }
 }

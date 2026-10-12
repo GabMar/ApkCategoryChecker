@@ -39,7 +39,7 @@ fun fileUnder(dir: String) =
 
 fun configXmlContains(text: String) =
     Signal { apk ->
-        if (text in apk.configXml) "res/xml/config.xml contains \"$text\"" else null
+        if (text in apk.configXml) "${apk.configXmlPath} contains \"$text\"" else null
     }
 
 fun manifestContains(text: String) =
