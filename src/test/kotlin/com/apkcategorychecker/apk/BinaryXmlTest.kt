@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 package com.apkcategorychecker.apk
 
 import org.junit.jupiter.api.Assertions.assertEquals

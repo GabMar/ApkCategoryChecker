@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MIT
 package com.apkcategorychecker.analyzer
 
 import java.nio.file.Path

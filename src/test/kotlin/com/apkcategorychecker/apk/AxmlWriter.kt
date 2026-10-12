@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 package com.apkcategorychecker.apk
 
 import java.io.ByteArrayOutputStream

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 package com.apkcategorychecker.cli
 
 import com.apkcategorychecker.apk.syntheticApk

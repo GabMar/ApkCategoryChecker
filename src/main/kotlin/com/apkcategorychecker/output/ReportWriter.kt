@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MIT
 package com.apkcategorychecker.output
 
 import com.apkcategorychecker.analyzer.ApkReport

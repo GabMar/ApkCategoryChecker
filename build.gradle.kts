@@ -6,7 +6,8 @@ plugins {
 }
 
 group = "com.apkcategorychecker"
-version = "2.0.0-SNAPSHOT"
+// Release builds pass -PreleaseVersion=x.y.z (see .github/workflows/release.yml).
+version = providers.gradleProperty("releaseVersion").getOrElse("2.0.0-SNAPSHOT")
 
 kotlin {
     jvmToolchain(21)

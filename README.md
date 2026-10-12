@@ -1,14 +1,20 @@
-# APK CATEGORY CHECKER #
+# ApkCategoryChecker
 
-Author: [Gabriele Martini](https://github.com/GabMar)
+[![CI](https://github.com/GabMar/ApkCategoryChecker/actions/workflows/ci.yml/badge.svg)](https://github.com/GabMar/ApkCategoryChecker/actions/workflows/ci.yml)
 
-## DESCRIPTION ##
+A command-line tool that detects which framework was used to build Android apps: Flutter, React Native, Cordova, Capacitor/Ionic, .NET MAUI, Unity and [more](#how-frameworks-are-recognized), or plain native.
 
-A Command-Line Program written in [Kotlin](https://kotlinlang.org/) to check what Framework has been used to build an APK file, or each APK in a directory. APKs are read directly as zip archives (DEX class names, binary XML manifest and resources): nothing is decompiled or extracted to disk.
+APKs are read directly as zip archives (DEX class names, binary XML manifest and resources): nothing is decompiled or extracted to disk, so even large batches are analyzed in seconds. For every detected framework the tool reports the evidence it found.
 
-## USAGE ##
+## Installation
 
-	java -jar ApkCategoryChecker.jar [OPTIONS] PATH...
+Download `ApkCategoryChecker.jar` from the [latest release](https://github.com/GabMar/ApkCategoryChecker/releases/latest). It requires Java 21 or later.
+
+## Usage
+
+```sh
+java -jar ApkCategoryChecker.jar [OPTIONS] PATH...
+```
 
 Each `PATH` is an APK file or a directory, searched recursively for `.apk` files. Results go to standard output (or to `--output`), progress and errors to standard error.
 
@@ -23,18 +29,20 @@ Option | Description
 
 Examples:
 
-	# Analyze a single APK, print CSV
-	java -jar ApkCategoryChecker.jar app.apk
+```sh
+# Analyze a single APK, print CSV
+java -jar ApkCategoryChecker.jar app.apk
 
-	# Analyze a directory tree, write JSON
-	java -jar ApkCategoryChecker.jar ~/apks -o results.json
+# Analyze a directory tree, write JSON
+java -jar ApkCategoryChecker.jar ~/apks -o results.json
 
-	# Stream one JSON object per APK into jq
-	java -jar ApkCategoryChecker.jar ~/apks -f jsonl | jq -r 'select(.mainFramework == "Flutter") | .packageName'
+# Stream one JSON object per APK into jq
+java -jar ApkCategoryChecker.jar ~/apks -f jsonl | jq -r 'select(.mainFramework == "Flutter") | .packageName'
+```
 
 The exit code is 0 even when some APKs cannot be analyzed: they are reported with an `error`. It is 2 for invalid arguments (e.g. a missing path).
 
-## RESULT FORMAT ##
+## Result format
 
 APKs are reported in path order. JSON fields are camelCase (`mainFramework`); CSV columns are snake_case (`main_framework`), with lists separated by `; ` and RFC 4180 quoting. Unknown values are `null` in JSON and empty in CSV.
 
@@ -55,7 +63,7 @@ Field | Description
 `analysisDurationMs` | How long the analysis of the APK took
 `success` (CSV only), `error` | Whether the APK could be analyzed, and if not why
 
-## RECOGNITION FRAMEWORKS METHODS ##
+## How frameworks are recognized
 
 Each framework is recognised by a set of signals: native libraries (in any `lib/<abi>/` directory), classes in the DEX files, files in the archive or text in the web assets. Unless noted, any one signal is enough; where possible both native libraries and classes are checked, because split APKs from App Bundles keep the native libraries in a separate per-ABI APK.
 
@@ -85,20 +93,24 @@ Framework | Signals | Base framework
 
 Web assets are the files under `assets/www/` (Cordova) and `assets/public/` (Capacitor). With `--web-app-threshold N`, an app with at least N `.html`, `.js` and `.css` files and no other match is reported as `Undefined_Web_App`. An app matching none of the above is reported as `Native`.
 
-## BUILD ##
+## Building from source
 
-Requires JDK 21 (Gradle will download one automatically if missing).
+Requires JDK 21; Gradle downloads one automatically if missing.
 
-	./gradlew shadowJar
+```sh
+./gradlew build                     # compile and run the tests
+./gradlew shadowJar                 # runnable jar in build/libs/ApkCategoryChecker.jar
+./gradlew run --args="path/to/app.apk -f json"
+```
 
-The runnable jar is written to `build/libs/ApkCategoryChecker.jar`.
+To publish a release, push a tag: the [release workflow](.github/workflows/release.yml) builds the jar with the tag's version and attaches it to a GitHub release.
 
-## MINIMUM REQUIREMENTS ##
+```sh
+git tag v2.0.0 && git push origin v2.0.0
+```
 
-This software requires Java 21 or higher
+## License
 
-## THIRD-PARTY LIBRARIES ##
+[MIT](LICENSE) © [Gabriele Martini](https://github.com/GabMar)
 
-* [picocli](https://picocli.info/)
-* [Apache Commons CSV](https://commons.apache.org/proper/commons-csv/)
-* [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
+Built with [picocli](https://picocli.info/), [Apache Commons CSV](https://commons.apache.org/proper/commons-csv/) and [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).

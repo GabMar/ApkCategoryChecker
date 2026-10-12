@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MIT
 package com.apkcategorychecker.framework
 
 /** Something that can be found in an APK: returns a human-readable evidence, or null if absent. */
