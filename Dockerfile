@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # The jar is platform independent: build it once on the build machine's platform.
-FROM --platform=$BUILDPLATFORM eclipse-temurin:21-jdk AS build
+FROM --platform=$BUILDPLATFORM eclipse-temurin:25-jdk AS build
 WORKDIR /src
 
 # Download Gradle and the dependencies in a layer of their own.
@@ -14,7 +14,7 @@ ARG VERSION=2.0.0-SNAPSHOT
 RUN --mount=type=cache,target=/root/.gradle ./gradlew --no-daemon --quiet shadowJar -PreleaseVersion="$VERSION"
 
 
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 LABEL org.opencontainers.image.title="ApkCategoryChecker" \
       org.opencontainers.image.description="Detects the framework used to build Android APKs" \
